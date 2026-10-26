@@ -9,7 +9,6 @@ import {
   Res,
   UseGuards,
 } from "@nestjs/common";
-import { AuthGuard } from "@nestjs/passport";
 import { ConfigService } from "@nestjs/config";
 import { Throttle } from "@nestjs/throttler";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -17,7 +16,6 @@ import type { Request, Response } from "express";
 
 import { CreateUserUseCase } from "@application/use-cases/users/create-user.use-case";
 import { VerifyOtpUseCase } from "@application/use-cases/auth/verify-otp.use-case";
-import { GoogleAuthUseCase } from "@application/use-cases/auth/google-auth.use-case";
 import { LoginWithPasswordUseCase } from "@application/use-cases/auth/login-with-password.use-case";
 import { LoginWithOtpUseCase } from "@application/use-cases/auth/login-with-otp.use-case";
 import { OtpService } from "@application/interfaces/otp.service.interface";
@@ -47,7 +45,6 @@ export class AuthController {
     private readonly configService: ConfigService<EnvironmentConfig>,
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly verifyOtpUseCase: VerifyOtpUseCase,
-    private readonly googleAuthUseCase: GoogleAuthUseCase,
     private readonly loginWithPasswordUseCase: LoginWithPasswordUseCase,
     private readonly loginWithOtpUseCase: LoginWithOtpUseCase,
     private readonly otpService: OtpService,
@@ -158,38 +155,6 @@ export class AuthController {
     return {
       message: "Logged in",
     };
-  }
-
-  @Get("google")
-  @ApiOperation({
-    summary: "Start Google OAuth login/signup flow",
-  })
-  @UseGuards(AuthGuard("google"))
-  googleAuth() {
-    // Passport redirects the user to Google.
-  }
-
-  @Get("google/callback")
-  @ApiOperation({
-    summary: "Google OAuth callback — sets session cookie",
-  })
-  @UseGuards(AuthGuard("google"))
-  async googleAuthCallback(@Req() req: Request, @Res() res: Response) {
-    const { email, googleId } = req.user as {
-      email: string;
-      googleId: string;
-    };
-
-    const user = await this.googleAuthUseCase.execute({
-      email,
-      googleId,
-    });
-
-    await this.establishSession(req, user.id);
-
-    res.redirect(
-      this.configService.get("FRONTEND_URL", "http://localhost:3000"),
-    );
   }
 
   @Post("change-password")
