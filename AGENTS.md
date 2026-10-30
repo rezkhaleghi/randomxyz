@@ -1,8 +1,8 @@
-# NestStarter — Project Rules for AI Agents
+# TmarCert — Project Rules for AI Agents
 
 ## Project Purpose
 
-NestStarter is a reusable NestJS backend boilerplate. Developers clone it, customize its domain and features, and turn it into their own backend application.
+TmarCert is a reusable NestJS backend boilerplate. Developers clone it, customize its domain and features, and turn it into their own backend application.
 
 It is not a finished production application, and it does not manage a production database or production data.
 
@@ -18,7 +18,7 @@ It is not a finished production application, and it does not manage a production
 
 ### Important distinction
 
-The starter's default configuration is for development and local experimentation. When a developer customizes the project for a production application containing persistent data, they are responsible for choosing and configuring an appropriate schema-evolution strategy. Migrations may be introduced at that stage, but they are not a default requirement of NestStarter.
+The starter's default configuration is for development and local experimentation. When a developer customizes the project for a production application containing persistent data, they are responsible for choosing and configuring an appropriate schema-evolution strategy. Migrations may be introduced at that stage, but they are not a default requirement of TmarCert.
 
 ## Production Templates
 
