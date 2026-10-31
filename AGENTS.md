@@ -1,11 +1,5 @@
 # TmarCert — Project Rules for AI Agents
 
-## Project Purpose
-
-TmarCert is a reusable NestJS backend boilerplate. Developers clone it, customize its domain and features, and turn it into their own backend application.
-
-It is not a finished production application, and it does not manage a production database or production data.
-
 ## Database and Schema Policy
 
 - Keep TypeORM `synchronize: true` as the default for the starter's development workflow.
