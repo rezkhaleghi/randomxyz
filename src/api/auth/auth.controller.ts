@@ -12,17 +12,11 @@ import {
 import { ConfigService } from "@nestjs/config";
 import { Throttle } from "@nestjs/throttler";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import type { Request, Response } from "express";
 
 import { OtpService } from "@application/interfaces/otp.service.interface";
 
 import { AuthSessionGuard } from "./auth-session.guard";
-import { AuthenticatedUserResponseDto } from "./dtos/authenticated-user.response.dto";
 import { RequestOtpDto } from "./dtos/request-otp.dto";
-import { SignUpDto } from "./dtos/sign-up.dto";
-import { LoginPasswordDto } from "./dtos/login-password.dto";
-import { LoginOtpDto } from "./dtos/login-otp.dto";
-import { UpdatePasswordDto } from "./dtos/update-password.dto";
 import { EnvironmentConfig } from "@infrastructure/config/environment.config";
 
 /**
