@@ -81,6 +81,9 @@ import { PageRepositoryImpl } from "./database/repositories/page.repository.impl
 import { HtmlSanitizer } from "@application/interfaces/html-sanitizer.interface";
 import { HtmlSanitizerService } from "./services/html-sanitizer.service";
 import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
+
+import { TmarJwtService } from "./services/tmar-jwt.service";
+
 /**
  * Infrastructure composition root.
  *
@@ -193,16 +196,19 @@ import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
         SMTP_FROM: Joi.string().email().required(),
 
         // -------------------------------------------------------------------
-        // Sessions
+        // Sessions (temporarily retained during migration)
         // -------------------------------------------------------------------
 
         SESSION_SECRET: Joi.string().min(32).required(),
 
         // -------------------------------------------------------------------
-        // Initial administrator
-        //
-        // Empty values are intentionally allowed because seeding an initial
-        // admin is optional during development.
+        // Tmar authentication
+        // -------------------------------------------------------------------
+
+        TMAR_JWT_SECRET: Joi.string().min(32).required(),
+
+        // -------------------------------------------------------------------
+        // Initial administrator (temporarily retained)
         // -------------------------------------------------------------------
 
         INITIAL_ADMIN_EMAIL: Joi.string().email().allow("").default(""),
@@ -317,6 +323,8 @@ import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
 
     SeedAdminService,
 
+    TmarJwtService,
+
     MinioService,
 
     {
@@ -416,6 +424,7 @@ import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
       provide: PageRepository,
       useClass: PageRepositoryImpl,
     },
+
     {
       provide: HtmlSanitizer,
       useClass: HtmlSanitizerService,
@@ -444,6 +453,7 @@ import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
     NotificationRepository,
     PageRepository,
     HtmlSanitizer,
+    TmarJwtService,
   ],
 })
 export class InfrastructureModule {}

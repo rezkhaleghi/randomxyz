@@ -65,4 +65,6 @@ export interface EnvironmentConfig {
   MINIO_SECRET_KEY: string;
   MINIO_BUCKET: string;
   MINIO_USE_SSL: boolean;
+
+  TMAR_JWT_SECRET: string;
 }
