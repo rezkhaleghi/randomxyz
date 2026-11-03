@@ -1,7 +1,6 @@
 import { Module } from "@nestjs/common";
 
 import { GetCurrentUserUseCase } from "./use-cases/users/get-current-user.use-case";
-import { UpdateCurrentUserUseCase } from "./use-cases/users/update-current-user.use-case";
 import { UpdateUserAvatarUseCase } from "./use-cases/users/update-user-avatar.use-case";
 import { DeleteUserAvatarUseCase } from "./use-cases/users/delete-user-avatar.use-case";
 import { SearchUsersUseCase } from "./use-cases/users/search-users.use-case";
@@ -71,7 +70,6 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
   providers: [
     // Users
     GetCurrentUserUseCase,
-    UpdateCurrentUserUseCase,
     UpdateUserAvatarUseCase,
     DeleteUserAvatarUseCase,
     SearchUsersUseCase,
@@ -148,7 +146,6 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
   exports: [
     // Users
     GetCurrentUserUseCase,
-    UpdateCurrentUserUseCase,
     UpdateUserAvatarUseCase,
     DeleteUserAvatarUseCase,
     SearchUsersUseCase,

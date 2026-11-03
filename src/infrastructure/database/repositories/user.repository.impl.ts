@@ -20,13 +20,6 @@ import {
   isPostgresUniqueViolation,
 } from "../utils/postgres-error.util";
 
-/**
- * Concrete implementation of the domain's UserRepository contract.
- *
- * This is the ONLY place that translates between the domain entity
- * and the ORM entity — that translation logic never leaks into
- * domain or application.
- */
 @Injectable()
 export class UserRepositoryImpl implements UserRepository {
   constructor(
@@ -53,6 +46,14 @@ export class UserRepositoryImpl implements UserRepository {
   async findByEmail(email: string): Promise<User | null> {
     const row = await this.repo.findOne({
       where: { email: email.toLowerCase() },
+    });
+
+    return row ? this.toDomain(row) : null;
+  }
+
+  async findByExternalUserId(externalUserId: string): Promise<User | null> {
+    const row = await this.repo.findOne({
+      where: { externalUserId },
     });
 
     return row ? this.toDomain(row) : null;
@@ -89,7 +90,7 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async countByRole(role: UserRole): Promise<number> {
-    return this.repo.count({ where: { role: role as UserRole } });
+    return this.repo.count({ where: { role } });
   }
 
   async save(user: User): Promise<User> {
@@ -373,14 +374,6 @@ export class UserRepositoryImpl implements UserRepository {
     };
   }
 
-  /**
-   * Converts a persistence unique-key race into the domain exception that
-   * represents the conflicting user field.
-   *
-   * The pre-checks in the application layer remain useful for fast,
-   * user-friendly failures, but they cannot prevent two concurrent requests
-   * from passing the check. The database constraint is the final authority.
-   */
   private throwUserUniqueViolation(error: unknown): void {
     if (!isPostgresUniqueViolation(error)) {
       return;
@@ -404,6 +397,7 @@ export class UserRepositoryImpl implements UserRepository {
   private toDomain(row: UserOrmEntity): User {
     return User.restore({
       id: row.id,
+      externalUserId: row.externalUserId,
       email: row.email,
       hashedPassword: row.hashedPassword,
       role: row.role,
@@ -425,6 +419,7 @@ export class UserRepositoryImpl implements UserRepository {
     const row = new UserOrmEntity();
 
     row.id = user.id;
+    row.externalUserId = user.externalUserId;
     row.email = user.email;
     row.hashedPassword = user.hashedPassword;
     row.role = user.role;

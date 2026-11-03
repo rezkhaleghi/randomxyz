@@ -34,7 +34,6 @@ import { User } from "@domain/entities/user.entity";
 import { AuthSessionGuard } from "../auth/auth-session.guard";
 
 import { GetCurrentUserUseCase } from "@application/use-cases/users/get-current-user.use-case";
-import { UpdateCurrentUserUseCase } from "@application/use-cases/users/update-current-user.use-case";
 import { UpdateUserAvatarUseCase } from "@application/use-cases/users/update-user-avatar.use-case";
 import { DeleteUserAvatarUseCase } from "@application/use-cases/users/delete-user-avatar.use-case";
 import { SearchUsersUseCase } from "@application/use-cases/users/search-users.use-case";
@@ -42,7 +41,6 @@ import { GetUserBalancesUseCase } from "@application/use-cases/users/get-user-ba
 import { ListUserNotificationsUseCase } from "@application/use-cases/notifications/list-user-notifications.use-case";
 import { MarkNotificationReadUseCase } from "@application/use-cases/notifications/mark-notification-read.use-case";
 
-import { UpdateProfileDto } from "../auth/dtos/update-profile.dto";
 import { AuthenticatedUserResponseDto } from "../auth/dtos/authenticated-user.response.dto";
 
 import { ListUserBalancesQueryDto } from "./dtos/list-user-balances.query.dto";
@@ -57,7 +55,6 @@ export class UsersController {
   constructor(
     private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
     private readonly getCurrentUserBalancesUseCase: GetUserBalancesUseCase,
-    private readonly updateCurrentUserUseCase: UpdateCurrentUserUseCase,
     private readonly updateUserAvatarUseCase: UpdateUserAvatarUseCase,
     private readonly deleteUserAvatarUseCase: DeleteUserAvatarUseCase,
     private readonly searchUsersUseCase: SearchUsersUseCase,
@@ -108,37 +105,6 @@ export class UsersController {
       sortBy: query.sortBy,
       sortDirection: query.sortDirection,
     });
-  }
-
-  @Patch("me")
-  @ApiOperation({
-    summary: "Update the currently authenticated user's profile",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Profile updated",
-    type: AuthenticatedUserResponseDto,
-  })
-  @ApiResponse({
-    status: 409,
-    description: "Username already exists",
-  })
-  async updateMe(@Body() dto: UpdateProfileDto, @Req() req: Request) {
-    const user = await this.updateCurrentUserUseCase.execute(
-      req.session.userId!,
-      {
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        userName: dto.userName,
-        dateOfBirth:
-          dto.dateOfBirth === undefined || dto.dateOfBirth === null
-            ? dto.dateOfBirth
-            : new Date(dto.dateOfBirth),
-        bio: dto.bio,
-      },
-    );
-
-    return this.toUserResponse(user);
   }
 
   @Post("me/avatar")
