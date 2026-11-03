@@ -105,6 +105,36 @@ export class UserRepositoryImpl implements UserRepository {
     }
   }
 
+  async createIfNotExistsByExternalUserId(user: User): Promise<User> {
+    const externalUserId = user.externalUserId;
+
+    if (!externalUserId) {
+      throw new Error(
+        "Cannot create a Tmar Travel user without an external user ID.",
+      );
+    }
+
+    try {
+      await this.repo
+        .createQueryBuilder()
+        .insert()
+        .into(UserOrmEntity)
+        .values(this.toOrm(user))
+        .onConflict('("externalUserId") DO NOTHING')
+        .execute();
+    } catch (error) {
+      this.throwUserUniqueViolation(error);
+      throw error;
+    }
+
+    const existingUser = await this.findByExternalUserId(externalUserId);
+
+    if (!existingUser) {
+      throw new Error("Tmar Travel user creation failed unexpectedly.");
+    }
+
+    return existingUser;
+  }
   async saveAdminMutation(user: User, wasAdmin: boolean): Promise<User | null> {
     if (!wasAdmin || user.role === UserRole.ADMIN) {
       return this.save(user);

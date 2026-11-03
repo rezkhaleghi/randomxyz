@@ -23,12 +23,13 @@ export class TmarJwtService {
 
       if (
         typeof payload === "string" ||
+        !Number.isInteger(payload.exp) ||
         typeof payload._id !== "string" ||
         !payload._id.trim() ||
         typeof payload.email !== "string" ||
         !payload.email.trim()
       ) {
-        throw new UnauthorizedException("Invalid authentication token.");
+        throw new Error("Invalid authentication token payload.");
       }
 
       return {

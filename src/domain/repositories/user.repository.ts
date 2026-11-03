@@ -17,6 +17,8 @@ export abstract class UserRepository {
 
   abstract findByUserName(userName: string): Promise<User | null>;
 
+  abstract createIfNotExistsByExternalUserId(user: User): Promise<User>;
+
   abstract findPage(
     params: PageQuery<"createdAt" | "email" | "role">,
   ): Promise<PageResult<User>>;

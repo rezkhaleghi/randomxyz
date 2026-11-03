@@ -21,32 +21,46 @@ export class TmarAuthUseCase {
     let user = await this.userRepository.findByExternalUserId(externalUserId);
 
     if (!user) {
-      user = User.create({
+      const newUser = User.create({
         externalUserId,
         email,
         hashedPassword: null,
         emailVerified: true,
       });
 
-      user.synchronizeTmarTravelProfile({
+      newUser.synchronizeTmarTravelProfile({
         externalUserId,
         email,
         firstName: identity.firstName,
         lastName: identity.lastName,
       });
-    } else {
-      user.synchronizeTmarTravelProfile({
-        externalUserId,
-        email,
-        firstName: identity.firstName,
-        lastName: identity.lastName,
-      });
+
+      // The repository handles concurrent first-time requests atomically.
+      user =
+        await this.userRepository.createIfNotExistsByExternalUserId(newUser);
     }
 
-    user = await this.userRepository.save(user);
-
+    // Never synchronize profile data for restricted accounts.
     if (user.status !== UserStatus.ACTIVE) {
       throw new UnauthorizedException("Your account is restricted.");
+    }
+
+    const profileChanged =
+      user.externalUserId !== externalUserId ||
+      user.email !== email ||
+      user.firstName !== identity.firstName ||
+      user.lastName !== identity.lastName ||
+      !user.emailVerified;
+
+    if (profileChanged) {
+      user.synchronizeTmarTravelProfile({
+        externalUserId,
+        email,
+        firstName: identity.firstName,
+        lastName: identity.lastName,
+      });
+
+      user = await this.userRepository.save(user);
     }
 
     return user;
