@@ -1,12 +1,16 @@
 import { Module } from "@nestjs/common";
 import { PassportModule } from "@nestjs/passport";
+
 import { ApplicationModule } from "@application/application.module";
+
 import { AuthController } from "./auth.controller";
 import { AuthSessionGuard } from "./auth-session.guard";
+import { TmarAuthGuard } from "./tmar-auth.guard";
 
 @Module({
   imports: [ApplicationModule, PassportModule.register({ session: true })],
   controllers: [AuthController],
-  providers: [AuthSessionGuard],
+  providers: [TmarAuthGuard, AuthSessionGuard],
+  exports: [TmarAuthGuard],
 })
 export class AuthModule {}

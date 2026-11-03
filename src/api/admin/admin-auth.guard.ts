@@ -5,24 +5,29 @@ import {
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
+import type { Request } from "express";
+
+import { User } from "@domain/entities/user.entity";
 import { UserRole } from "@domain/enums/user-role.enum";
-import { UserRepository } from "@domain/repositories/user.repository";
-import { UserStatus } from "@domain/enums/user-status.enum";
+
+import { TmarAuthGuard } from "../auth/tmar-auth.guard";
+
+type AuthenticatedRequest = Request & {
+  user?: User;
+};
 
 @Injectable()
 export class AdminAuthGuard implements CanActivate {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly tmarAuthGuard: TmarAuthGuard) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
-    const userId = request.session?.userId;
-    if (!userId) {
-      throw new UnauthorizedException();
-    }
+    await this.tmarAuthGuard.canActivate(context);
 
-    const user = await this.userRepository.findById(userId);
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
 
-    if (!user || user.status !== UserStatus.ACTIVE) {
+    const user = request.user;
+
+    if (!user) {
       throw new UnauthorizedException();
     }
 
@@ -30,7 +35,11 @@ export class AdminAuthGuard implements CanActivate {
       throw new ForbiddenException("Administrator access required.");
     }
 
-    request.user = user;
+    // Temporary bridge for admin controllers that still use sessions.
+    if (request.session) {
+      request.session.userId = user.id;
+    }
+
     return true;
   }
 }
