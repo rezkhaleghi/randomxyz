@@ -43,13 +43,7 @@ import { OtpServiceImpl } from "./services/otp.service.impl";
 import { RedisOtpStore } from "./services/redis-otp.store";
 import { OtpService } from "@application/interfaces/otp.service.interface";
 
-import { GoogleStrategy } from "./auth/google.strategy";
-import { SessionSerializer } from "./auth/session.serializer";
-
 import { SeedAdminService } from "./database/seed-admin.service";
-
-import { RedisLoginProtectionService } from "./services/redis-login-protection.service";
-import { LoginProtection } from "@application/interfaces/login-protection.interface";
 
 import { NotificationService } from "@application/interfaces/notification.service.interface";
 import { SmtpNotificationService } from "./services/notification.service";
@@ -75,9 +69,6 @@ import {
 } from "@application/interfaces/payment-provider-resolver.interface";
 import { PaymentProviderResolverService } from "./services/payment-provider-resolver.service";
 import { PaymentProviderInterface } from "@application/interfaces/payment-provider.interface";
-
-import { RedisSessionManager } from "./services/redis-session-manager.service";
-import { SessionManager } from "@application/interfaces/session-manager.interface";
 
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
 import { EnvironmentConfig } from "./config/environment.config";
@@ -312,13 +303,6 @@ import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
 
     RedisOtpStore,
 
-    RedisLoginProtectionService,
-
-    {
-      provide: LoginProtection,
-      useExisting: RedisLoginProtectionService,
-    },
-
     SmtpNotificationService,
 
     {
@@ -332,10 +316,6 @@ import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
     },
 
     SeedAdminService,
-
-    GoogleStrategy,
-
-    SessionSerializer,
 
     MinioService,
 
@@ -426,10 +406,6 @@ import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
       provide: PAYMENT_PROVIDER_RESOLVER,
       useClass: PaymentProviderResolverService,
     },
-    {
-      provide: SessionManager,
-      useClass: RedisSessionManager,
-    },
 
     {
       provide: NotificationRepository,
@@ -450,7 +426,6 @@ import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
     UserRepository,
     PasswordHasher,
     OtpService,
-    LoginProtection,
     NotificationService,
     "REDIS_CLIENT",
     FileStorage,
@@ -466,7 +441,6 @@ import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
     TicketMessageRepository,
     TicketCategoryRepository,
     PAYMENT_PROVIDER_RESOLVER,
-    SessionManager,
     NotificationRepository,
     PageRepository,
     HtmlSanitizer,

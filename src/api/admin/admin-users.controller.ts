@@ -23,8 +23,6 @@ import { GetAuditLogsUseCase } from "@application/use-cases/admin-users/get-audi
 import { DeleteAdminUserAvatarUseCase } from "@application/use-cases/admin-users/delete-user-avatar.use-case";
 import { GetAdminStatisticsUseCase } from "@application/use-cases/admin-users/get-statistics.use-case";
 
-import { ChangeUserPasswordUseCase } from "@application/use-cases/users/change-user-password.use-case";
-
 import { AdminAuthGuard } from "./admin-auth.guard";
 
 import { UpdateUserPasswordtDto } from "./dtos/users/update-user-password.dto";
@@ -36,7 +34,6 @@ import { ListAuditLogsQueryDto } from "./dtos/audit-logs/list-audit-logs.query.d
 import { ListUsersQueryDto } from "./dtos/users/list-users.query.dto";
 import { CreateUserDto } from "./dtos/users/create-user.dto";
 import { UpdateUserDto } from "./dtos/users/update-user.dto";
-import { SessionManager } from "@application/interfaces/session-manager.interface";
 
 /**
  * HTTP controller for administrator user management.
@@ -60,11 +57,9 @@ export class AdminUsersController {
     private readonly createUserUseCase: CreateAdminUserUseCase,
     private readonly updateUserUseCase: UpdateAdminUserUseCase,
     private readonly deleteUserUseCase: DeleteAdminUserUseCase,
-    private readonly changeUserPasswordUseCase: ChangeUserPasswordUseCase,
     private readonly deleteAdminUserAvatarUseCase: DeleteAdminUserAvatarUseCase,
     private readonly getAdminStatisticsUseCase: GetAdminStatisticsUseCase,
     private readonly getAuditLogsUseCase: GetAuditLogsUseCase,
-    private readonly sessionManager: SessionManager,
   ) {}
 
   /**
@@ -286,42 +281,6 @@ export class AdminUsersController {
 
     return {
       message: "User deleted.",
-    };
-  }
-
-  /**
-   * Allows an administrator to reset another user's password.
-   */
-  @Patch(":id/password")
-  @ApiOperation({
-    summary: "Reset a user's password",
-  })
-  @ApiParam({
-    name: "id",
-    description: "User UUID",
-    format: "uuid",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Password changed",
-  })
-  @ApiResponse({
-    status: 404,
-    description: "User not found",
-  })
-  async changePassword(
-    @Param("id", ParseUUIDPipe) id: string,
-    @Body() dto: UpdateUserPasswordtDto,
-  ) {
-    await this.changeUserPasswordUseCase.execute({
-      userId: id,
-      password: dto.password,
-    });
-
-    await this.sessionManager.destroyAllSessions(id);
-
-    return {
-      message: "Password changed.",
     };
   }
 
