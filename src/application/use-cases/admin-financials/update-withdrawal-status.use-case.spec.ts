@@ -65,7 +65,7 @@ describe("AdminUpdateWithdrawalStatusUseCase", () => {
   const createWithdrawal = () =>
     Withdrawal.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "100",
       destination: "destination-1",
     });
@@ -351,7 +351,7 @@ describe("AdminUpdateWithdrawalStatusUseCase", () => {
   it("refunds the exact withdrawal amount", async () => {
     const withdrawal = Withdrawal.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "100.25",
       destination: "destination-1",
     });

@@ -40,7 +40,7 @@ describe("ListDepositsUseCase", () => {
 
     const input = {
       userId: "user-1",
-      currency: "USDT",
+      currency: "USD",
       status: "PENDING",
       referenceId: "reference-1",
       providerPaymentId: "payment-1",
@@ -59,7 +59,7 @@ describe("ListDepositsUseCase", () => {
     expect(depositRepositoryMock.search).toHaveBeenCalledWith(
       {
         userId: "user-1",
-        currency: "USDT",
+        currency: "USD",
         status: "PENDING",
         referenceId: "reference-1",
         providerPaymentId: "payment-1",

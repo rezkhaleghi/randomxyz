@@ -25,7 +25,7 @@ describe("AdminGetDepositUseCase", () => {
     const deposit = Deposit.create({
       id: "deposit-1",
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "100",
       provider: PaymentProvider.FAKE_PROVIDER,
       idempotencyKey: "idempotency-key-1",

@@ -24,7 +24,7 @@ export interface CreatePaymentInput {
    * - IRR
    * - USD
    * - EUR
-   * - USDT
+   * - USD
    * - BTC
    */
   currency: PaymentCurrency;

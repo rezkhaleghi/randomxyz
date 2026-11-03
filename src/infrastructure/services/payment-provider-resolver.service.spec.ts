@@ -8,7 +8,7 @@ import { PaymentProviderInterface } from "@application/interfaces/payment-provid
 describe("PaymentProviderResolverService", () => {
   const fakeProvider: PaymentProviderInterface = {
     name: PaymentProvider.FAKE_PROVIDER,
-    supportedCurrencies: [PaymentCurrency.USD],
+    supportedCurrencies: [PaymentCurrency.IRT],
     createPayment: jest.fn(),
     verifyPayment: jest.fn(),
   };

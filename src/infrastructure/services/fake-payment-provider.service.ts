@@ -15,7 +15,7 @@ import { PaymentProvider } from "@domain/enums/payment-provider.enum";
 @Injectable()
 export class FakePaymentProvider implements PaymentProviderInterface {
   readonly name = PaymentProvider.FAKE_PROVIDER;
-  readonly supportedCurrencies = [PaymentCurrency.USD, PaymentCurrency.IRR];
+  readonly supportedCurrencies = [PaymentCurrency.USD, PaymentCurrency.IRT];
 
   constructor(
     @Optional()

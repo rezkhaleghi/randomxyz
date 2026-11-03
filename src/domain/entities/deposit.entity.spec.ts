@@ -12,7 +12,7 @@ describe("Deposit", () => {
   const createDeposit = () =>
     Deposit.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "100",
       provider: PaymentProvider.FAKE_PROVIDER,
       idempotencyKey: "idempotency-key-1",
@@ -24,7 +24,7 @@ describe("Deposit", () => {
     expect(deposit.id).toBeDefined();
     expect(deposit.referenceId).toBeDefined();
     expect(deposit.userId).toBe("user-1");
-    expect(deposit.currency).toBe(PaymentCurrency.USDT);
+    expect(deposit.currency).toBe(PaymentCurrency.USD);
     expect(deposit.amount).toBe("100");
     expect(deposit.status).toBe(DepositStatus.PENDING);
     expect(deposit.idempotencyKey).toBe("idempotency-key-1");
@@ -54,7 +54,7 @@ describe("Deposit", () => {
   it("keeps the existing transaction id when no transaction id is provided", () => {
     const deposit = Deposit.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "100",
       transactionId: "transaction-1",
       provider: PaymentProvider.FAKE_PROVIDER,
@@ -97,7 +97,7 @@ describe("Deposit", () => {
     expect(() =>
       Deposit.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "0",
         provider: PaymentProvider.FAKE_PROVIDER,
         idempotencyKey: "idempotency-key-3",
@@ -109,7 +109,7 @@ describe("Deposit", () => {
     expect(() =>
       Deposit.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "-10",
         provider: PaymentProvider.FAKE_PROVIDER,
         idempotencyKey: "idempotency-key-4",

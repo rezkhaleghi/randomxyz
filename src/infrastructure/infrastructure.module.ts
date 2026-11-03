@@ -129,7 +129,7 @@ import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
 
         DEFAULT_CURRENCY: Joi.string()
           .valid(...Object.values(PaymentCurrency))
-          .default(PaymentCurrency.USD),
+          .default(PaymentCurrency.IRT),
 
         // -------------------------------------------------------------------
         // PostgreSQL

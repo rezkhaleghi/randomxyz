@@ -18,7 +18,7 @@ export const ADMIN_WITHDRAWAL_STATUSES = [
 
 export type AdminWithdrawalStatus = (typeof ADMIN_WITHDRAWAL_STATUSES)[number];
 
-export class UpdateWithdrawalStatusDto {
+export class UpdateWithdrawalStatUSDo {
   @ApiProperty({
     enum: ADMIN_WITHDRAWAL_STATUSES,
     example: WithdrawalStatus.APPROVED,

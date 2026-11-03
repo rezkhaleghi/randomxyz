@@ -20,7 +20,7 @@ import { AdminGetWithdrawalUseCase } from "@application/use-cases/admin-financia
 import { AdminListWithdrawalsUseCase } from "@application/use-cases/admin-financials/list-withdrawals.use-case";
 import { AdminUpdateWithdrawalStatusUseCase } from "@application/use-cases/admin-financials/update-withdrawal-status.use-case";
 import { ListWithdrawalsQueryDto } from "./dtos/withdrawals/list-withdrawals.query.dto";
-import { UpdateWithdrawalStatusDto } from "./dtos/withdrawals/update-withdrawal-status.dto";
+import { UpdateWithdrawalStatUSDo } from "./dtos/withdrawals/update-withdrawal-status.dto";
 
 @ApiTags("admin-withdrawals")
 @Controller("admin/withdrawals")
@@ -65,7 +65,7 @@ export class AdminWithdrawalsController {
   })
   async updateStatus(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() body: UpdateWithdrawalStatusDto,
+    @Body() body: UpdateWithdrawalStatUSDo,
     @Req() req: Request,
   ) {
     return this.updateWithdrawalStatusUseCase.execute({

@@ -38,7 +38,7 @@ import { CreateTicketCategoryDto } from "./dtos/tickets/create-ticket-category.d
 import { UpdateTicketCategoryDto } from "./dtos/tickets/update-ticket-category.dto";
 import { CreateTicketMessageDto } from "./dtos/tickets/create-ticket-message.dto";
 import { AssignTicketDto } from "./dtos/tickets/assign-ticket.dto";
-import { UpdateTicketStatusDto } from "./dtos/tickets/update-ticket-status.dto";
+import { UpdateTicketStatUSDo } from "./dtos/tickets/update-ticket-status.dto";
 import { UpdateTicketPriorityDto } from "./dtos/tickets/update-ticket-priority.dto";
 
 @ApiTags("admin-tickets")
@@ -197,12 +197,12 @@ export class AdminTicketsController {
   @Patch(":id/status")
   @ApiOperation({ summary: "Change ticket status" })
   @ApiParam({ name: "id", description: "Ticket UUID", format: "uuid" })
-  @ApiBody({ type: UpdateTicketStatusDto })
+  @ApiBody({ type: UpdateTicketStatUSDo })
   @ApiResponse({ status: 200, description: "Ticket status updated" })
   @ApiResponse({ status: 404, description: "Ticket not found" })
   async status(
     @Param("id", ParseUUIDPipe) id: string,
-    @Body() dto: UpdateTicketStatusDto,
+    @Body() dto: UpdateTicketStatUSDo,
     @Req() req: Request,
   ) {
     await this.updateTicketStatusUseCase.execute({

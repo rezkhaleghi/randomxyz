@@ -7,7 +7,7 @@ describe("Ledger", () => {
   it("creates a valid ledger entry", () => {
     const ledger = Ledger.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "100",
       balanceBefore: "50",
       balanceAfter: "150",
@@ -16,7 +16,7 @@ describe("Ledger", () => {
 
     expect(ledger.id).toBeDefined();
     expect(ledger.userId).toBe("user-1");
-    expect(ledger.currency).toBe(PaymentCurrency.USDT);
+    expect(ledger.currency).toBe(PaymentCurrency.USD);
     expect(ledger.amount).toBe("100");
     expect(ledger.balanceBefore).toBe("50");
     expect(ledger.balanceAfter).toBe("150");
@@ -35,7 +35,7 @@ describe("Ledger", () => {
     const ledger = Ledger.create({
       id: "ledger-1",
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "25.50",
       balanceBefore: "100",
       balanceAfter: "125.50",
@@ -54,7 +54,7 @@ describe("Ledger", () => {
   it("accepts decimal amounts", () => {
     const ledger = Ledger.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "0.25",
       balanceBefore: "10.50",
       balanceAfter: "10.75",
@@ -68,7 +68,7 @@ describe("Ledger", () => {
     expect(() =>
       Ledger.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
         balanceBefore: "50",
         balanceAfter: "140",
@@ -81,7 +81,7 @@ describe("Ledger", () => {
     expect(() =>
       Ledger.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "0",
         balanceBefore: "100",
         balanceAfter: "100",
@@ -94,7 +94,7 @@ describe("Ledger", () => {
     expect(() =>
       Ledger.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "-50",
         balanceBefore: "100",
         balanceAfter: "50",
@@ -107,7 +107,7 @@ describe("Ledger", () => {
     expect(() =>
       Ledger.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "50",
         balanceBefore: "100",
         balanceAfter: "150",
@@ -119,7 +119,7 @@ describe("Ledger", () => {
   it("accepts negative withdrawal", () => {
     const ledger = Ledger.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "-50",
       balanceBefore: "100",
       balanceAfter: "50",
@@ -133,7 +133,7 @@ describe("Ledger", () => {
   it("accepts positive refund", () => {
     const ledger = Ledger.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "50",
       balanceBefore: "100",
       balanceAfter: "150",
@@ -146,7 +146,7 @@ describe("Ledger", () => {
   it("accepts positive transfer in", () => {
     const ledger = Ledger.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "50",
       balanceBefore: "100",
       balanceAfter: "150",
@@ -159,7 +159,7 @@ describe("Ledger", () => {
   it("accepts negative transfer out", () => {
     const ledger = Ledger.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "-50",
       balanceBefore: "100",
       balanceAfter: "50",
@@ -172,7 +172,7 @@ describe("Ledger", () => {
   it("accepts positive admin adjustment", () => {
     const ledger = Ledger.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "50",
       balanceBefore: "100",
       balanceAfter: "150",
@@ -185,7 +185,7 @@ describe("Ledger", () => {
   it("accepts negative admin adjustment", () => {
     const ledger = Ledger.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "-50",
       balanceBefore: "100",
       balanceAfter: "50",
@@ -201,7 +201,7 @@ describe("Ledger", () => {
     const ledger = Ledger.restore({
       id: "ledger-1",
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "-50",
       balanceBefore: "100",
       balanceAfter: "50",
@@ -231,7 +231,7 @@ describe("Ledger", () => {
       Ledger.restore({
         id: "ledger-1",
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "50",
         balanceBefore: "100",
         balanceAfter: "140",
@@ -249,7 +249,7 @@ describe("Ledger", () => {
       Ledger.restore({
         id: "ledger-1",
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "50",
         balanceBefore: "100",
         balanceAfter: "150",

@@ -10,7 +10,7 @@ describe("Withdrawal", () => {
   const createWithdrawal = () =>
     Withdrawal.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "100",
       destination: "destination-1",
     });
@@ -21,7 +21,7 @@ describe("Withdrawal", () => {
     expect(withdrawal.id).toBeDefined();
     expect(withdrawal.referenceId).toBeDefined();
     expect(withdrawal.userId).toBe("user-1");
-    expect(withdrawal.currency).toBe(PaymentCurrency.USDT);
+    expect(withdrawal.currency).toBe(PaymentCurrency.USD);
     expect(withdrawal.amount).toBe("100");
     expect(withdrawal.destination).toBe("destination-1");
     expect(withdrawal.getStatus()).toBe(WithdrawalStatus.PENDING);
@@ -34,7 +34,7 @@ describe("Withdrawal", () => {
     expect(() =>
       Withdrawal.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "0",
         destination: "destination-1",
       }),
@@ -45,7 +45,7 @@ describe("Withdrawal", () => {
     expect(() =>
       Withdrawal.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "-100",
         destination: "destination-1",
       }),
@@ -113,7 +113,7 @@ describe("Withdrawal", () => {
     const withdrawal = Withdrawal.restore({
       id: "withdrawal-1",
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "100",
       status: WithdrawalStatus.APPROVED,
       destination: "destination-1",
@@ -169,7 +169,7 @@ describe("Withdrawal", () => {
     const withdrawal = Withdrawal.restore({
       id: "withdrawal-1",
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "100",
       status: WithdrawalStatus.COMPLETED,
       destination: "destination-1",

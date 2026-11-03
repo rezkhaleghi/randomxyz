@@ -9,13 +9,13 @@ describe("UserBalance", () => {
   it("creates a balance with a generated id", () => {
     const balance = UserBalance.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "100",
     });
 
     expect(balance.id).toBeDefined();
     expect(balance.userId).toBe("user-1");
-    expect(balance.currency).toBe(PaymentCurrency.USDT);
+    expect(balance.currency).toBe(PaymentCurrency.USD);
     expect(balance.amount).toBe("100");
   });
 
@@ -23,7 +23,7 @@ describe("UserBalance", () => {
     const balance = UserBalance.create({
       id: "balance-1",
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "100",
     });
 
@@ -33,7 +33,7 @@ describe("UserBalance", () => {
   it("allows a zero balance", () => {
     const balance = UserBalance.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "0",
     });
 
@@ -43,7 +43,7 @@ describe("UserBalance", () => {
   it("allows decimal balances", () => {
     const balance = UserBalance.create({
       userId: "user-1",
-      currency: PaymentCurrency.USDT,
+      currency: PaymentCurrency.USD,
       amount: "10.50",
     });
 
@@ -54,7 +54,7 @@ describe("UserBalance", () => {
     expect(() =>
       UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "-1",
       }),
     ).toThrow(InvalidUserBalanceException);
@@ -64,7 +64,7 @@ describe("UserBalance", () => {
     it("increases the balance", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -76,7 +76,7 @@ describe("UserBalance", () => {
     it("handles decimal amounts", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100.50",
       });
 
@@ -88,7 +88,7 @@ describe("UserBalance", () => {
     it("rejects zero", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -98,7 +98,7 @@ describe("UserBalance", () => {
     it("rejects a negative amount", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -110,7 +110,7 @@ describe("UserBalance", () => {
     it("decreases the balance", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -122,7 +122,7 @@ describe("UserBalance", () => {
     it("allows debiting the exact balance", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -134,7 +134,7 @@ describe("UserBalance", () => {
     it("handles decimal amounts", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100.50",
       });
 
@@ -146,7 +146,7 @@ describe("UserBalance", () => {
     it("rejects zero", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -156,7 +156,7 @@ describe("UserBalance", () => {
     it("rejects a negative amount", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -166,7 +166,7 @@ describe("UserBalance", () => {
     it("rejects an amount greater than the balance", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -182,7 +182,7 @@ describe("UserBalance", () => {
     it("increases the balance with a positive adjustment", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -194,7 +194,7 @@ describe("UserBalance", () => {
     it("decreases the balance with a negative adjustment", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -206,7 +206,7 @@ describe("UserBalance", () => {
     it("allows an adjustment that brings the balance to zero", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -218,7 +218,7 @@ describe("UserBalance", () => {
     it("rejects an adjustment that would make the balance negative", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 
@@ -232,7 +232,7 @@ describe("UserBalance", () => {
     it("does nothing for a zero adjustment", () => {
       const balance = UserBalance.create({
         userId: "user-1",
-        currency: PaymentCurrency.USDT,
+        currency: PaymentCurrency.USD,
         amount: "100",
       });
 

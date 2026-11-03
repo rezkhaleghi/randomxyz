@@ -1,8 +1,4 @@
 export enum PaymentCurrency {
-  IRR = "IRR",
+  IRT = "IRT",
   USD = "USD",
-  EUR = "EUR",
-  USDT = "USDT",
-  BTC = "BTC",
-  TRX = "TRX",
 }
