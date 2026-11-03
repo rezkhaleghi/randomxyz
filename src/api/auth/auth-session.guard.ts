@@ -4,27 +4,31 @@ import {
   Injectable,
   UnauthorizedException,
 } from "@nestjs/common";
-import { UserRepository } from "@domain/repositories/user.repository";
-import { UserStatus } from "@domain/enums/user-status.enum";
+import type { Request } from "express";
+
+import { TmarAuthGuard } from "./tmar-auth.guard";
+
+type AuthenticatedRequest = Request & {
+  user?: {
+    id: string;
+  };
+};
 
 @Injectable()
 export class AuthSessionGuard implements CanActivate {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(private readonly tmarAuthGuard: TmarAuthGuard) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest();
+    await this.tmarAuthGuard.canActivate(context);
 
-    const userId = request.session?.userId;
+    const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
 
-    if (!userId) {
+    if (!request.user || !request.session) {
       throw new UnauthorizedException();
     }
 
-    const user = await this.userRepository.findById(userId);
-
-    if (!user || user.status !== UserStatus.ACTIVE) {
-      throw new UnauthorizedException();
-    }
+    // Temporary compatibility for controllers still using req.session.userId.
+    request.session.userId = request.user.id;
 
     return true;
   }
