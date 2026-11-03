@@ -19,7 +19,7 @@ import { GetWithdrawalUseCase } from "@application/use-cases/withdrawals/get-wit
 
 import { ListWithdrawalsQueryDto } from "./dtos/list-withdrawals.query.dto";
 import { CreateWithdrawalDto } from "./dtos/create-withdrawal.dto";
-
+import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 @ApiTags("withdrawals")
 @Controller("withdrawals")
 @UseGuards(AuthSessionGuard)
@@ -33,9 +33,12 @@ export class WithdrawalsController {
   @Get()
   @ApiOperation({ summary: "List my withdrawals" })
   @ApiResponse({ status: 200, description: "Withdrawal list" })
-  async list(@Query() query: ListWithdrawalsQueryDto, @Req() req: Request) {
+  async list(
+    @Query() query: ListWithdrawalsQueryDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
     return this.listWithdrawalsUseCase.execute({
-      userId: req.session.userId!,
+      userId: req.user.id,
       page: query.page,
       limit: query.limit,
       sortBy: query.sortBy,
@@ -46,9 +49,12 @@ export class WithdrawalsController {
   @Get(":id")
   @ApiOperation({ summary: "Get my withdrawal" })
   @ApiResponse({ status: 200, description: "Withdrawal record" })
-  async get(@Param("id", ParseUUIDPipe) id: string, @Req() req: Request) {
+  async get(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
     return this.getWithdrawalUseCase.execute({
-      userId: req.session.userId!,
+      userId: req.user.id,
       id,
     });
   }
@@ -56,9 +62,12 @@ export class WithdrawalsController {
   @Post()
   @ApiOperation({ summary: "Request a withdrawal" })
   @ApiResponse({ status: 201, description: "Withdrawal created" })
-  async create(@Body() dto: CreateWithdrawalDto, @Req() req: Request) {
+  async create(
+    @Body() dto: CreateWithdrawalDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
     return this.createWithdrawalUseCase.execute({
-      userId: req.session.userId!,
+      userId: req.user.id,
       currency: dto.currency,
       amount: dto.amount,
       destination: dto.destination,

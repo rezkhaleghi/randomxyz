@@ -47,7 +47,7 @@ import { ListUserBalancesQueryDto } from "./dtos/list-user-balances.query.dto";
 import { SearchUsersQueryDto } from "./dtos/search-users.query.dto";
 import { ListNotificationsQueryDto } from "./dtos/list-notifications.query.dto";
 import { NotificationResponseDto } from "./dtos/notification.response.dto";
-
+import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 @ApiTags("users")
 @Controller("users")
 @UseGuards(AuthSessionGuard)
@@ -75,8 +75,8 @@ export class UsersController {
     status: 401,
     description: "Not authenticated",
   })
-  async getMe(@Req() req: Request) {
-    const user = await this.getCurrentUserUseCase.execute(req.session.userId!);
+  async getMe(@Req() req: AuthenticatedRequest) {
+    const user = await this.getCurrentUserUseCase.execute(req.user.id);
 
     return this.toUserResponse(user);
   }
@@ -97,104 +97,13 @@ export class UsersController {
   })
   async getMyBalances(
     @Query() query: ListUserBalancesQueryDto,
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
   ) {
-    return this.getCurrentUserBalancesUseCase.execute(req.session.userId!, {
+    return this.getCurrentUserBalancesUseCase.execute(req.user.id, {
       page: query.page,
       limit: query.limit,
       sortBy: query.sortBy,
       sortDirection: query.sortDirection,
-    });
-  }
-
-  @Post("me/avatar")
-  @UseInterceptors(FileInterceptor("file"))
-  @ApiOperation({
-    summary: "Update the currently authenticated user's avatar",
-  })
-  @ApiConsumes("multipart/form-data")
-  @ApiBody({
-    schema: {
-      type: "object",
-      properties: {
-        file: {
-          type: "string",
-          format: "binary",
-        },
-      },
-      required: ["file"],
-    },
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Avatar updated",
-    type: AuthenticatedUserResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: "Invalid or unsupported image",
-  })
-  async updateAvatar(
-    @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({
-            maxSize: 5 * 1024 * 1024,
-          }),
-          new FileTypeValidator({
-            fileType: /^image\/(jpeg|png|webp|gif)$/,
-          }),
-        ],
-      }),
-    )
-    file: {
-      buffer: Buffer;
-      mimetype: string;
-    },
-    @Req() req: Request,
-  ) {
-    const user = await this.updateUserAvatarUseCase.execute(
-      req.session.userId!,
-      {
-        buffer: file.buffer,
-        mimetype: file.mimetype,
-      },
-    );
-
-    return this.toUserResponse(user);
-  }
-
-  @Delete("me/avatar")
-  @ApiOperation({
-    summary: "Delete the currently authenticated user's avatar",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Avatar deleted",
-    type: AuthenticatedUserResponseDto,
-  })
-  async deleteAvatar(@Req() req: Request) {
-    const user = await this.deleteUserAvatarUseCase.execute(
-      req.session.userId!,
-    );
-
-    return this.toUserResponse(user);
-  }
-
-  @Get("search")
-  @ApiOperation({
-    summary: "Search users",
-    description:
-      "Search users by exact email, username, first name, last name, or full name.",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Users matching the search query",
-  })
-  async search(@Query() query: SearchUsersQueryDto) {
-    return this.searchUsersUseCase.execute(query.q, {
-      page: query.page,
-      limit: query.limit,
     });
   }
 
@@ -212,10 +121,10 @@ export class UsersController {
   })
   async getMyNotifications(
     @Query() query: ListNotificationsQueryDto,
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.listUserNotificationsUseCase.execute({
-      userId: req.session.userId!,
+      userId: req.user.id,
       page: query.page,
       limit: query.limit,
       sortDirection: query.sortDirection,
@@ -243,9 +152,9 @@ export class UsersController {
   })
   async markNotificationAsRead(
     @Param("id", ParseUUIDPipe) id: string,
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
   ) {
-    return this.markNotificationReadUseCase.execute(req.session.userId!, id);
+    return this.markNotificationReadUseCase.execute(req.user.id, id);
   }
 
   private toUserResponse(user: User) {

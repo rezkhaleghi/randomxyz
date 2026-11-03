@@ -22,6 +22,7 @@ import { VerifyDepositUseCase } from "@application/use-cases/deposits/verify-dep
 import { AuthSessionGuard } from "../auth/auth-session.guard";
 import { ListDepositsQueryDto } from "./dtos/list-deposits.query.dto";
 import { CreateDepositDto } from "./dtos/create-deposit.dto";
+import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 
 @ApiTags("deposits")
 @Controller("deposits")
@@ -37,9 +38,12 @@ export class DepositsController {
   @Get()
   @ApiOperation({ summary: "List my deposits" })
   @ApiResponse({ status: 200, description: "Deposit list" })
-  async list(@Req() req: Request, @Query() query: ListDepositsQueryDto) {
+  async list(
+    @Req() req: AuthenticatedRequest,
+    @Query() query: ListDepositsQueryDto,
+  ) {
     return this.listDepositsUseCase.execute({
-      userId: req.session.userId!,
+      userId: req.user.id,
       page: query.page,
       limit: query.limit,
       sortBy: query.sortBy,
@@ -50,9 +54,12 @@ export class DepositsController {
   @Get(":id")
   @ApiOperation({ summary: "Get my deposit" })
   @ApiResponse({ status: 200, description: "Deposit record" })
-  async get(@Param("id", ParseUUIDPipe) id: string, @Req() req: Request) {
+  async get(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
     return this.getDepositUseCase.execute({
-      userId: req.session.userId!,
+      userId: req.user.id,
       id,
     });
   }
@@ -68,7 +75,7 @@ export class DepositsController {
   @ApiResponse({ status: 201, description: "Deposit created" })
   async create(
     @Body() dto: CreateDepositDto,
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
     @Headers("Idempotency-Key") idempotencyKey: string | undefined,
   ) {
     const normalizedIdempotencyKey = idempotencyKey?.trim();
@@ -80,7 +87,7 @@ export class DepositsController {
     }
 
     return this.createDepositUseCase.execute({
-      userId: req.session.userId!,
+      userId: req.user.id,
       currency: dto.currency,
       amount: dto.amount,
       provider: dto.provider,
@@ -91,9 +98,12 @@ export class DepositsController {
   @Post(":id/verify")
   @ApiOperation({ summary: "Verify a deposit" })
   @ApiResponse({ status: 200, description: "Deposit verified" })
-  async verify(@Param("id", ParseUUIDPipe) id: string, @Req() req: Request) {
+  async verify(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
     return this.verifyDepositUseCase.execute({
-      userId: req.session.userId!,
+      userId: req.user.id,
       depositId: id,
     });
   }
