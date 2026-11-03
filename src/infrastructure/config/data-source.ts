@@ -8,9 +8,6 @@ import { UserBalanceOrmEntity } from "../database/orm-entities/user-balance.orm-
 import { LedgerOrmEntity } from "../database/orm-entities/ledger.orm-entity";
 import { DepositOrmEntity } from "../database/orm-entities/deposit.orm-entity";
 import { WithdrawalOrmEntity } from "../database/orm-entities/withdrawal.orm-entity";
-import { TicketOrmEntity } from "../database/orm-entities/ticket.orm-entity";
-import { TicketMessageOrmEntity } from "../database/orm-entities/ticket-message.orm-entity";
-import { TicketCategoryOrmEntity } from "../database/orm-entities/ticket-category.orm-entity";
 import { NotificationOrmEntity } from "@infrastructure/database/orm-entities/notification.orm-entity";
 import { PageOrmEntity } from "@infrastructure/database/orm-entities/page.orm-entity";
 
@@ -37,9 +34,6 @@ export default new DataSource({
     LedgerOrmEntity,
     DepositOrmEntity,
     WithdrawalOrmEntity,
-    TicketOrmEntity,
-    TicketMessageOrmEntity,
-    TicketCategoryOrmEntity,
     NotificationOrmEntity,
     PageOrmEntity,
   ],

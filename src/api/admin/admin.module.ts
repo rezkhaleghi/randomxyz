@@ -10,7 +10,6 @@ import { AdminUserBalancesController } from "./admin-user-balances.controller";
 import { AdminLedgersController } from "./admin-ledgers.controller";
 import { AdminDepositsController } from "./admin-deposits.controller";
 import { AdminWithdrawalsController } from "./admin-withdrawals.controller";
-import { AdminTicketsController } from "./admin-tickets.controller";
 import { AdminNotificationsController } from "./admin-notifications.controller";
 import { AdminPagesController } from "./admin-pages.controller";
 
@@ -23,7 +22,6 @@ import { AdminPagesController } from "./admin-pages.controller";
     AdminLedgersController,
     AdminDepositsController,
     AdminWithdrawalsController,
-    AdminTicketsController,
     AdminNotificationsController,
     AdminPagesController,
   ],

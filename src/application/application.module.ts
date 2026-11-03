@@ -33,22 +33,6 @@ import { GetDepositUseCase } from "./use-cases/deposits/get-deposit.use-case";
 import { ListWithdrawalsUseCase } from "./use-cases/withdrawals/list-withdrawals.use-case";
 import { GetWithdrawalUseCase } from "./use-cases/withdrawals/get-withdrawal.use-case";
 
-import { CreateTicketUseCase } from "./use-cases/tickets/create-ticket.use-case";
-import { ListUserTicketsUseCase } from "./use-cases/tickets/list-user-tickets.use-case";
-import { GetTicketUseCase } from "./use-cases/tickets/get-ticket.use-case";
-import { CreateTicketMessageUseCase } from "./use-cases/tickets/create-ticket-message.use-case";
-
-import { ListAdminTicketsUseCase } from "./use-cases/admin-tickets/list-admin-tickets.use-case";
-import { GetAdminTicketUseCase } from "./use-cases/admin-tickets/get-admin-ticket.use-case";
-import { CreateAdminTicketMessageUseCase } from "./use-cases/admin-tickets/create-admin-ticket-message.use-case";
-import { AssignTicketUseCase } from "./use-cases/admin-tickets/assign-ticket.use-case";
-import { UpdateTicketStatusUseCase } from "./use-cases/admin-tickets/update-ticket-status.use-case";
-import { UpdateTicketPriorityUseCase } from "./use-cases/admin-tickets/update-ticket-priority.use-case";
-import { ListTicketCategoriesUseCase } from "./use-cases/admin-tickets/list-ticket-categories.use-case";
-import { CreateTicketCategoryUseCase } from "./use-cases/admin-tickets/create-ticket-category.use-case";
-import { UpdateTicketCategoryUseCase } from "./use-cases/admin-tickets/update-ticket-category.use-case";
-import { DeactivateTicketCategoryUseCase } from "./use-cases/admin-tickets/deactive-ticket-category.use-case";
-
 import { SendNotificationUseCase } from "./use-cases/notifications/send-notification.use-case";
 import { ListUserNotificationsUseCase } from "./use-cases/notifications/list-user-notifications.use-case";
 import { MarkNotificationReadUseCase } from "./use-cases/notifications/mark-notification-read.use-case";
@@ -91,12 +75,6 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
     ListWithdrawalsUseCase,
     GetWithdrawalUseCase,
 
-    // tickets
-    CreateTicketUseCase,
-    ListUserTicketsUseCase,
-    GetTicketUseCase,
-    CreateTicketMessageUseCase,
-
     // Notifications
     SendNotificationUseCase,
     ListUserNotificationsUseCase,
@@ -115,18 +93,6 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
     // Admin Notifications
     AdminListNotificationsUseCase,
     AdminGetNotificationUseCase,
-
-    // Admin tickets
-    ListAdminTicketsUseCase,
-    GetAdminTicketUseCase,
-    CreateAdminTicketMessageUseCase,
-    AssignTicketUseCase,
-    UpdateTicketStatusUseCase,
-    UpdateTicketPriorityUseCase,
-    ListTicketCategoriesUseCase,
-    CreateTicketCategoryUseCase,
-    UpdateTicketCategoryUseCase,
-    DeactivateTicketCategoryUseCase,
 
     // Admin users
     ListUsersUseCase,
@@ -170,12 +136,6 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
     ListWithdrawalsUseCase,
     GetWithdrawalUseCase,
 
-    // User tickets
-    CreateTicketUseCase,
-    ListUserTicketsUseCase,
-    GetTicketUseCase,
-    CreateTicketMessageUseCase,
-
     // Notifications
     SendNotificationUseCase,
     MarkNotificationReadUseCase,
@@ -194,18 +154,6 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
     // Admin Notifications
     AdminListNotificationsUseCase,
     AdminGetNotificationUseCase,
-
-    // Admin tickets
-    ListAdminTicketsUseCase,
-    GetAdminTicketUseCase,
-    CreateAdminTicketMessageUseCase,
-    AssignTicketUseCase,
-    UpdateTicketStatusUseCase,
-    UpdateTicketPriorityUseCase,
-    ListTicketCategoriesUseCase,
-    CreateTicketCategoryUseCase,
-    UpdateTicketCategoryUseCase,
-    DeactivateTicketCategoryUseCase,
 
     // Admin users
     ListUsersUseCase,

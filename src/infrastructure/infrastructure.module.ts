@@ -12,9 +12,6 @@ import { UserBalanceOrmEntity } from "./database/orm-entities/user-balance.orm-e
 import { LedgerOrmEntity } from "./database/orm-entities/ledger.orm-entity";
 import { DepositOrmEntity } from "./database/orm-entities/deposit.orm-entity";
 import { WithdrawalOrmEntity } from "./database/orm-entities/withdrawal.orm-entity";
-import { TicketOrmEntity } from "./database/orm-entities/ticket.orm-entity";
-import { TicketMessageOrmEntity } from "./database/orm-entities/ticket-message.orm-entity";
-import { TicketCategoryOrmEntity } from "./database/orm-entities/ticket-category.orm-entity";
 
 import { UserRepositoryImpl } from "./database/repositories/user.repository.impl";
 import { AuditLogRepositoryImpl } from "./database/repositories/audit-log.repository.impl";
@@ -22,9 +19,6 @@ import { UserBalanceRepositoryImpl } from "./database/repositories/user-balance.
 import { LedgerRepositoryImpl } from "./database/repositories/ledger.repository.impl";
 import { DepositRepositoryImpl } from "./database/repositories/deposit.repository.impl";
 import { WithdrawalRepositoryImpl } from "./database/repositories/withdrawal.repository.impl";
-import { TicketRepositoryImpl } from "./database/repositories/ticket.repository.impl";
-import { TicketMessageRepositoryImpl } from "./database/repositories/ticket-message.repository.impl";
-import { TicketCategoryRepositoryImpl } from "./database/repositories/ticket-category.repository.impl";
 
 import { UserRepository } from "@domain/repositories/user.repository";
 import { AuditLogRepository } from "@domain/repositories/audit-log.repository";
@@ -32,9 +26,6 @@ import { UserBalanceRepository } from "@domain/repositories/user-balance.reposit
 import { LedgerRepository } from "@domain/repositories/ledger.repository";
 import { DepositRepository } from "@domain/repositories/deposit.repository";
 import { WithdrawalRepository } from "@domain/repositories/withdrawal.repository";
-import { TicketRepository } from "@domain/repositories/ticket.repository";
-import { TicketMessageRepository } from "@domain/repositories/ticket-message.repository";
-import { TicketCategoryRepository } from "@domain/repositories/ticket-category.repository";
 
 import { BcryptPasswordHasher } from "./services/bcrypt-password-hasher.service";
 import { PasswordHasher } from "@application/interfaces/password-hasher.interface";
@@ -257,9 +248,6 @@ import { TmarJwtService } from "./services/tmar-jwt.service";
       LedgerOrmEntity,
       DepositOrmEntity,
       WithdrawalOrmEntity,
-      TicketOrmEntity,
-      TicketMessageOrmEntity,
-      TicketCategoryOrmEntity,
       NotificationOrmEntity,
       PageOrmEntity,
     ]),
@@ -376,21 +364,6 @@ import { TmarJwtService } from "./services/tmar-jwt.service";
       useClass: WithdrawalRepositoryImpl,
     },
 
-    {
-      provide: TicketRepository,
-      useClass: TicketRepositoryImpl,
-    },
-
-    {
-      provide: TicketMessageRepository,
-      useClass: TicketMessageRepositoryImpl,
-    },
-
-    {
-      provide: TicketCategoryRepository,
-      useClass: TicketCategoryRepositoryImpl,
-    },
-
     FakePaymentProvider,
 
     {
@@ -446,9 +419,6 @@ import { TmarJwtService } from "./services/tmar-jwt.service";
     LedgerRepository,
     DepositRepository,
     WithdrawalRepository,
-    TicketRepository,
-    TicketMessageRepository,
-    TicketCategoryRepository,
     PAYMENT_PROVIDER_RESOLVER,
     NotificationRepository,
     PageRepository,

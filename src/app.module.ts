@@ -7,7 +7,6 @@ import { AuthModule } from "./api/auth/auth.module";
 import { DepositsModule } from "./api/deposits/deposits.module";
 import { FilesModule } from "./api/files/files.module";
 import { HealthModule } from "./api/health/health.module";
-import { TicketsModule } from "./api/tickets/tickets.module";
 import { UsersModule } from "./api/users/users.module";
 import { WithdrawalsModule } from "./api/withdrawals/withdrawals.module";
 import { InfrastructureModule } from "./infrastructure/infrastructure.module";
@@ -66,7 +65,6 @@ import { PagesModule } from "@api/pages/pages.module";
     // User-facing API modules.
     UsersModule,
     FilesModule,
-    TicketsModule,
 
     // Financial API modules.
     DepositsModule,
