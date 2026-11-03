@@ -17,7 +17,6 @@ import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 import { CreateAdminUserUseCase } from "@application/use-cases/admin-users/create-user.use-case";
 import { GetUserUseCase } from "@application/use-cases/admin-users/get-user.use-case";
 import { ListUsersUseCase } from "@application/use-cases/admin-users/list-users.use-case";
-import { UpdateAdminUserUseCase } from "@application/use-cases/admin-users/update-user.use-case";
 import { GetAuditLogsUseCase } from "@application/use-cases/admin-users/get-audit-logs.use-case";
 import { GetAdminStatisticsUseCase } from "@application/use-cases/admin-users/get-statistics.use-case";
 
@@ -51,7 +50,6 @@ export class AdminUsersController {
     private readonly listUsersUseCase: ListUsersUseCase,
     private readonly getUserUseCase: GetUserUseCase,
     private readonly createUserUseCase: CreateAdminUserUseCase,
-    private readonly updateUserUseCase: UpdateAdminUserUseCase,
     private readonly getAdminStatisticsUseCase: GetAdminStatisticsUseCase,
     private readonly getAuditLogsUseCase: GetAuditLogsUseCase,
   ) {}
@@ -167,50 +165,6 @@ export class AdminUsersController {
   async create(@Body() dto: CreateUserDto, @Req() req: AuthenticatedRequest) {
     return this.toResponse(
       await this.createUserUseCase.execute(dto, req.user.id),
-    );
-  }
-
-  @Patch(":id")
-  @ApiOperation({
-    summary: "Update a user's account and profile",
-  })
-  @ApiParam({
-    name: "id",
-    description: "User UUID",
-    format: "uuid",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "User updated",
-    type: AdminUserResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: "User not found",
-  })
-  @ApiResponse({
-    status: 409,
-    description: "Email, username, or last-admin conflict",
-  })
-  async update(
-    @Param("id", ParseUUIDPipe) id: string,
-    @Body() dto: UpdateUserDto,
-    @Req() req: AuthenticatedRequest,
-  ) {
-    return this.toResponse(
-      await this.updateUserUseCase.execute(
-        {
-          id,
-          ...dto,
-
-          // Undefined means "do not change"; null means "clear the value".
-          dateOfBirth:
-            dto.dateOfBirth === undefined || dto.dateOfBirth === null
-              ? dto.dateOfBirth
-              : new Date(dto.dateOfBirth),
-        },
-        req.user.id,
-      ),
     );
   }
 

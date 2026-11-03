@@ -3,17 +3,11 @@ import { Module } from "@nestjs/common";
 import { TmarAuthUseCase } from "./use-cases/auth/tmar-auth.use-case";
 
 import { GetCurrentUserUseCase } from "./use-cases/users/get-current-user.use-case";
-import { UpdateUserAvatarUseCase } from "./use-cases/users/update-user-avatar.use-case";
-import { DeleteUserAvatarUseCase } from "./use-cases/users/delete-user-avatar.use-case";
-import { SearchUsersUseCase } from "./use-cases/users/search-users.use-case";
 import { GetUserBalancesUseCase } from "./use-cases/users/get-user-balances.use-case";
 
 import { ListUsersUseCase } from "./use-cases/admin-users/list-users.use-case";
 import { GetUserUseCase } from "./use-cases/admin-users/get-user.use-case";
 import { CreateAdminUserUseCase } from "./use-cases/admin-users/create-user.use-case";
-import { UpdateAdminUserUseCase } from "./use-cases/admin-users/update-user.use-case";
-import { DeleteAdminUserUseCase } from "./use-cases/admin-users/delete-user.use-case";
-import { DeleteAdminUserAvatarUseCase } from "./use-cases/admin-users/delete-user-avatar.use-case";
 import { GetAdminStatisticsUseCase } from "./use-cases/admin-users/get-statistics.use-case";
 import { GetAuditLogsUseCase } from "./use-cases/admin-users/get-audit-logs.use-case";
 
@@ -59,9 +53,6 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
 
     // Users
     GetCurrentUserUseCase,
-    UpdateUserAvatarUseCase,
-    DeleteUserAvatarUseCase,
-    SearchUsersUseCase,
     GetUserBalancesUseCase,
 
     // Deposits
@@ -98,9 +89,6 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
     ListUsersUseCase,
     GetUserUseCase,
     CreateAdminUserUseCase,
-    UpdateAdminUserUseCase,
-    DeleteAdminUserUseCase,
-    DeleteAdminUserAvatarUseCase,
     GetAdminStatisticsUseCase,
     GetAuditLogsUseCase,
 
@@ -120,9 +108,6 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
 
     // Users
     GetCurrentUserUseCase,
-    UpdateUserAvatarUseCase,
-    DeleteUserAvatarUseCase,
-    SearchUsersUseCase,
     GetUserBalancesUseCase,
 
     // Deposits
@@ -159,9 +144,6 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
     ListUsersUseCase,
     GetUserUseCase,
     CreateAdminUserUseCase,
-    UpdateAdminUserUseCase,
-    DeleteAdminUserUseCase,
-    DeleteAdminUserAvatarUseCase,
     GetAdminStatisticsUseCase,
     GetAuditLogsUseCase,
 
