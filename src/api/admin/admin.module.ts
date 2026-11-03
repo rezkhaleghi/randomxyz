@@ -2,8 +2,6 @@ import { Module } from "@nestjs/common";
 
 import { ApplicationModule } from "@application/application.module";
 
-import { TmarAuthGuard } from "../auth/tmar-auth.guard";
-
 import { AdminAuthGuard } from "./admin-auth.guard";
 import { AdminUsersController } from "./admin-users.controller";
 import { AdminUserBalancesController } from "./admin-user-balances.controller";
@@ -26,6 +24,6 @@ import { AdminPagesController } from "./admin-pages.controller";
     AdminPagesController,
   ],
 
-  providers: [TmarAuthGuard, AdminAuthGuard],
+  providers: [AdminAuthGuard],
 })
 export class AdminModule {}

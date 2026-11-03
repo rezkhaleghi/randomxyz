@@ -12,21 +12,20 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import type { Request } from "express";
 
 import { CreateDepositUseCase } from "@application/use-cases/deposits/create-deposit.use-case";
 import { GetDepositUseCase } from "@application/use-cases/deposits/get-deposit.use-case";
 import { ListDepositsUseCase } from "@application/use-cases/deposits/list-deposits.use-case";
 import { VerifyDepositUseCase } from "@application/use-cases/deposits/verify-deposit.use-case";
 
-import { AuthSessionGuard } from "../auth/auth-session.guard";
+import { TmarAuthGuard } from "../auth/tmar-auth.guard";
 import { ListDepositsQueryDto } from "./dtos/list-deposits.query.dto";
 import { CreateDepositDto } from "./dtos/create-deposit.dto";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 
 @ApiTags("deposits")
 @Controller("deposits")
-@UseGuards(AuthSessionGuard)
+@UseGuards(TmarAuthGuard)
 export class DepositsController {
   constructor(
     private readonly createDepositUseCase: CreateDepositUseCase,

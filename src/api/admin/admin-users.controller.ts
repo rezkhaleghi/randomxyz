@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseUUIDPipe,
@@ -12,20 +11,18 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import type { Request } from "express";
+
+import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 
 import { CreateAdminUserUseCase } from "@application/use-cases/admin-users/create-user.use-case";
-import { DeleteAdminUserUseCase } from "@application/use-cases/admin-users/delete-user.use-case";
 import { GetUserUseCase } from "@application/use-cases/admin-users/get-user.use-case";
 import { ListUsersUseCase } from "@application/use-cases/admin-users/list-users.use-case";
 import { UpdateAdminUserUseCase } from "@application/use-cases/admin-users/update-user.use-case";
 import { GetAuditLogsUseCase } from "@application/use-cases/admin-users/get-audit-logs.use-case";
-import { DeleteAdminUserAvatarUseCase } from "@application/use-cases/admin-users/delete-user-avatar.use-case";
 import { GetAdminStatisticsUseCase } from "@application/use-cases/admin-users/get-statistics.use-case";
 
 import { AdminAuthGuard } from "./admin-auth.guard";
 
-import { UpdateUserPasswordtDto } from "./dtos/users/update-user-password.dto";
 import { AdminUserResponseDto } from "./dtos/users/admin-user.response.dto";
 import { AdminUserListResponseDto } from "./dtos/users/admin-user-list.response.dto";
 
@@ -40,12 +37,11 @@ import { UpdateUserDto } from "./dtos/users/update-user.dto";
  *
  * Responsibilities:
  * - Receive and validate HTTP requests through DTOs.
- * - Extract route/query/body/session data.
+ * - Extract route, query, body, and authenticated-user data.
  * - Delegate business operations to application use cases.
  * - Convert domain users into API response DTOs.
  *
  * The controller does not contain domain business rules.
- * Domain behavior is handled by User and application use cases.
  */
 @Controller("admin/users")
 @ApiTags("admin-users")
@@ -56,15 +52,10 @@ export class AdminUsersController {
     private readonly getUserUseCase: GetUserUseCase,
     private readonly createUserUseCase: CreateAdminUserUseCase,
     private readonly updateUserUseCase: UpdateAdminUserUseCase,
-    private readonly deleteUserUseCase: DeleteAdminUserUseCase,
-    private readonly deleteAdminUserAvatarUseCase: DeleteAdminUserAvatarUseCase,
     private readonly getAdminStatisticsUseCase: GetAdminStatisticsUseCase,
     private readonly getAuditLogsUseCase: GetAuditLogsUseCase,
   ) {}
 
-  /**
-   * Returns statistics for the administrator dashboard.
-   */
   @Get("statistics")
   @ApiOperation({
     summary: "Get admin dashboard statistics",
@@ -77,9 +68,6 @@ export class AdminUsersController {
     return this.getAdminStatisticsUseCase.execute();
   }
 
-  /**
-   * Returns paginated audit logs with optional filters.
-   */
   @Get("audit-logs")
   @ApiOperation({
     summary: "Get admin audit logs",
@@ -113,9 +101,6 @@ export class AdminUsersController {
     };
   }
 
-  /**
-   * Lists and searches users with pagination, sorting, and filtering.
-   */
   @Get()
   @ApiOperation({
     summary: "List and search users",
@@ -144,9 +129,6 @@ export class AdminUsersController {
     };
   }
 
-  /**
-   * Returns one user by UUID.
-   */
   @Get(":id")
   @ApiOperation({
     summary: "Get one user by ID",
@@ -169,12 +151,6 @@ export class AdminUsersController {
     return this.toResponse(await this.getUserUseCase.execute(id));
   }
 
-  /**
-   * Creates a new regular user or administrator account.
-   *
-   * The current administrator is passed to the use case so the
-   * creation can be recorded in the audit log.
-   */
   @Post()
   @ApiOperation({
     summary: "Create a user or administrator",
@@ -188,19 +164,12 @@ export class AdminUsersController {
     status: 409,
     description: "Email already exists",
   })
-  async create(@Body() dto: CreateUserDto, @Req() request: Request) {
+  async create(@Body() dto: CreateUserDto, @Req() req: AuthenticatedRequest) {
     return this.toResponse(
-      await this.createUserUseCase.execute(dto, request.session.userId!),
+      await this.createUserUseCase.execute(dto, req.user.id),
     );
   }
 
-  /**
-   * Updates a user's account and profile.
-   *
-   * The DTO contains only fields provided by the administrator.
-   * The application use case decides which domain operations
-   * are required for those changes.
-   */
   @Patch(":id")
   @ApiOperation({
     summary: "Update a user's account and profile",
@@ -226,7 +195,7 @@ export class AdminUsersController {
   async update(
     @Param("id", ParseUUIDPipe) id: string,
     @Body() dto: UpdateUserDto,
-    @Req() request: Request,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.toResponse(
       await this.updateUserUseCase.execute(
@@ -234,24 +203,17 @@ export class AdminUsersController {
           id,
           ...dto,
 
-          // Convert the API date string into the domain Date type.
           // Undefined means "do not change"; null means "clear the value".
           dateOfBirth:
             dto.dateOfBirth === undefined || dto.dateOfBirth === null
               ? dto.dateOfBirth
               : new Date(dto.dateOfBirth),
         },
-        request.session.userId!,
+        req.user.id,
       ),
     );
   }
 
-  /**
-   * Maps the domain User entity to the API response shape.
-   *
-   * Keeping this mapping here prevents internal domain properties
-   * from being exposed directly through the HTTP API.
-   */
   private toResponse(user: {
     id: string;
     email: string;

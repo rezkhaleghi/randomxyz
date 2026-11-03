@@ -11,7 +11,8 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
-import type { Request } from "express";
+
+import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
 
@@ -88,7 +89,7 @@ export class AdminUserBalancesController {
     @Param("currency", new ParseEnumPipe(PaymentCurrency))
     currency: PaymentCurrency,
     @Body() dto: UpdateUserBalanceDto,
-    @Req() request: Request,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.updateUserBalanceUseCase.execute(
       {
@@ -96,7 +97,7 @@ export class AdminUserBalancesController {
         currency,
         amount: dto.amount,
       },
-      request.session.userId!,
+      req.user.id,
     );
   }
 }

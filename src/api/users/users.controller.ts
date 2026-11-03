@@ -1,38 +1,19 @@
 import {
-  Body,
   Controller,
-  Delete,
   Get,
   Patch,
   Query,
   Req,
   UseGuards,
-  UploadedFile,
-  UseInterceptors,
-  ParseFilePipe,
-  MaxFileSizeValidator,
-  FileTypeValidator,
-  Post,
   Param,
   ParseUUIDPipe,
 } from "@nestjs/common";
 
-import { FileInterceptor } from "@nestjs/platform-express";
-
-import {
-  ApiBody,
-  ApiConsumes,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from "@nestjs/swagger";
-
-import type { Request } from "express";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 import { User } from "@domain/entities/user.entity";
 
-import { AuthSessionGuard } from "../auth/auth-session.guard";
-
+import { TmarAuthGuard } from "../auth/tmar-auth.guard";
 import { GetCurrentUserUseCase } from "@application/use-cases/users/get-current-user.use-case";
 import { UpdateUserAvatarUseCase } from "@application/use-cases/users/update-user-avatar.use-case";
 import { DeleteUserAvatarUseCase } from "@application/use-cases/users/delete-user-avatar.use-case";
@@ -50,7 +31,7 @@ import { NotificationResponseDto } from "./dtos/notification.response.dto";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 @ApiTags("users")
 @Controller("users")
-@UseGuards(AuthSessionGuard)
+@UseGuards(TmarAuthGuard)
 export class UsersController {
   constructor(
     private readonly getCurrentUserUseCase: GetCurrentUserUseCase,

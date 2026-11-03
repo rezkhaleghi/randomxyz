@@ -46,9 +46,6 @@ export interface EnvironmentConfig {
   SMTP_PASSWORD: string;
   SMTP_FROM: string;
 
-  // Sessions
-  SESSION_SECRET: string;
-
   // Initial administrator
   INITIAL_ADMIN_EMAIL: string;
   INITIAL_ADMIN_PASSWORD: string;

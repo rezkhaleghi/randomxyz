@@ -187,12 +187,6 @@ import { TmarJwtService } from "./services/tmar-jwt.service";
         SMTP_FROM: Joi.string().email().required(),
 
         // -------------------------------------------------------------------
-        // Sessions (temporarily retained during migration)
-        // -------------------------------------------------------------------
-
-        SESSION_SECRET: Joi.string().min(32).required(),
-
-        // -------------------------------------------------------------------
         // Tmar authentication
         // -------------------------------------------------------------------
 

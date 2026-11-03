@@ -18,7 +18,8 @@ import {
   ApiResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import type { Request } from "express";
+
+import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 
 import { CreatePageUseCase } from "@application/use-cases/admin-pages/create-page.use-case";
 import { DeletePageUseCase } from "@application/use-cases/admin-pages/delete-page.use-case";
@@ -49,9 +50,9 @@ export class AdminPagesController {
   @ApiResponse({ status: 201, description: "Page created" })
   @ApiResponse({ status: 400, description: "Invalid page input" })
   @ApiResponse({ status: 409, description: "Page slug already exists" })
-  create(@Body() dto: CreatePageDto, @Req() req: Request) {
+  create(@Body() dto: CreatePageDto, @Req() req: AuthenticatedRequest) {
     return this.createPageUseCase.execute({
-      actorUserId: req.session.userId!,
+      actorUserId: req.user.id,
       title: dto.title,
       slug: dto.slug,
       content: dto.content,
@@ -91,10 +92,10 @@ export class AdminPagesController {
   update(
     @Param("id", ParseUUIDPipe) id: string,
     @Body() dto: UpdatePageDto,
-    @Req() req: Request,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.updatePageUseCase.execute({
-      actorUserId: req.session.userId!,
+      actorUserId: req.user.id,
       id,
       title: dto.title,
       slug: dto.slug,
@@ -108,9 +109,12 @@ export class AdminPagesController {
   @ApiParam({ name: "id", format: "uuid" })
   @ApiResponse({ status: 200, description: "Page deleted" })
   @ApiResponse({ status: 404, description: "Page not found" })
-  async delete(@Param("id", ParseUUIDPipe) id: string, @Req() req: Request) {
+  async delete(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
     await this.deletePageUseCase.execute({
-      actorUserId: req.session.userId!,
+      actorUserId: req.user.id,
       id,
     });
 

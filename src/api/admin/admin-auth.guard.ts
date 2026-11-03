@@ -35,11 +35,6 @@ export class AdminAuthGuard implements CanActivate {
       throw new ForbiddenException("Administrator access required.");
     }
 
-    // Temporary bridge for admin controllers that still use sessions.
-    if (request.session) {
-      request.session.userId = user.id;
-    }
-
     return true;
   }
 }

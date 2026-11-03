@@ -10,9 +10,8 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
-import type { Request } from "express";
 
-import { AuthSessionGuard } from "../auth/auth-session.guard";
+import { TmarAuthGuard } from "../auth/tmar-auth.guard";
 import { CreateWithdrawalUseCase } from "@application/use-cases/withdrawals/create-withdrawal.use-case";
 import { ListWithdrawalsUseCase } from "@application/use-cases/withdrawals/list-withdrawals.use-case";
 import { GetWithdrawalUseCase } from "@application/use-cases/withdrawals/get-withdrawal.use-case";
@@ -22,7 +21,7 @@ import { CreateWithdrawalDto } from "./dtos/create-withdrawal.dto";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 @ApiTags("withdrawals")
 @Controller("withdrawals")
-@UseGuards(AuthSessionGuard)
+@UseGuards(TmarAuthGuard)
 export class WithdrawalsController {
   constructor(
     private readonly createWithdrawalUseCase: CreateWithdrawalUseCase,

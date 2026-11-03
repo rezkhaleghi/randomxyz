@@ -15,7 +15,6 @@ import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 import { OtpService } from "@application/interfaces/otp.service.interface";
 
-import { AuthSessionGuard } from "./auth-session.guard";
 import { RequestOtpDto } from "./dtos/request-otp.dto";
 import { EnvironmentConfig } from "@infrastructure/config/environment.config";
 
