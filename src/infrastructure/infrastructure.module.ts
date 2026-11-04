@@ -101,7 +101,7 @@ import { TmarJwtService } from "./services/tmar-jwt.service";
           .valid("development", "test", "production")
           .default("development"),
 
-        PORT: Joi.number().port().default(3000),
+        PORT: Joi.number().port().default(5001),
 
         TRUST_PROXY: Joi.number().integer().min(0).default(1),
 

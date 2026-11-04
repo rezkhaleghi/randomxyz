@@ -41,6 +41,7 @@ export class TmarJwtService {
             : null,
         lastName:
           typeof payload.lastName === "string" ? payload.lastName.trim() : null,
+        status: typeof payload.status === "string" ? payload.status : null,
       };
     } catch {
       throw new UnauthorizedException(

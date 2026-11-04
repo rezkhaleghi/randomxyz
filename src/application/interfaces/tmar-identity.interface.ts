@@ -3,4 +3,5 @@ export interface TmarIdentity {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  status: string | null;
 }

@@ -18,6 +18,11 @@ export class TmarAuthUseCase {
       throw new UnauthorizedException("Invalid authentication identity.");
     }
 
+    // Reject users blocked by Tmar-Travel.
+    if (identity.status === "blocked") {
+      throw new UnauthorizedException("Your Tmar-Travel account is blocked.");
+    }
+
     let user = await this.userRepository.findByExternalUserId(externalUserId);
 
     if (!user) {
@@ -40,7 +45,7 @@ export class TmarAuthUseCase {
         await this.userRepository.createIfNotExistsByExternalUserId(newUser);
     }
 
-    // Never synchronize profile data for restricted accounts.
+    // Never synchronize profile data for restricted local accounts.
     if (user.status !== UserStatus.ACTIVE) {
       throw new UnauthorizedException("Your account is restricted.");
     }

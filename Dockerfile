@@ -26,6 +26,6 @@ COPY --from=builder /app/dist ./dist
 # Run the application as the non-root Node user.
 USER node
 
-EXPOSE 3000
+EXPOSE 5001
 
 CMD ["node", "dist/main.js"]
