@@ -9,6 +9,9 @@ import { PageRepository } from "@domain/repositories/page.repository";
 import { LocationRepository } from "@domain/repositories/location.repository";
 import { LocationDateOverrideRepository } from "@domain/repositories/location-date-override.repository";
 import { PermitSettingsRepository } from "@domain/repositories/permit-setting.repository";
+import { PermitRepository } from "@domain/repositories/permit.repository";
+import { PassengerRepository } from "@domain/repositories/passenger.repository";
+import { VehicleRepository } from "@domain/repositories/vehicle.repository";
 
 export interface UnitOfWorkRepositories {
   userRepository: UserRepository;
@@ -22,6 +25,9 @@ export interface UnitOfWorkRepositories {
   locationRepository: LocationRepository;
   locationDateOverrideRepository: LocationDateOverrideRepository;
   permitSettingsRepository: PermitSettingsRepository;
+  permitRepository: PermitRepository;
+  passengerRepository: PassengerRepository;
+  vehicleRepository: VehicleRepository;
 }
 
 export abstract class UnitOfWork {

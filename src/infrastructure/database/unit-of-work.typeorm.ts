@@ -17,6 +17,9 @@ import { PageRepositoryImpl } from "./repositories/page.repository.impl";
 import { LocationRepositoryImpl } from "./repositories/location.repository.impl";
 import { LocationDateOverrideRepositoryImpl } from "./repositories/location-date-override.repository.impl";
 import { PermitSettingsRepositoryImpl } from "./repositories/permit-setting.repository.impl";
+import { PermitRepositoryImpl } from "./repositories/permit.repository.impl";
+import { PassengerRepositoryImpl } from "./repositories/passenger.repository.impl";
+import { VehicleRepositoryImpl } from "./repositories/vehicle.repository.impl";
 
 import { UserOrmEntity } from "./orm-entities/user.orm-entity";
 import { UserBalanceOrmEntity } from "./orm-entities/user-balance.orm-entity";
@@ -29,6 +32,9 @@ import { PageOrmEntity } from "./orm-entities/page.orm-entity";
 import { LocationOrmEntity } from "./orm-entities/location.orm-entity";
 import { LocationDateOverrideOrmEntity } from "./orm-entities/location-date-override.orm-entity";
 import { PermitSettingOrmEntity } from "./orm-entities/permit-setting.orm-entity";
+import { PermitOrmEntity } from "./orm-entities/permit.orm-entity";
+import { PassengerOrmEntity } from "./orm-entities/passenger.orm-entity";
+import { VehicleOrmEntity } from "./orm-entities/vehicle.orm-entity";
 
 @Injectable()
 export class TypeOrmUnitOfWork implements UnitOfWork {
@@ -72,6 +78,15 @@ export class TypeOrmUnitOfWork implements UnitOfWork {
         ),
         permitSettingsRepository: new PermitSettingsRepositoryImpl(
           manager.getRepository(PermitSettingOrmEntity),
+        ),
+        permitRepository: new PermitRepositoryImpl(
+          manager.getRepository(PermitOrmEntity),
+        ),
+        passengerRepository: new PassengerRepositoryImpl(
+          manager.getRepository(PassengerOrmEntity),
+        ),
+        vehicleRepository: new VehicleRepositoryImpl(
+          manager.getRepository(VehicleOrmEntity),
         ),
       };
 
