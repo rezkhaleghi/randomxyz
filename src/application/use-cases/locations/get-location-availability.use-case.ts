@@ -24,6 +24,7 @@ export class GetLocationAvailabilityUseCase {
         locationRepository,
         locationDateOverrideRepository,
         permitSettingsRepository,
+        permitRepository,
       }) => {
         const location = await locationRepository.findAvailableById(
           input.locationId,
@@ -46,6 +47,7 @@ export class GetLocationAvailabilityUseCase {
           overrides.map((override) => [override.date, override]),
         );
 
+        const today = this.getTodayDate();
         const days = [];
         let currentDate = input.startDate;
 
@@ -57,10 +59,12 @@ export class GetLocationAvailabilityUseCase {
           const feePerVehicle =
             override?.fee ?? location.fee ?? settings.defaultFee;
 
-          // Permit reservations are not implemented yet.
-          // This will be calculated from confirmed permits
-          // when the permit booking feature is introduced.
-          const reservedCapacity = 0;
+          const reservedCapacity =
+            await permitRepository.countReservedPassengers(
+              location.id,
+              currentDate,
+              today,
+            );
 
           const remainingCapacity = Math.max(0, capacity - reservedCapacity);
 

@@ -129,6 +129,7 @@ export class Ledger {
 
       case LedgerType.WITHDRAWAL:
       case LedgerType.TRANSFER_OUT:
+      case LedgerType.PERMIT_PAYMENT:
         if (!isNegativeDecimal(amount)) {
           throw new InvalidLedgerEntryException();
         }

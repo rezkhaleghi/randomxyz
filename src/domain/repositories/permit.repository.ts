@@ -12,4 +12,10 @@ export abstract class PermitRepository {
   abstract findByQrToken(qrToken: string): Promise<Permit | null>;
 
   abstract findByUserId(userId: string): Promise<Permit[]>;
+
+  abstract countReservedPassengers(
+    locationId: string,
+    date: string,
+    todayDate: string,
+  ): Promise<number>;
 }

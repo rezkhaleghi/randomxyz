@@ -3,8 +3,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 import { Permit } from "@domain/entities/permit.entity";
+import { PermitStatus } from "@domain/enums/permit-status.enum";
 import { PermitRepository } from "@domain/repositories/permit.repository";
 
+import { PassengerOrmEntity } from "../orm-entities/passenger.orm-entity";
 import { PermitOrmEntity } from "../orm-entities/permit.orm-entity";
 
 @Injectable()
@@ -60,6 +62,45 @@ export class PermitRepositoryImpl extends PermitRepository {
     });
 
     return rows.map((row) => this.toDomain(row));
+  }
+
+  async countReservedPassengers(
+    locationId: string,
+    date: string,
+    todayDate: string,
+  ): Promise<number> {
+    const result = await this.repository
+      .createQueryBuilder("permit")
+      .innerJoin(
+        PassengerOrmEntity,
+        "passenger",
+        "passenger.permitId = permit.id",
+      )
+      .select("COUNT(passenger.id)", "count")
+      .where("permit.locationId = :locationId", { locationId })
+      .andWhere(
+        `(
+          (
+            permit.status = :confirmedStatus
+            AND permit.startDate <= :date
+            AND permit.endDate >= :date
+          )
+          OR
+          (
+            permit.status = :expiredStatus
+            AND :date = :todayDate
+          )
+        )`,
+        {
+          confirmedStatus: PermitStatus.CONFIRMED,
+          expiredStatus: PermitStatus.EXPIRED,
+          date,
+          todayDate,
+        },
+      )
+      .getRawOne<{ count: string }>();
+
+    return Number(result?.count ?? 0);
   }
 
   private toDomain(row: PermitOrmEntity): Permit {

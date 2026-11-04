@@ -55,6 +55,8 @@ import { ListLocationsUseCase } from "./use-cases/locations/list-locations.use-c
 import { AdminGetLocationUseCase } from "./use-cases/admin-locations/get-location.use-case";
 import { GetLocationAvailabilityUseCase } from "./use-cases/locations/get-location-availability.use-case";
 
+import { CreatePermitUseCase } from "./use-cases/permits/create-permit.use-case";
+
 /**
  * Registers application use cases. Infrastructure bindings are supplied by
  * the composition root and injected through application interfaces.
@@ -110,11 +112,11 @@ import { GetLocationAvailabilityUseCase } from "./use-cases/locations/get-locati
     AdminListLocationsUseCase,
     AdminGetLocationUseCase,
     GetLocationUseCase,
-    ListLocationsUseCase,
     GetLocationAvailabilityUseCase,
 
     GetPermitSettingsUseCase,
     UpdatePermitSettingsUseCase,
+    CreatePermitUseCase,
 
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,
@@ -174,11 +176,11 @@ import { GetLocationAvailabilityUseCase } from "./use-cases/locations/get-locati
     AdminGetLocationUseCase,
     ListLocationsUseCase,
     GetLocationUseCase,
-    ListLocationsUseCase,
     GetLocationAvailabilityUseCase,
 
     GetPermitSettingsUseCase,
     UpdatePermitSettingsUseCase,
+    CreatePermitUseCase,
 
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,

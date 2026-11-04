@@ -10,6 +10,7 @@ import { HealthModule } from "./api/health/health.module";
 import { UsersModule } from "./api/users/users.module";
 import { WithdrawalsModule } from "./api/withdrawals/withdrawals.module";
 import { LocationsModule } from "./api/locations/locations.module";
+import { PermitsModule } from "./api/permits/permits.module";
 
 import { InfrastructureModule } from "./infrastructure/infrastructure.module";
 
@@ -52,6 +53,7 @@ import { LocationSyncScheduler } from "./infrastructure/services/location-sync.s
     UsersModule,
     FilesModule,
     LocationsModule,
+    PermitsModule,
 
     DepositsModule,
     WithdrawalsModule,
