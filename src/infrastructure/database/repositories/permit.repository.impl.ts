@@ -4,7 +4,13 @@ import { Repository } from "typeorm";
 
 import { Permit } from "@domain/entities/permit.entity";
 import { PermitStatus } from "@domain/enums/permit-status.enum";
-import { PermitRepository } from "@domain/repositories/permit.repository";
+import {
+  AdminPermitFilters,
+  AdminPermitSortBy,
+  PermitRepository,
+} from "@domain/repositories/permit.repository";
+
+import { PageQuery, PageResult } from "@shared/pagination/page-query";
 
 import { PassengerOrmEntity } from "../orm-entities/passenger.orm-entity";
 import { PermitOrmEntity } from "../orm-entities/permit.orm-entity";
@@ -20,21 +26,16 @@ export class PermitRepositoryImpl extends PermitRepository {
 
   async create(permit: Permit): Promise<Permit> {
     const saved = await this.repository.save(this.toOrm(permit));
-
     return this.toDomain(saved);
   }
 
   async save(permit: Permit): Promise<Permit> {
     const saved = await this.repository.save(this.toOrm(permit));
-
     return this.toDomain(saved);
   }
 
   async findById(id: string): Promise<Permit | null> {
-    const row = await this.repository.findOne({
-      where: { id },
-    });
-
+    const row = await this.repository.findOne({ where: { id } });
     return row ? this.toDomain(row) : null;
   }
 
@@ -48,10 +49,7 @@ export class PermitRepositoryImpl extends PermitRepository {
   }
 
   async findByQrToken(qrToken: string): Promise<Permit | null> {
-    const row = await this.repository.findOne({
-      where: { qrToken },
-    });
-
+    const row = await this.repository.findOne({ where: { qrToken } });
     return row ? this.toDomain(row) : null;
   }
 
@@ -64,12 +62,89 @@ export class PermitRepositoryImpl extends PermitRepository {
     return rows.map((row) => this.toDomain(row));
   }
 
+  async findAdminPage(
+    filters: AdminPermitFilters,
+    params: PageQuery<AdminPermitSortBy>,
+  ): Promise<PageResult<Permit>> {
+    const query = this.repository.createQueryBuilder("permit");
+
+    if (filters.userId) {
+      query.andWhere("permit.userId = :userId", {
+        userId: filters.userId,
+      });
+    }
+
+    if (filters.locationId) {
+      query.andWhere("permit.locationId = :locationId", {
+        locationId: filters.locationId,
+      });
+    }
+
+    if (filters.status) {
+      query.andWhere("permit.status = :status", {
+        status: filters.status,
+      });
+    }
+
+    if (filters.startDateFrom) {
+      query.andWhere("permit.startDate >= :startDateFrom", {
+        startDateFrom: filters.startDateFrom,
+      });
+    }
+
+    if (filters.startDateTo) {
+      query.andWhere("permit.startDate <= :startDateTo", {
+        startDateTo: filters.startDateTo,
+      });
+    }
+
+    const columns: Record<AdminPermitSortBy, string> = {
+      createdAt: "permit.createdAt",
+      startDate: "permit.startDate",
+      endDate: "permit.endDate",
+    };
+
+    query
+      .orderBy(
+        columns[params.sortBy ?? "createdAt"],
+        params.sortDirection ?? "DESC",
+      )
+      .addOrderBy("permit.id", "ASC")
+      .skip((params.page - 1) * params.limit)
+      .take(params.limit);
+
+    const [rows, total] = await query.getManyAndCount();
+
+    return {
+      data: rows.map((row) => this.toDomain(row)),
+      page: params.page,
+      limit: params.limit,
+      total,
+      totalPages: Math.ceil(total / params.limit),
+    };
+  }
+
+  async expireConfirmedBefore(date: string): Promise<number> {
+    const result = await this.repository
+      .createQueryBuilder()
+      .update(PermitOrmEntity)
+      .set({ status: PermitStatus.EXPIRED })
+      .where('"status" = :status', {
+        status: PermitStatus.CONFIRMED,
+      })
+      .andWhere('"endDate" < :date', { date })
+      .execute();
+
+    return result.affected ?? 0;
+  }
+
   async countReservedPassengers(
     locationId: string,
     date: string,
     todayDate: string,
+    excludePermitId?: string,
   ): Promise<number> {
-    const result = await this.repository
+    const query = this.repository
       .createQueryBuilder("permit")
       .innerJoin(
         PassengerOrmEntity,
@@ -97,8 +172,15 @@ export class PermitRepositoryImpl extends PermitRepository {
           date,
           todayDate,
         },
-      )
-      .getRawOne<{ count: string }>();
+      );
+
+    if (excludePermitId) {
+      query.andWhere("permit.id != :excludePermitId", {
+        excludePermitId,
+      });
+    }
+
+    const result = await query.getRawOne<{ count: string }>();
 
     return Number(result?.count ?? 0);
   }

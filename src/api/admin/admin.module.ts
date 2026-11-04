@@ -12,10 +12,10 @@ import { AdminNotificationsController } from "./admin-notifications.controller";
 import { AdminPagesController } from "./admin-pages.controller";
 import { AdminLocationsController } from "./admin-locations.controller";
 import { AdminPermitSettingsController } from "./admin-permit-settings.controller";
+import { AdminPermitsController } from "./admin-permits.controller";
 
 @Module({
   imports: [ApplicationModule],
-
   controllers: [
     AdminUsersController,
     AdminUserBalancesController,
@@ -26,8 +26,8 @@ import { AdminPermitSettingsController } from "./admin-permit-settings.controlle
     AdminPagesController,
     AdminLocationsController,
     AdminPermitSettingsController,
+    AdminPermitsController,
   ],
-
   providers: [AdminAuthGuard],
 })
 export class AdminModule {}

@@ -83,4 +83,14 @@ export class Permit {
     this.status = PermitStatus.ENDED;
     this.updatedAt = new Date();
   }
+
+  revoke(): void {
+    this.status = PermitStatus.REVOKED;
+    this.updatedAt = new Date();
+  }
+
+  expire(): void {
+    this.status = PermitStatus.EXPIRED;
+    this.updatedAt = new Date();
+  }
 }

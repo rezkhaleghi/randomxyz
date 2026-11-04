@@ -58,6 +58,12 @@ import { CreatePermitUseCase } from "./use-cases/permits/create-permit.use-case"
 import { ListPermitsUseCase } from "./use-cases/permits/list-permits.use-case";
 import { GetPermitUseCase } from "./use-cases/permits/get-permit.use-case";
 import { EndPermitUseCase } from "./use-cases/permits/end-permit.use-case";
+import { VerifyPermitUseCase } from "./use-cases/permits/verify-permit.use-case";
+import { ExpirePermitsUseCase } from "./use-cases/permits/expire-permits.use-case";
+import { AdminListPermitsUseCase } from "./use-cases/admin-permits/list-permits.use-case";
+import { AdminGetPermitUseCase } from "./use-cases/admin-permits/get-permit.use-case";
+import { AdminUpdatePermitUseCase } from "./use-cases/admin-permits/update-permit.use-case";
+import { AdminRevokePermitUseCase } from "./use-cases/admin-permits/revoke-permit.use-case";
 
 /**
  * Registers application use cases. Infrastructure bindings are supplied by
@@ -117,6 +123,14 @@ import { EndPermitUseCase } from "./use-cases/permits/end-permit.use-case";
 
     GetPermitSettingsUseCase,
     UpdatePermitSettingsUseCase,
+
+    VerifyPermitUseCase,
+    ExpirePermitsUseCase,
+
+    AdminListPermitsUseCase,
+    AdminGetPermitUseCase,
+    AdminUpdatePermitUseCase,
+    AdminRevokePermitUseCase,
 
     CreatePermitUseCase,
     ListPermitsUseCase,
@@ -184,6 +198,14 @@ import { EndPermitUseCase } from "./use-cases/permits/end-permit.use-case";
 
     GetPermitSettingsUseCase,
     UpdatePermitSettingsUseCase,
+
+    VerifyPermitUseCase,
+    ExpirePermitsUseCase,
+
+    AdminListPermitsUseCase,
+    AdminGetPermitUseCase,
+    AdminUpdatePermitUseCase,
+    AdminRevokePermitUseCase,
 
     CreatePermitUseCase,
     ListPermitsUseCase,
