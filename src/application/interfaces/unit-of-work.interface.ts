@@ -8,6 +8,7 @@ import { NotificationRepository } from "@domain/repositories/notification.reposi
 import { PageRepository } from "@domain/repositories/page.repository";
 import { LocationRepository } from "@domain/repositories/location.repository";
 import { LocationDateOverrideRepository } from "@domain/repositories/location-date-override.repository";
+import { PermitSettingsRepository } from "@domain/repositories/permit-setting.repository";
 
 export interface UnitOfWorkRepositories {
   userRepository: UserRepository;
@@ -20,6 +21,7 @@ export interface UnitOfWorkRepositories {
   pageRepository: PageRepository;
   locationRepository: LocationRepository;
   locationDateOverrideRepository: LocationDateOverrideRepository;
+  permitSettingsRepository: PermitSettingsRepository;
 }
 
 export abstract class UnitOfWork {

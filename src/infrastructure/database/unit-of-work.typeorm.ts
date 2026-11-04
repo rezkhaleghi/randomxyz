@@ -16,6 +16,7 @@ import { NotificationRepositoryImpl } from "./repositories/notification.reposito
 import { PageRepositoryImpl } from "./repositories/page.repository.impl";
 import { LocationRepositoryImpl } from "./repositories/location.repository.impl";
 import { LocationDateOverrideRepositoryImpl } from "./repositories/location-date-override.repository.impl";
+import { PermitSettingsRepositoryImpl } from "./repositories/permit-setting.repository.impl";
 
 import { UserOrmEntity } from "./orm-entities/user.orm-entity";
 import { UserBalanceOrmEntity } from "./orm-entities/user-balance.orm-entity";
@@ -27,6 +28,7 @@ import { NotificationOrmEntity } from "./orm-entities/notification.orm-entity";
 import { PageOrmEntity } from "./orm-entities/page.orm-entity";
 import { LocationOrmEntity } from "./orm-entities/location.orm-entity";
 import { LocationDateOverrideOrmEntity } from "./orm-entities/location-date-override.orm-entity";
+import { PermitSettingOrmEntity } from "./orm-entities/permit-setting.orm-entity";
 
 @Injectable()
 export class TypeOrmUnitOfWork implements UnitOfWork {
@@ -67,6 +69,9 @@ export class TypeOrmUnitOfWork implements UnitOfWork {
         ),
         locationDateOverrideRepository: new LocationDateOverrideRepositoryImpl(
           manager.getRepository(LocationDateOverrideOrmEntity),
+        ),
+        permitSettingsRepository: new PermitSettingsRepositoryImpl(
+          manager.getRepository(PermitSettingOrmEntity),
         ),
       };
 

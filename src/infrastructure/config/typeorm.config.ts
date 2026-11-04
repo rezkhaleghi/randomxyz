@@ -9,6 +9,7 @@ import { WithdrawalOrmEntity } from "@infrastructure/database/orm-entities/withd
 import { NotificationOrmEntity } from "@infrastructure/database/orm-entities/notification.orm-entity";
 import { PageOrmEntity } from "@infrastructure/database/orm-entities/page.orm-entity";
 import { LocationOrmEntity } from "@infrastructure/database/orm-entities/location.orm-entity";
+import { PermitSettingOrmEntity } from "@infrastructure/database/orm-entities/permit-setting.orm-entity";
 
 /**
  * NestJS database configuration.
@@ -35,6 +36,7 @@ export default registerAs(
       NotificationOrmEntity,
       PageOrmEntity,
       LocationOrmEntity,
+      PermitSettingOrmEntity,
     ],
     synchronize: process.env.NODE_ENV === "development",
     // synchronize: true, // Set to false in production to avoid data loss

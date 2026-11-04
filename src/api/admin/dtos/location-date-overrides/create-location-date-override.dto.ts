@@ -3,11 +3,11 @@ import { Type } from "class-transformer";
 import {
   IsDateString,
   IsInt,
-  IsOptional,
   IsString,
   Matches,
   Max,
   Min,
+  ValidateIf,
 } from "class-validator";
 
 export class CreateLocationDateOverrideDto {
@@ -25,7 +25,7 @@ export class CreateLocationDateOverrideDto {
     minimum: 1,
     maximum: 1000000,
   })
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined)
   @Type(() => Number)
   @IsInt()
   @Min(1)
@@ -36,7 +36,7 @@ export class CreateLocationDateOverrideDto {
     description: "Fee per vehicle in IRT. Omit to inherit the location fee.",
     example: "3000000",
   })
-  @IsOptional()
+  @ValidateIf((_, value) => value !== undefined)
   @IsString()
   @Matches(/^(0|[1-9]\d*)$/)
   fee?: string;

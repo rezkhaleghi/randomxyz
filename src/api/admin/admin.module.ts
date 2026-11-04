@@ -11,6 +11,7 @@ import { AdminWithdrawalsController } from "./admin-withdrawals.controller";
 import { AdminNotificationsController } from "./admin-notifications.controller";
 import { AdminPagesController } from "./admin-pages.controller";
 import { AdminLocationsController } from "./admin-locations.controller";
+import { AdminPermitSettingsController } from "./admin-permit-settings.controller";
 
 @Module({
   imports: [ApplicationModule],
@@ -24,6 +25,7 @@ import { AdminLocationsController } from "./admin-locations.controller";
     AdminNotificationsController,
     AdminPagesController,
     AdminLocationsController,
+    AdminPermitSettingsController,
   ],
 
   providers: [AdminAuthGuard],

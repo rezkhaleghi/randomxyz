@@ -48,6 +48,9 @@ import { CreateLocationDateOverrideUseCase } from "./use-cases/admin-locations/c
 import { UpdateLocationDateOverrideUseCase } from "./use-cases/admin-locations/update-location-date-override.use-case";
 import { DeleteLocationDateOverrideUseCase } from "./use-cases/admin-locations/delete-location-date-override.use-case";
 
+import { GetPermitSettingsUseCase } from "./use-cases/admin-settings/get-permit-setting.use-case";
+import { UpdatePermitSettingsUseCase } from "./use-cases/admin-settings/update-permit-setting.use-case";
+
 /**
  * Registers application use cases. Infrastructure bindings are supplied by
  * the composition root and injected through application interfaces.
@@ -100,6 +103,9 @@ import { DeleteLocationDateOverrideUseCase } from "./use-cases/admin-locations/d
     CreateLocationDateOverrideUseCase,
     UpdateLocationDateOverrideUseCase,
     DeleteLocationDateOverrideUseCase,
+
+    GetPermitSettingsUseCase,
+    UpdatePermitSettingsUseCase,
 
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,
@@ -155,6 +161,9 @@ import { DeleteLocationDateOverrideUseCase } from "./use-cases/admin-locations/d
     CreateLocationDateOverrideUseCase,
     UpdateLocationDateOverrideUseCase,
     DeleteLocationDateOverrideUseCase,
+
+    GetPermitSettingsUseCase,
+    UpdatePermitSettingsUseCase,
 
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,
