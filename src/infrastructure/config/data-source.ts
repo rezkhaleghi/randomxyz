@@ -10,6 +10,7 @@ import { DepositOrmEntity } from "../database/orm-entities/deposit.orm-entity";
 import { WithdrawalOrmEntity } from "../database/orm-entities/withdrawal.orm-entity";
 import { NotificationOrmEntity } from "@infrastructure/database/orm-entities/notification.orm-entity";
 import { PageOrmEntity } from "@infrastructure/database/orm-entities/page.orm-entity";
+import { LocationOrmEntity } from "@infrastructure/database/orm-entities/location.orm-entity";
 
 /**
  * TypeORM CLI data source configuration.
@@ -36,6 +37,7 @@ export default new DataSource({
     WithdrawalOrmEntity,
     NotificationOrmEntity,
     PageOrmEntity,
+    LocationOrmEntity,
   ],
   migrations: [__dirname + "/../database/migrations/*.{js,ts}"],
   synchronize: true, // Set to false in production to avoid data loss

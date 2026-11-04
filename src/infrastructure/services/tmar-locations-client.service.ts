@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 
-import { LocationsClient } from "@application/interfaces/locations-client.interface";
+import { TmarTravelLocationsClient } from "@application/interfaces/tmar-locations-client.interface";
 import { EnvironmentConfig } from "@infrastructure/config/environment.config";
 
 @Injectable()
-export class LocationsClientService extends LocationsClient {
+export class TmarTravelLocationsClientService extends TmarTravelLocationsClient {
   constructor(
     private readonly configService: ConfigService<EnvironmentConfig>,
   ) {
@@ -14,8 +14,10 @@ export class LocationsClientService extends LocationsClient {
 
   async fetchAvailableLocations(): Promise<unknown> {
     const baseUrl = this.configService
-      .getOrThrow("TMAR_TRAVEL_BASE_URL")
+      .getOrThrow("FRONTEND_URL")
       .replace(/\/+$/, "");
+
+    // maybe /destinations/sync
 
     const response = await fetch(`${baseUrl}/locations/sync`, {
       method: "GET",

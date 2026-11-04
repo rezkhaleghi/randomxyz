@@ -76,9 +76,9 @@ import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
 import { TmarJwtService } from "./services/tmar-jwt.service";
 import { LocationRepository } from "@domain/repositories/location.repository";
 import { LocationRepositoryImpl } from "./database/repositories/location.repository.impl";
-import { LocationsClient } from "@application/interfaces/locations-client.interface";
+import { TmarTravelLocationsClient } from "@application/interfaces/tmar-locations-client.interface";
 import { LocationSyncScheduler } from "./services/location-sync.scheduler";
-import { LocationsClientService } from "./services/locations-client.service";
+import { TmarTravelLocationsClientService } from "./services/tmar-locations-client.service";
 
 /**
  * Infrastructure composition root.
@@ -404,8 +404,8 @@ import { LocationsClientService } from "./services/locations-client.service";
 
     { provide: LocationRepository, useClass: LocationRepositoryImpl },
     {
-      provide: LocationsClient,
-      useClass: LocationsClientService,
+      provide: TmarTravelLocationsClient,
+      useClass: TmarTravelLocationsClientService,
     },
     LocationSyncScheduler,
   ],

@@ -1,3 +1,3 @@
-export abstract class LocationsClient {
+export abstract class TmarTravelLocationsClient {
   abstract fetchAvailableLocations(): Promise<unknown>;
 }

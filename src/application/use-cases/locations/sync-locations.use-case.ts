@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
 
-import { LocationsClient } from "@application/interfaces/locations-client.interface";
+import { TmarTravelLocationsClient } from "@application/interfaces/tmar-locations-client.interface";
 import {
   LocationRepository,
   LocationSyncRecord,
@@ -29,7 +29,7 @@ export class SyncLocationsUseCase {
   private readonly logger = new Logger(SyncLocationsUseCase.name);
 
   constructor(
-    private readonly client: LocationsClient,
+    private readonly client: TmarTravelLocationsClient,
     private readonly locationRepository: LocationRepository,
   ) {}
 
