@@ -80,6 +80,9 @@ import { TmarTravelLocationsClient } from "@application/interfaces/tmar-location
 import { LocationSyncScheduler } from "./services/location-sync.scheduler";
 import { TmarTravelLocationsClientService } from "./services/tmar-locations-client.service";
 import { LocationOrmEntity } from "./database/orm-entities/location.orm-entity";
+import { LocationDateOverrideRepository } from "@domain/repositories/location-date-override.repository";
+import { LocationDateOverrideRepositoryImpl } from "./database/repositories/location-date-override.repository.impl";
+import { LocationDateOverrideOrmEntity } from "./database/orm-entities/location-date-override.orm-entity";
 
 /**
  * Infrastructure composition root.
@@ -252,6 +255,7 @@ import { LocationOrmEntity } from "./database/orm-entities/location.orm-entity";
       NotificationOrmEntity,
       PageOrmEntity,
       LocationOrmEntity,
+      LocationDateOverrideOrmEntity,
     ]),
   ],
 
@@ -410,6 +414,10 @@ import { LocationOrmEntity } from "./database/orm-entities/location.orm-entity";
       provide: TmarTravelLocationsClient,
       useClass: TmarTravelLocationsClientService,
     },
+    {
+      provide: LocationDateOverrideRepository,
+      useClass: LocationDateOverrideRepositoryImpl,
+    },
   ],
 
   exports: [
@@ -434,6 +442,7 @@ import { LocationOrmEntity } from "./database/orm-entities/location.orm-entity";
     TmarJwtService,
     LocationRepository,
     TmarTravelLocationsClient,
+    LocationDateOverrideRepository,
   ],
 })
 export class InfrastructureModule {}

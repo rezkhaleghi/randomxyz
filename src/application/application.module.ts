@@ -43,6 +43,10 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
 import { SyncLocationsUseCase } from "@application/use-cases/locations/sync-locations.use-case";
 import { ListLocationsUseCase } from "./use-cases/admin-locations/list-locations.use-case";
 import { UpdateLocationUseCase } from "./use-cases/admin-locations/update-location.use-case";
+import { ListLocationDateOverridesUseCase } from "./use-cases/admin-locations/list-location-date-overrides.use-case";
+import { CreateLocationDateOverrideUseCase } from "./use-cases/admin-locations/create-location-date-override.use-case";
+import { UpdateLocationDateOverrideUseCase } from "./use-cases/admin-locations/update-location-date-override.use-case";
+import { DeleteLocationDateOverrideUseCase } from "./use-cases/admin-locations/delete-location-date-override.use-case";
 
 /**
  * Registers application use cases. Infrastructure bindings are supplied by
@@ -91,6 +95,11 @@ import { UpdateLocationUseCase } from "./use-cases/admin-locations/update-locati
     CreateAdminUserUseCase,
     GetAdminStatisticsUseCase,
     GetAuditLogsUseCase,
+
+    ListLocationDateOverridesUseCase,
+    CreateLocationDateOverrideUseCase,
+    UpdateLocationDateOverrideUseCase,
+    DeleteLocationDateOverrideUseCase,
 
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,
@@ -141,6 +150,11 @@ import { UpdateLocationUseCase } from "./use-cases/admin-locations/update-locati
     CreateAdminUserUseCase,
     GetAdminStatisticsUseCase,
     GetAuditLogsUseCase,
+
+    ListLocationDateOverridesUseCase,
+    CreateLocationDateOverrideUseCase,
+    UpdateLocationDateOverrideUseCase,
+    DeleteLocationDateOverrideUseCase,
 
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,

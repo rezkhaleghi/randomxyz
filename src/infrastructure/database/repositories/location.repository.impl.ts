@@ -39,8 +39,6 @@ export class LocationRepositoryImpl extends LocationRepository {
           isAvailable: true,
         }));
 
-        // Local settings such as isEnabled, capacity and fee
-        // must never be overwritten by Tmar-Travel synchronization.
         await repository.upsert(rows, {
           conflictPaths: ["externalId"],
           skipUpdateIfNoValuesChanged: true,
@@ -120,6 +118,10 @@ export class LocationRepositoryImpl extends LocationRepository {
       total,
       totalPages: Math.ceil(total / params.limit),
     };
+  }
+
+  async findById(id: string): Promise<LocationRecord | null> {
+    return this.repository.findOne({ where: { id } });
   }
 
   async findByIdForUpdate(id: string): Promise<LocationRecord | null> {

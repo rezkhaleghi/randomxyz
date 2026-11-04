@@ -45,6 +45,8 @@ export abstract class LocationRepository {
     params: PageQuery<LocationSortBy>,
   ): Promise<PageResult<LocationRecord>>;
 
+  abstract findById(id: string): Promise<LocationRecord | null>;
+
   abstract findByIdForUpdate(id: string): Promise<LocationRecord | null>;
 
   abstract save(location: LocationRecord): Promise<LocationRecord>;

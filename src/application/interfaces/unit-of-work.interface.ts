@@ -7,6 +7,7 @@ import { WithdrawalRepository } from "@domain/repositories/withdrawal.repository
 import { NotificationRepository } from "@domain/repositories/notification.repository";
 import { PageRepository } from "@domain/repositories/page.repository";
 import { LocationRepository } from "@domain/repositories/location.repository";
+import { LocationDateOverrideRepository } from "@domain/repositories/location-date-override.repository";
 
 export interface UnitOfWorkRepositories {
   userRepository: UserRepository;
@@ -18,6 +19,7 @@ export interface UnitOfWorkRepositories {
   notificationRepository: NotificationRepository;
   pageRepository: PageRepository;
   locationRepository: LocationRepository;
+  locationDateOverrideRepository: LocationDateOverrideRepository;
 }
 
 export abstract class UnitOfWork {
