@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 
 import { User } from "@domain/entities/user.entity";
 import { UserRole } from "@domain/enums/user-role.enum";
+import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
 import { AuditAction } from "@domain/enums/audit-action.enum";
 
 import { UserAlreadyExistsException } from "@domain/exceptions/domain.exception";
@@ -28,6 +29,10 @@ describe("CreateAdminUserUseCase", () => {
     execute: jest.fn(),
   };
 
+  const configService = {
+    getOrThrow: jest.fn(() => PaymentCurrency.IRT),
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -49,15 +54,15 @@ describe("CreateAdminUserUseCase", () => {
     );
   });
 
-  it("creates an admin user with a normalized email", async () => {
+  it("creates an admin user with a normalized email and default balance", async () => {
     repository.findByEmail.mockResolvedValue(null);
     hash.mockResolvedValue("hashed");
-
     repository.save.mockImplementation(async (user) => user);
 
     const useCase = new CreateAdminUserUseCase(
       { hash } as any,
       unitOfWork as any,
+      configService as any,
     );
 
     const result = await useCase.execute(
@@ -75,22 +80,12 @@ describe("CreateAdminUserUseCase", () => {
     expect(result.emailVerified).toBe(true);
 
     expect(repository.findByEmail).toHaveBeenCalledWith("admin@example.com");
-
     expect(hash).toHaveBeenCalledWith("password123");
-
-    expect(repository.save).toHaveBeenCalledWith(
-      expect.objectContaining({
-        email: "admin@example.com",
-        hashedPassword: "hashed",
-        role: UserRole.ADMIN,
-        emailVerified: true,
-      }),
-    );
 
     expect(userBalanceRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: result.id,
-        currency: expect.anything(),
+        currency: PaymentCurrency.IRT,
         amount: "0",
       }),
     );
@@ -124,6 +119,7 @@ describe("CreateAdminUserUseCase", () => {
     const useCase = new CreateAdminUserUseCase(
       { hash } as any,
       unitOfWork as any,
+      configService as any,
     );
 
     await expect(

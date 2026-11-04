@@ -1,14 +1,23 @@
 import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 import { TmarIdentity } from "@application/interfaces/tmar-identity.interface";
+import { UnitOfWork } from "@application/interfaces/unit-of-work.interface";
 
 import { User } from "@domain/entities/user.entity";
+import { UserBalance } from "@domain/entities/user-balance.entity";
+
 import { UserStatus } from "@domain/enums/user-status.enum";
-import { UserRepository } from "@domain/repositories/user.repository";
+import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
+
+import { EnvironmentConfig } from "@infrastructure/config/environment.config";
 
 @Injectable()
 export class TmarAuthUseCase {
-  constructor(private readonly userRepository: UserRepository) {}
+  constructor(
+    private readonly unitOfWork: UnitOfWork,
+    private readonly configService: ConfigService<EnvironmentConfig>,
+  ) {}
 
   async execute(identity: TmarIdentity): Promise<User> {
     const externalUserId = identity._id.trim();
@@ -18,56 +27,81 @@ export class TmarAuthUseCase {
       throw new UnauthorizedException("Invalid authentication identity.");
     }
 
-    // Reject users blocked by Tmar-Travel.
     if (identity.status === "blocked") {
       throw new UnauthorizedException("Your Tmar-Travel account is blocked.");
     }
 
-    let user = await this.userRepository.findByExternalUserId(externalUserId);
+    const currency = this.configService.getOrThrow(
+      "DEFAULT_CURRENCY",
+    ) as PaymentCurrency;
 
-    if (!user) {
-      const newUser = User.create({
-        externalUserId,
-        email,
-        hashedPassword: null,
-        emailVerified: true,
-      });
+    return this.unitOfWork.execute(
+      async ({ userRepository, userBalanceRepository }) => {
+        let user = await userRepository.findByExternalUserId(externalUserId);
 
-      newUser.synchronizeTmarTravelProfile({
-        externalUserId,
-        email,
-        firstName: identity.firstName,
-        lastName: identity.lastName,
-      });
+        if (!user) {
+          const newUser = User.create({
+            externalUserId,
+            email,
+            hashedPassword: null,
+            emailVerified: true,
+          });
 
-      // The repository handles concurrent first-time requests atomically.
-      user =
-        await this.userRepository.createIfNotExistsByExternalUserId(newUser);
-    }
+          newUser.synchronizeTmarTravelProfile({
+            externalUserId,
+            email,
+            firstName: identity.firstName,
+            lastName: identity.lastName,
+          });
 
-    // Never synchronize profile data for restricted local accounts.
-    if (user.status !== UserStatus.ACTIVE) {
-      throw new UnauthorizedException("Your account is restricted.");
-    }
+          user =
+            await userRepository.createIfNotExistsByExternalUserId(newUser);
+        }
 
-    const profileChanged =
-      user.externalUserId !== externalUserId ||
-      user.email !== email ||
-      user.firstName !== identity.firstName ||
-      user.lastName !== identity.lastName ||
-      !user.emailVerified;
+        // Serialize first-login requests and balance creation for this user.
+        user = (await userRepository.findByIdForUpdate(user.id)) ?? user;
 
-    if (profileChanged) {
-      user.synchronizeTmarTravelProfile({
-        externalUserId,
-        email,
-        firstName: identity.firstName,
-        lastName: identity.lastName,
-      });
+        if (user.status !== UserStatus.ACTIVE) {
+          throw new UnauthorizedException("Your account is restricted.");
+        }
 
-      user = await this.userRepository.save(user);
-    }
+        // Ensure every active user has a balance in the default currency.
+        const existingBalance =
+          await userBalanceRepository.findByUserIdAndCurrency(
+            user.id,
+            currency,
+          );
 
-    return user;
+        if (!existingBalance) {
+          await userBalanceRepository.create(
+            UserBalance.create({
+              userId: user.id,
+              currency,
+              amount: "0",
+            }),
+          );
+        }
+
+        const profileChanged =
+          user.externalUserId !== externalUserId ||
+          user.email !== email ||
+          user.firstName !== identity.firstName ||
+          user.lastName !== identity.lastName ||
+          !user.emailVerified;
+
+        if (profileChanged) {
+          user.synchronizeTmarTravelProfile({
+            externalUserId,
+            email,
+            firstName: identity.firstName,
+            lastName: identity.lastName,
+          });
+
+          user = await userRepository.save(user);
+        }
+
+        return user;
+      },
+    );
   }
 }

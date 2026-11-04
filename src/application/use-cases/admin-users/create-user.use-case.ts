@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 import { User } from "@domain/entities/user.entity";
 import { UserBalance } from "@domain/entities/user-balance.entity";
@@ -12,7 +13,9 @@ import { UserAlreadyExistsException } from "@domain/exceptions/domain.exception"
 
 import { PasswordHasher } from "@application/interfaces/password-hasher.interface";
 import { UnitOfWork } from "@application/interfaces/unit-of-work.interface";
+
 import { normalizeEmail } from "@domain/utils/normalize-email";
+import { EnvironmentConfig } from "@infrastructure/config/environment.config";
 
 export interface CreateAdminUserInput {
   email: string;
@@ -25,6 +28,7 @@ export class CreateAdminUserUseCase {
   constructor(
     private readonly passwordHasher: PasswordHasher,
     private readonly unitOfWork: UnitOfWork,
+    private readonly configService: ConfigService<EnvironmentConfig>,
   ) {}
 
   async execute(
@@ -34,6 +38,10 @@ export class CreateAdminUserUseCase {
     const email = normalizeEmail(input.email);
 
     const hashedPassword = await this.passwordHasher.hash(input.password);
+
+    const currency = this.configService.getOrThrow(
+      "DEFAULT_CURRENCY",
+    ) as PaymentCurrency;
 
     return this.unitOfWork.execute(
       async ({ userRepository, userBalanceRepository, auditLogRepository }) => {
@@ -48,15 +56,15 @@ export class CreateAdminUserUseCase {
           emailVerified: true,
         });
 
-        const balance = UserBalance.create({
-          userId: user.id,
-          currency: PaymentCurrency.USD,
-          amount: "0",
-        });
-
         const saved = await userRepository.save(user);
 
-        await userBalanceRepository.create(balance);
+        await userBalanceRepository.create(
+          UserBalance.create({
+            userId: saved.id,
+            currency,
+            amount: "0",
+          }),
+        );
 
         await auditLogRepository.create(
           AuditLog.create({
