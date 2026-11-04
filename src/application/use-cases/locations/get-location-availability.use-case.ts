@@ -6,10 +6,14 @@ import {
 
 import { UnitOfWork } from "@application/interfaces/unit-of-work.interface";
 
+import { addDecimal, isNegativeDecimal } from "@domain/utils/decimal.util";
+
 export interface GetLocationAvailabilityInput {
   locationId: string;
   startDate: string;
   endDate: string;
+  vehicleCount: number;
+  passengerCount: number;
 }
 
 @Injectable()
@@ -18,6 +22,16 @@ export class GetLocationAvailabilityUseCase {
 
   async execute(input: GetLocationAvailabilityInput) {
     this.validateDateRange(input.startDate, input.endDate);
+
+    if (!Number.isInteger(input.vehicleCount) || input.vehicleCount < 1) {
+      throw new BadRequestException("vehicleCount must be a positive integer.");
+    }
+
+    if (!Number.isInteger(input.passengerCount) || input.passengerCount < 1) {
+      throw new BadRequestException(
+        "passengerCount must be a positive integer.",
+      );
+    }
 
     return this.unitOfWork.execute(
       async ({
@@ -48,7 +62,9 @@ export class GetLocationAvailabilityUseCase {
         );
 
         const today = this.getTodayDate();
+
         const days = [];
+        let totalEstimatedFee = "0";
         let currentDate = input.startDate;
 
         while (currentDate <= input.endDate) {
@@ -59,6 +75,12 @@ export class GetLocationAvailabilityUseCase {
           const feePerVehicle =
             override?.fee ?? location.fee ?? settings.defaultFee;
 
+          if (isNegativeDecimal(feePerVehicle)) {
+            throw new BadRequestException(
+              `Invalid permit fee configured for ${currentDate}.`,
+            );
+          }
+
           const reservedCapacity =
             await permitRepository.countReservedPassengers(
               location.id,
@@ -68,14 +90,26 @@ export class GetLocationAvailabilityUseCase {
 
           const remainingCapacity = Math.max(0, capacity - reservedCapacity);
 
+          const estimatedFee = this.calculateDailyFee(
+            feePerVehicle,
+            input.vehicleCount,
+          );
+
+          const isAvailable = remainingCapacity >= input.passengerCount;
+
           days.push({
             date: currentDate,
             feePerVehicle,
+            vehicleCount: input.vehicleCount,
+            passengerCount: input.passengerCount,
+            estimatedFee,
             capacity,
             reservedCapacity,
             remainingCapacity,
-            isAvailable: remainingCapacity > 0,
+            isAvailable,
           });
+
+          totalEstimatedFee = addDecimal(totalEstimatedFee, estimatedFee);
 
           currentDate = this.addDays(currentDate, 1);
         }
@@ -84,11 +118,28 @@ export class GetLocationAvailabilityUseCase {
           locationId: location.id,
           startDate: input.startDate,
           endDate: input.endDate,
+          vehicleCount: input.vehicleCount,
+          passengerCount: input.passengerCount,
           currency: "IRT",
+          isRangeAvailable: days.every((day) => day.isAvailable),
+          totalEstimatedFee,
           days,
         };
       },
     );
+  }
+
+  private calculateDailyFee(
+    feePerVehicle: string,
+    vehicleCount: number,
+  ): string {
+    let total = "0";
+
+    for (let index = 0; index < vehicleCount; index += 1) {
+      total = addDecimal(total, feePerVehicle);
+    }
+
+    return total;
   }
 
   private validateDateRange(startDate: string, endDate: string): void {

@@ -6,7 +6,7 @@ import { GetLocationUseCase } from "@application/use-cases/locations/get-locatio
 import { GetLocationAvailabilityUseCase } from "@application/use-cases/locations/get-location-availability.use-case";
 
 import { ListLocationsQueryDto } from "./dtos/list-locations.query.dto";
-import { GetLocationAvailabilityQueryDto } from "./dtos/get-location-availability.query.dto";
+import { GetPermitAvailabilityQueryDto } from "./dtos/get-permit-availability.query.dto";
 
 @ApiTags("locations")
 @Controller("locations")
@@ -28,25 +28,29 @@ export class LocationsController {
     });
   }
 
-  @Get(":locationId/availability")
+  @Get(":locationId/permit-availability")
   @ApiOperation({
-    summary: "Get daily location availability and permit fees",
+    summary: "Get permit availability and price estimation",
+    description:
+      "Returns daily availability and estimated permit fees for the requested passenger and vehicle counts.",
   })
   @ApiParam({ name: "locationId", format: "uuid" })
   @ApiResponse({
     status: 200,
-    description: "Daily capacity and fee information",
+    description: "Daily permit availability and price estimation",
   })
-  @ApiResponse({ status: 400, description: "Invalid date range" })
+  @ApiResponse({ status: 400, description: "Invalid request parameters" })
   @ApiResponse({ status: 404, description: "Location not found" })
-  getAvailability(
+  getPermitAvailability(
     @Param("locationId", ParseUUIDPipe) locationId: string,
-    @Query() query: GetLocationAvailabilityQueryDto,
+    @Query() query: GetPermitAvailabilityQueryDto,
   ) {
     return this.getLocationAvailabilityUseCase.execute({
       locationId,
       startDate: query.startDate,
       endDate: query.endDate,
+      vehicleCount: query.vehicleCount,
+      passengerCount: query.passengerCount,
     });
   }
 

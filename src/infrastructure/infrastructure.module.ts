@@ -83,6 +83,9 @@ import { LocationOrmEntity } from "./database/orm-entities/location.orm-entity";
 import { LocationDateOverrideRepository } from "@domain/repositories/location-date-override.repository";
 import { LocationDateOverrideRepositoryImpl } from "./database/repositories/location-date-override.repository.impl";
 import { LocationDateOverrideOrmEntity } from "./database/orm-entities/location-date-override.orm-entity";
+import { PermitOrmEntity } from "./database/orm-entities/permit.orm-entity";
+import { PermitRepository } from "@domain/repositories/permit.repository";
+import { PermitRepositoryImpl } from "./database/repositories/permit.repository.impl";
 
 /**
  * Infrastructure composition root.
@@ -256,6 +259,7 @@ import { LocationDateOverrideOrmEntity } from "./database/orm-entities/location-
       PageOrmEntity,
       LocationOrmEntity,
       LocationDateOverrideOrmEntity,
+      PermitOrmEntity,
     ]),
   ],
 
@@ -418,6 +422,10 @@ import { LocationDateOverrideOrmEntity } from "./database/orm-entities/location-
       provide: LocationDateOverrideRepository,
       useClass: LocationDateOverrideRepositoryImpl,
     },
+    {
+      provide: PermitRepository,
+      useClass: PermitRepositoryImpl,
+    },
   ],
 
   exports: [
@@ -443,6 +451,7 @@ import { LocationDateOverrideOrmEntity } from "./database/orm-entities/location-
     LocationRepository,
     TmarTravelLocationsClient,
     LocationDateOverrideRepository,
+    PermitRepository,
   ],
 })
 export class InfrastructureModule {}
