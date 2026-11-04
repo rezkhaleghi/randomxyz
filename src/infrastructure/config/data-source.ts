@@ -12,6 +12,7 @@ import { NotificationOrmEntity } from "@infrastructure/database/orm-entities/not
 import { PageOrmEntity } from "@infrastructure/database/orm-entities/page.orm-entity";
 import { LocationOrmEntity } from "@infrastructure/database/orm-entities/location.orm-entity";
 import { PermitSettingOrmEntity } from "@infrastructure/database/orm-entities/permit-setting.orm-entity";
+import { LocationDateOverrideOrmEntity } from "@infrastructure/database/orm-entities/location-date-override.orm-entity";
 
 /**
  * TypeORM CLI data source configuration.
@@ -40,6 +41,7 @@ export default new DataSource({
     PageOrmEntity,
     LocationOrmEntity,
     PermitSettingOrmEntity,
+    LocationDateOverrideOrmEntity,
   ],
   migrations: [__dirname + "/../database/migrations/*.{js,ts}"],
   synchronize: true, // Set to false in production to avoid data loss

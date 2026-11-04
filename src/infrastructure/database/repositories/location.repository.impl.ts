@@ -120,6 +120,58 @@ export class LocationRepositoryImpl extends LocationRepository {
     };
   }
 
+  async findAvailablePage(
+    search: string | undefined,
+    params: PageQuery<"name">,
+  ): Promise<PageResult<LocationRecord>> {
+    const query = this.repository
+      .createQueryBuilder("location")
+      .where("location.isAvailable = :isAvailable", {
+        isAvailable: true,
+      })
+      .andWhere("location.isEnabled = :isEnabled", {
+        isEnabled: true,
+      });
+
+    if (search?.trim()) {
+      query.andWhere(
+        `(
+          LOWER(location.name) LIKE LOWER(:search)
+          OR LOWER(location.city) LIKE LOWER(:search)
+          OR LOWER(location.province) LIKE LOWER(:search)
+          OR LOWER(location.slug) LIKE LOWER(:search)
+        )`,
+        { search: `%${search.trim()}%` },
+      );
+    }
+
+    query
+      .orderBy("location.name", "ASC")
+      .addOrderBy("location.id", "ASC")
+      .skip((params.page - 1) * params.limit)
+      .take(params.limit);
+
+    const [rows, total] = await query.getManyAndCount();
+
+    return {
+      data: rows,
+      page: params.page,
+      limit: params.limit,
+      total,
+      totalPages: Math.ceil(total / params.limit),
+    };
+  }
+
+  async findAvailableById(id: string): Promise<LocationRecord | null> {
+    return this.repository.findOne({
+      where: {
+        id,
+        isAvailable: true,
+        isEnabled: true,
+      },
+    });
+  }
+
   async findById(id: string): Promise<LocationRecord | null> {
     return this.repository.findOne({ where: { id } });
   }

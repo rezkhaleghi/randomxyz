@@ -9,33 +9,24 @@ import { FilesModule } from "./api/files/files.module";
 import { HealthModule } from "./api/health/health.module";
 import { UsersModule } from "./api/users/users.module";
 import { WithdrawalsModule } from "./api/withdrawals/withdrawals.module";
+import { LocationsModule } from "./api/locations/locations.module";
+
 import { InfrastructureModule } from "./infrastructure/infrastructure.module";
+
 import {
   AcceptLanguageResolver,
   HeaderResolver,
   I18nModule,
 } from "nestjs-i18n";
 import * as path from "path";
+
 import { PagesModule } from "@api/pages/pages.module";
 import { ApplicationModule } from "@application/application.module";
+
 import { LocationSyncScheduler } from "./infrastructure/services/location-sync.scheduler";
-/**
- * Root application module.
- *
- * AppModule is the composition root of the NestJS application.
- * It connects the API modules with the shared infrastructure and
- * global framework-level configuration.
- */
+
 @Module({
   imports: [
-    /**
-     * Global API rate limiting.
-     *
-     * 60 requests per 60 seconds per client.
-     *
-     * The guard below makes this policy apply automatically to
-     * controllers throughout the application.
-     */
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
@@ -52,37 +43,23 @@ import { LocationSyncScheduler } from "./infrastructure/services/location-sync.s
       resolvers: [new HeaderResolver(["x-lang"]), AcceptLanguageResolver],
     }),
 
-    /**
-     * Infrastructure contains concrete implementations for things
-     * such as persistence, Redis, authentication services, storage,
-     * and other external dependencies.
-     */
     InfrastructureModule,
-
     ApplicationModule,
 
-    // Authentication and authorization.
     AuthModule,
     AdminModule,
 
-    // User-facing API modules.
     UsersModule,
     FilesModule,
+    LocationsModule,
 
-    // Financial API modules.
     DepositsModule,
     WithdrawalsModule,
 
-    // Operational endpoints such as health checks.
     HealthModule,
-
     PagesModule,
   ],
 
-  /**
-   * Register rate limiting globally instead of requiring every
-   * controller to explicitly use @UseGuards(ThrottlerGuard).
-   */
   providers: [
     {
       provide: APP_GUARD,

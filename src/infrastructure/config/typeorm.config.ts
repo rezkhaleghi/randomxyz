@@ -10,6 +10,7 @@ import { NotificationOrmEntity } from "@infrastructure/database/orm-entities/not
 import { PageOrmEntity } from "@infrastructure/database/orm-entities/page.orm-entity";
 import { LocationOrmEntity } from "@infrastructure/database/orm-entities/location.orm-entity";
 import { PermitSettingOrmEntity } from "@infrastructure/database/orm-entities/permit-setting.orm-entity";
+import { LocationDateOverrideOrmEntity } from "@infrastructure/database/orm-entities/location-date-override.orm-entity";
 
 /**
  * NestJS database configuration.
@@ -37,6 +38,7 @@ export default registerAs(
       PageOrmEntity,
       LocationOrmEntity,
       PermitSettingOrmEntity,
+      LocationDateOverrideOrmEntity,
     ],
     synchronize: process.env.NODE_ENV === "development",
     // synchronize: true, // Set to false in production to avoid data loss
