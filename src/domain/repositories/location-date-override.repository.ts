@@ -15,6 +15,11 @@ export abstract class LocationDateOverrideRepository {
     endDate?: string,
   ): Promise<LocationDateOverrideRecord[]>;
 
+  abstract findByLocationAndDate(
+    locationId: string,
+    date: string,
+  ): Promise<LocationDateOverrideRecord | null>;
+
   abstract findByIdForUpdate(
     locationId: string,
     id: string,

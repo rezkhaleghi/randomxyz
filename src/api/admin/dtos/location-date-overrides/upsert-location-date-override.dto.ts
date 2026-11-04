@@ -9,7 +9,7 @@ import {
   ValidateIf,
 } from "class-validator";
 
-export class UpdateLocationDateOverrideDto {
+export class UpsertLocationDateOverrideDto {
   @ApiPropertyOptional({
     description:
       "Daily capacity measured in people. Use null to inherit normal location capacity.",

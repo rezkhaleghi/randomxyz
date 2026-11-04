@@ -44,8 +44,7 @@ import { SyncLocationsUseCase } from "@application/use-cases/locations/sync-loca
 import { AdminListLocationsUseCase } from "./use-cases/admin-locations/list-locations.use-case";
 import { UpdateLocationUseCase } from "./use-cases/admin-locations/update-location.use-case";
 import { ListLocationDateOverridesUseCase } from "./use-cases/admin-locations/list-location-date-overrides.use-case";
-import { CreateLocationDateOverrideUseCase } from "./use-cases/admin-locations/create-location-date-override.use-case";
-import { UpdateLocationDateOverrideUseCase } from "./use-cases/admin-locations/update-location-date-override.use-case";
+import { UpsertLocationDateOverrideUseCase } from "./use-cases/admin-locations/upsert-location-date-override.use-case";
 import { DeleteLocationDateOverrideUseCase } from "./use-cases/admin-locations/delete-location-date-override.use-case";
 
 import { GetPermitSettingsUseCase } from "./use-cases/admin-settings/get-permit-setting.use-case";
@@ -106,8 +105,7 @@ import { CreatePermitUseCase } from "./use-cases/permits/create-permit.use-case"
     GetAuditLogsUseCase,
 
     ListLocationDateOverridesUseCase,
-    CreateLocationDateOverrideUseCase,
-    UpdateLocationDateOverrideUseCase,
+    UpsertLocationDateOverrideUseCase,
     DeleteLocationDateOverrideUseCase,
     AdminListLocationsUseCase,
     AdminGetLocationUseCase,
@@ -169,8 +167,7 @@ import { CreatePermitUseCase } from "./use-cases/permits/create-permit.use-case"
     GetAuditLogsUseCase,
 
     ListLocationDateOverridesUseCase,
-    CreateLocationDateOverrideUseCase,
-    UpdateLocationDateOverrideUseCase,
+    UpsertLocationDateOverrideUseCase,
     DeleteLocationDateOverrideUseCase,
     AdminListLocationsUseCase,
     AdminGetLocationUseCase,

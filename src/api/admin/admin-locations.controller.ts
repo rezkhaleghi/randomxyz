@@ -6,7 +6,7 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
-  Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -25,15 +25,13 @@ import { AdminListLocationsUseCase } from "@application/use-cases/admin-location
 import { AdminGetLocationUseCase } from "@application/use-cases/admin-locations/get-location.use-case";
 import { UpdateLocationUseCase } from "@application/use-cases/admin-locations/update-location.use-case";
 import { ListLocationDateOverridesUseCase } from "@application/use-cases/admin-locations/list-location-date-overrides.use-case";
-import { CreateLocationDateOverrideUseCase } from "@application/use-cases/admin-locations/create-location-date-override.use-case";
-import { UpdateLocationDateOverrideUseCase } from "@application/use-cases/admin-locations/update-location-date-override.use-case";
+import { UpsertLocationDateOverrideUseCase } from "@application/use-cases/admin-locations/upsert-location-date-override.use-case";
 import { DeleteLocationDateOverrideUseCase } from "@application/use-cases/admin-locations/delete-location-date-override.use-case";
 
 import { AdminAuthGuard } from "./admin-auth.guard";
 import { ListLocationsQueryDto } from "./dtos/locations/list-locations.query.dto";
 import { UpdateLocationDto } from "./dtos/locations/update-location.dto";
-import { CreateLocationDateOverrideDto } from "./dtos/location-date-overrides/create-location-date-override.dto";
-import { UpdateLocationDateOverrideDto } from "./dtos/location-date-overrides/update-location-date-override.dto";
+import { UpsertLocationDateOverrideDto } from "./dtos/location-date-overrides/upsert-location-date-override.dto";
 import { ListLocationDateOverridesQueryDto } from "./dtos/location-date-overrides/list-location-date-overrides.query.dto";
 
 @ApiTags("admin-locations")
@@ -45,8 +43,7 @@ export class AdminLocationsController {
     private readonly adminGetLocationUseCase: AdminGetLocationUseCase,
     private readonly updateLocationUseCase: UpdateLocationUseCase,
     private readonly listLocationDateOverridesUseCase: ListLocationDateOverridesUseCase,
-    private readonly createLocationDateOverrideUseCase: CreateLocationDateOverrideUseCase,
-    private readonly updateLocationDateOverrideUseCase: UpdateLocationDateOverrideUseCase,
+    private readonly upsertLocationDateOverrideUseCase: UpsertLocationDateOverrideUseCase,
     private readonly deleteLocationDateOverrideUseCase: DeleteLocationDateOverrideUseCase,
   ) {}
 
@@ -121,44 +118,32 @@ export class AdminLocationsController {
     });
   }
 
-  @Post(":locationId/date-overrides")
-  @ApiOperation({ summary: "Create a date-specific location override" })
+  @Put(":locationId/date-overrides/:date")
+  @ApiOperation({
+    summary: "Create or update a date-specific location override",
+    description:
+      "Creates an override when none exists for the date, otherwise updates the existing override.",
+  })
   @ApiParam({ name: "locationId", format: "uuid" })
-  @ApiBody({ type: CreateLocationDateOverrideDto })
-  @ApiResponse({ status: 201, description: "Date override created" })
+  @ApiParam({
+    name: "date",
+    example: "2026-12-21",
+    description: "Calendar date in YYYY-MM-DD format.",
+  })
+  @ApiBody({ type: UpsertLocationDateOverrideDto })
+  @ApiResponse({ status: 200, description: "Date override created or updated" })
+  @ApiResponse({ status: 400, description: "Invalid date or override values" })
   @ApiResponse({ status: 404, description: "Location not found" })
-  @ApiResponse({ status: 409, description: "Override already exists" })
-  createDateOverride(
+  upsertDateOverride(
     @Param("locationId", ParseUUIDPipe) locationId: string,
-    @Body() dto: CreateLocationDateOverrideDto,
+    @Param("date") date: string,
+    @Body() dto: UpsertLocationDateOverrideDto,
     @Req() req: AuthenticatedRequest,
   ) {
-    return this.createLocationDateOverrideUseCase.execute({
+    return this.upsertLocationDateOverrideUseCase.execute({
       actorUserId: req.user.id,
       locationId,
-      date: dto.date,
-      capacity: dto.capacity,
-      fee: dto.fee,
-    });
-  }
-
-  @Patch(":locationId/date-overrides/:overrideId")
-  @ApiOperation({ summary: "Update a date-specific location override" })
-  @ApiParam({ name: "locationId", format: "uuid" })
-  @ApiParam({ name: "overrideId", format: "uuid" })
-  @ApiBody({ type: UpdateLocationDateOverrideDto })
-  @ApiResponse({ status: 200, description: "Date override updated" })
-  @ApiResponse({ status: 404, description: "Date override not found" })
-  updateDateOverride(
-    @Param("locationId", ParseUUIDPipe) locationId: string,
-    @Param("overrideId", ParseUUIDPipe) overrideId: string,
-    @Body() dto: UpdateLocationDateOverrideDto,
-    @Req() req: AuthenticatedRequest,
-  ) {
-    return this.updateLocationDateOverrideUseCase.execute({
-      actorUserId: req.user.id,
-      locationId,
-      overrideId,
+      date,
       capacity: dto.capacity,
       fee: dto.fee,
     });

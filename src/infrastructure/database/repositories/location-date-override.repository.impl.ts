@@ -1,6 +1,5 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { ConflictException } from "@nestjs/common";
 import { Repository } from "typeorm";
 
 import {
@@ -37,6 +36,15 @@ export class LocationDateOverrideRepositoryImpl extends LocationDateOverrideRepo
     }
 
     return query.orderBy("override.date", "ASC").getMany();
+  }
+
+  async findByLocationAndDate(
+    locationId: string,
+    date: string,
+  ): Promise<LocationDateOverrideRecord | null> {
+    return this.repository.findOne({
+      where: { locationId, date },
+    });
   }
 
   async findByIdForUpdate(
