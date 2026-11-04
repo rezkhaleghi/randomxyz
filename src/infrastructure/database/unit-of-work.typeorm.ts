@@ -14,6 +14,7 @@ import { DepositRepositoryImpl } from "./repositories/deposit.repository.impl";
 import { WithdrawalRepositoryImpl } from "./repositories/withdrawal.repository.impl";
 import { NotificationRepositoryImpl } from "./repositories/notification.repository.impl";
 import { PageRepositoryImpl } from "./repositories/page.repository.impl";
+import { LocationRepositoryImpl } from "./repositories/location.repository.impl";
 
 import { UserOrmEntity } from "./orm-entities/user.orm-entity";
 import { UserBalanceOrmEntity } from "./orm-entities/user-balance.orm-entity";
@@ -23,6 +24,7 @@ import { DepositOrmEntity } from "./orm-entities/deposit.orm-entity";
 import { WithdrawalOrmEntity } from "./orm-entities/withdrawal.orm-entity";
 import { NotificationOrmEntity } from "./orm-entities/notification.orm-entity";
 import { PageOrmEntity } from "./orm-entities/page.orm-entity";
+import { LocationOrmEntity } from "./orm-entities/location.orm-entity";
 
 @Injectable()
 export class TypeOrmUnitOfWork implements UnitOfWork {
@@ -56,6 +58,10 @@ export class TypeOrmUnitOfWork implements UnitOfWork {
         ),
         pageRepository: new PageRepositoryImpl(
           manager.getRepository(PageOrmEntity),
+        ),
+        locationRepository: new LocationRepositoryImpl(
+          manager.getRepository(LocationOrmEntity),
+          this.dataSource,
         ),
       };
 

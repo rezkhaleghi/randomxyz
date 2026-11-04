@@ -42,6 +42,8 @@ import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
 
 import { SyncLocationsUseCase } from "@application/use-cases/locations/sync-locations.use-case";
 import { ListLocationsUseCase } from "./use-cases/admin-locations/list-locations.use-case";
+import { UpdateLocationUseCase } from "./use-cases/admin-locations/update-location.use-case";
+
 /**
  * Registers application use cases. Infrastructure bindings are supplied by
  * the composition root and injected through application interfaces.
@@ -50,57 +52,46 @@ import { ListLocationsUseCase } from "./use-cases/admin-locations/list-locations
   imports: [],
 
   providers: [
-    // Authentication
     TmarAuthUseCase,
 
-    // Users
     GetCurrentUserUseCase,
     GetUserBalancesUseCase,
 
-    // Deposits
     CreateDepositUseCase,
     VerifyDepositUseCase,
     ListDepositsUseCase,
     GetDepositUseCase,
 
-    // Withdrawals
     CreateWithdrawalUseCase,
     ListWithdrawalsUseCase,
     GetWithdrawalUseCase,
 
-    // Notifications
     SendNotificationUseCase,
     ListUserNotificationsUseCase,
     MarkNotificationReadUseCase,
 
-    // Pages
     GetPublicPageUseCase,
 
-    // Location
     SyncLocationsUseCase,
 
-    // Admin Locations
     ListLocationsUseCase,
+    UpdateLocationUseCase,
 
-    // Admin Pages
     CreatePageUseCase,
     ListPagesUseCase,
     GetPageUseCase,
     UpdatePageUseCase,
     DeletePageUseCase,
 
-    // Admin Notifications
     AdminListNotificationsUseCase,
     AdminGetNotificationUseCase,
 
-    // Admin users
     ListUsersUseCase,
     GetUserUseCase,
     CreateAdminUserUseCase,
     GetAdminStatisticsUseCase,
     GetAuditLogsUseCase,
 
-    // Admin financials
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,
     AdminListDepositsUseCase,
@@ -111,57 +102,46 @@ import { ListLocationsUseCase } from "./use-cases/admin-locations/list-locations
   ],
 
   exports: [
-    // Authentication
     TmarAuthUseCase,
 
-    // Users
     GetCurrentUserUseCase,
     GetUserBalancesUseCase,
 
-    // Deposits
     CreateDepositUseCase,
     VerifyDepositUseCase,
     ListDepositsUseCase,
     GetDepositUseCase,
 
-    // Withdrawals
     CreateWithdrawalUseCase,
     ListWithdrawalsUseCase,
     GetWithdrawalUseCase,
 
-    // Notifications
     SendNotificationUseCase,
     MarkNotificationReadUseCase,
     ListUserNotificationsUseCase,
 
-    // Page
     GetPublicPageUseCase,
 
-    // Location
     SyncLocationsUseCase,
 
-    // Admin Locations
     ListLocationsUseCase,
+    UpdateLocationUseCase,
 
-    // Admin Page
     CreatePageUseCase,
     UpdatePageUseCase,
     DeletePageUseCase,
     ListPagesUseCase,
     GetPageUseCase,
 
-    // Admin Notifications
     AdminListNotificationsUseCase,
     AdminGetNotificationUseCase,
 
-    // Admin users
     ListUsersUseCase,
     GetUserUseCase,
     CreateAdminUserUseCase,
     GetAdminStatisticsUseCase,
     GetAuditLogsUseCase,
 
-    // Admin financials
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,
     AdminListDepositsUseCase,

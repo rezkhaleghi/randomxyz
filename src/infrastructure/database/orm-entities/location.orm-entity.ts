@@ -35,13 +35,28 @@ export class LocationOrmEntity {
   @Column({ type: "varchar", length: 32 })
   y!: string;
 
-  // Availability comes from Tmar-Travel.
+  // Availability is controlled by Tmar-Travel.
   @Column({ type: "boolean", default: true })
   isAvailable!: boolean;
 
-  // Enablement belongs to Tmar-Cert and must survive synchronization.
+  // Enablement is controlled by Tmar-Cert.
   @Column({ type: "boolean", default: true })
   isEnabled!: boolean;
+
+  // Zero means the location has not yet been configured
+  // for permit reservations.
+  @Column({ type: "integer", default: 0 })
+  capacity!: number;
+
+  // Null means use the global default permit fee.
+  // PostgreSQL numeric values are returned as strings.
+  @Column({
+    type: "numeric",
+    precision: 20,
+    scale: 0,
+    nullable: true,
+  })
+  fee!: string | null;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;

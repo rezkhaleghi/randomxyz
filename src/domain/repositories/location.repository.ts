@@ -21,6 +21,8 @@ export interface LocationRecord {
   y: string;
   isAvailable: boolean;
   isEnabled: boolean;
+  capacity: number;
+  fee: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -31,6 +33,8 @@ export interface LocationFilters {
   isEnabled?: boolean;
 }
 
+export type LocationSortBy = "name" | "province" | "city" | "createdAt";
+
 export abstract class LocationRepository {
   abstract syncAvailableLocations(
     locations: LocationSyncRecord[],
@@ -38,6 +42,10 @@ export abstract class LocationRepository {
 
   abstract findPage(
     filters: LocationFilters,
-    params: PageQuery<"name" | "province" | "city" | "createdAt">,
+    params: PageQuery<LocationSortBy>,
   ): Promise<PageResult<LocationRecord>>;
+
+  abstract findByIdForUpdate(id: string): Promise<LocationRecord | null>;
+
+  abstract save(location: LocationRecord): Promise<LocationRecord>;
 }

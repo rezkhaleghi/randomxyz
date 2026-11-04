@@ -6,6 +6,7 @@ import {
   LocationFilters,
   LocationRecord,
   LocationRepository,
+  LocationSortBy,
   LocationSyncRecord,
 } from "@domain/repositories/location.repository";
 import { PageQuery, PageResult } from "@shared/pagination/page-query";
@@ -15,9 +16,9 @@ import { LocationOrmEntity } from "../orm-entities/location.orm-entity";
 @Injectable()
 export class LocationRepositoryImpl extends LocationRepository {
   constructor(
-    private readonly dataSource: DataSource,
     @InjectRepository(LocationOrmEntity)
     private readonly repository: Repository<LocationOrmEntity>,
+    private readonly dataSource: DataSource,
   ) {
     super();
   }
@@ -38,6 +39,8 @@ export class LocationRepositoryImpl extends LocationRepository {
           isAvailable: true,
         }));
 
+        // Local settings such as isEnabled, capacity and fee
+        // must never be overwritten by Tmar-Travel synchronization.
         await repository.upsert(rows, {
           conflictPaths: ["externalId"],
           skipUpdateIfNoValuesChanged: true,
@@ -48,7 +51,9 @@ export class LocationRepositoryImpl extends LocationRepository {
         .createQueryBuilder()
         .update(LocationOrmEntity)
         .set({ isAvailable: false })
-        .where('"isAvailable" = :isAvailable', { isAvailable: true });
+        .where('"isAvailable" = :isAvailable', {
+          isAvailable: true,
+        });
 
       if (locations.length > 0) {
         updateQuery.andWhere('"externalId" NOT IN (:...externalIds)', {
@@ -62,7 +67,7 @@ export class LocationRepositoryImpl extends LocationRepository {
 
   async findPage(
     filters: LocationFilters,
-    params: PageQuery<"name" | "province" | "city" | "createdAt">,
+    params: PageQuery<LocationSortBy>,
   ): Promise<PageResult<LocationRecord>> {
     const query = this.repository.createQueryBuilder("location");
 
@@ -90,18 +95,18 @@ export class LocationRepositoryImpl extends LocationRepository {
       });
     }
 
-    const sortColumns = {
+    const sortColumns: Record<LocationSortBy, string> = {
       name: "location.name",
       province: "location.province",
       city: "location.city",
       createdAt: "location.createdAt",
-    } as const;
-
-    const sortBy = params.sortBy ?? "name";
-    const sortDirection = params.sortDirection ?? "ASC";
+    };
 
     query
-      .orderBy(sortColumns[sortBy], sortDirection)
+      .orderBy(
+        sortColumns[params.sortBy ?? "name"],
+        params.sortDirection ?? "ASC",
+      )
       .addOrderBy("location.id", "ASC")
       .skip((params.page - 1) * params.limit)
       .take(params.limit);
@@ -115,5 +120,17 @@ export class LocationRepositoryImpl extends LocationRepository {
       total,
       totalPages: Math.ceil(total / params.limit),
     };
+  }
+
+  async findByIdForUpdate(id: string): Promise<LocationRecord | null> {
+    return this.repository
+      .createQueryBuilder("location")
+      .setLock("pessimistic_write")
+      .where("location.id = :id", { id })
+      .getOne();
+  }
+
+  async save(location: LocationRecord): Promise<LocationRecord> {
+    return this.repository.save(location as LocationOrmEntity);
   }
 }
