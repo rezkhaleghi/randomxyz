@@ -21,6 +21,7 @@ export interface RevokePermitInput {
   permitId: string;
   actorUserId: string;
   reason: string;
+  refund?: boolean;
 }
 
 @Injectable()
@@ -68,7 +69,7 @@ export class AdminRevokePermitUseCase {
 
       let refundAmount = "0";
 
-      if (!isZeroDecimal(permit.totalAmount)) {
+      if (input.refund && !isZeroDecimal(permit.totalAmount)) {
         const balance =
           await repositories.userBalanceRepository.findByUserIdAndCurrencyForUpdate(
             permit.userId,
@@ -124,6 +125,7 @@ export class AdminRevokePermitUseCase {
             reason: input.reason.trim(),
             previousStatus,
             newStatus: permit.status,
+            refundIssued: input.refund ?? false,
             refundAmount,
             currency: permit.currency,
           },
@@ -133,6 +135,7 @@ export class AdminRevokePermitUseCase {
       return {
         id: permit.id,
         status: permit.status,
+        refundIssued: input.refund ?? false,
         refundAmount,
         currency: permit.currency,
       };

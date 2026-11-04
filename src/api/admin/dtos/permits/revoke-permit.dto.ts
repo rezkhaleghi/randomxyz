@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class RevokePermitDto {
   @ApiProperty({
@@ -8,4 +8,12 @@ export class RevokePermitDto {
   @IsString()
   @IsNotEmpty()
   reason!: string;
+
+  @ApiPropertyOptional({
+    description: "Whether the full permit amount should be refunded.",
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  refund?: boolean;
 }

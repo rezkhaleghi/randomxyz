@@ -69,9 +69,9 @@ export class AdminPermitsController {
 
   @Post(":permitId/revoke")
   @ApiOperation({
-    summary: "Revoke a permit and refund its payment",
+    summary: "Revoke a permit",
     description:
-      "A reason is required. Refunds are credited to the user's wallet.",
+      "A reason is required. The administrator can optionally refund the full permit amount.",
   })
   revoke(
     @Param("permitId", ParseUUIDPipe) permitId: string,
@@ -82,6 +82,7 @@ export class AdminPermitsController {
       permitId,
       actorUserId: req.user.id,
       reason: dto.reason,
+      refund: dto.refund ?? false,
     });
   }
 }
