@@ -74,6 +74,11 @@ import { HtmlSanitizerService } from "./services/html-sanitizer.service";
 import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
 
 import { TmarJwtService } from "./services/tmar-jwt.service";
+import { LocationRepository } from "@domain/repositories/location.repository";
+import { LocationRepositoryImpl } from "./database/repositories/location.repository.impl";
+import { LocationsClient } from "@application/interfaces/locations-client.interface";
+import { LocationSyncScheduler } from "./services/location-sync.scheduler";
+import { LocationsClientService } from "./services/locations-client.service";
 
 /**
  * Infrastructure composition root.
@@ -396,6 +401,13 @@ import { TmarJwtService } from "./services/tmar-jwt.service";
       provide: HtmlSanitizer,
       useClass: HtmlSanitizerService,
     },
+
+    { provide: LocationRepository, useClass: LocationRepositoryImpl },
+    {
+      provide: LocationsClient,
+      useClass: LocationsClientService,
+    },
+    LocationSyncScheduler,
   ],
 
   exports: [
@@ -418,6 +430,7 @@ import { TmarJwtService } from "./services/tmar-jwt.service";
     PageRepository,
     HtmlSanitizer,
     TmarJwtService,
+    LocationRepository,
   ],
 })
 export class InfrastructureModule {}
