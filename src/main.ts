@@ -5,22 +5,18 @@ import { Logger, ValidationPipe } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 import helmet from "helmet";
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 
 import { AppModule } from "./app.module";
 import { EnvironmentConfig } from "@infrastructure/config/environment.config";
 
-/**
- * Application bootstrap function.
- *
- * Creates the NestJS application, configures global middleware,
- * validation, exception handling, Swagger, and starts the HTTP server.
- */
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger("HTTP");
 
   const configService = app.get(ConfigService<EnvironmentConfig>);
+  const frontendOrigin = new URL(configService.getOrThrow("FRONTEND_URL"))
+    .origin;
 
   app.enableShutdownHooks();
 
@@ -30,16 +26,38 @@ async function bootstrap() {
     .set("trust proxy", configService.get("TRUST_PROXY", 1));
 
   app.enableCors({
-    origin: configService.getOrThrow("FRONTEND_URL"),
+    origin: frontendOrigin,
     credentials: true,
   });
 
   app.use(helmet());
 
   /**
-   * Generate a server-side correlation ID for every request.
+   * Reject cross-origin state-changing requests.
+   *
+   * The frontend is the only trusted browser origin.
+   * Safe methods are not subject to this check.
    */
-  app.use((request: Request, response: Response, next: () => void) => {
+  app.use((request: Request, response: Response, next: NextFunction) => {
+    const safeMethods = ["GET", "HEAD", "OPTIONS"];
+
+    if (safeMethods.includes(request.method)) {
+      return next();
+    }
+
+    const origin = request.headers.origin;
+
+    if (origin !== frontendOrigin) {
+      return response.status(403).json({
+        statusCode: 403,
+        message: "Origin not allowed.",
+      });
+    }
+
+    next();
+  });
+
+  app.use((request: Request, response: Response, next: NextFunction) => {
     const requestId = randomUUID();
 
     response.setHeader("X-Request-Id", requestId);
@@ -49,10 +67,7 @@ async function bootstrap() {
     next();
   });
 
-  /**
-   * Log completed requests without logging credentials or personal data.
-   */
-  app.use((request: Request, response: Response, next: () => void) => {
+  app.use((request: Request, response: Response, next: NextFunction) => {
     const startedAt = process.hrtime.bigint();
     const requestId =
       (request as Request & { requestId?: string }).requestId ?? "unknown";
