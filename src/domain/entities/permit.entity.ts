@@ -78,4 +78,9 @@ export class Permit {
       props.updatedAt,
     );
   }
+
+  end(): void {
+    this.status = PermitStatus.ENDED;
+    this.updatedAt = new Date();
+  }
 }

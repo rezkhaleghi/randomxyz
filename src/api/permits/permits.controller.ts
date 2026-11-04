@@ -1,7 +1,20 @@
-import { Body, Controller, Post, Req, UseGuards } from "@nestjs/common";
-import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 import { CreatePermitUseCase } from "@application/use-cases/permits/create-permit.use-case";
+import { EndPermitUseCase } from "@application/use-cases/permits/end-permit.use-case";
+import { GetPermitUseCase } from "@application/use-cases/permits/get-permit.use-case";
+import { ListPermitsUseCase } from "@application/use-cases/permits/list-permits.use-case";
 
 import { TmarAuthGuard } from "../auth/tmar-auth.guard";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
@@ -12,7 +25,12 @@ import { CreatePermitDto } from "./dtos/create-permit.dto";
 @Controller("permits")
 @UseGuards(TmarAuthGuard)
 export class PermitsController {
-  constructor(private readonly createPermitUseCase: CreatePermitUseCase) {}
+  constructor(
+    private readonly createPermitUseCase: CreatePermitUseCase,
+    private readonly listPermitsUseCase: ListPermitsUseCase,
+    private readonly getPermitUseCase: GetPermitUseCase,
+    private readonly endPermitUseCase: EndPermitUseCase,
+  ) {}
 
   @Post()
   @ApiOperation({
@@ -46,6 +64,78 @@ export class PermitsController {
       endDate: dto.endDate,
       passengers: dto.passengers,
       vehicles: dto.vehicles,
+    });
+  }
+
+  @Get()
+  @ApiOperation({
+    summary: "List the current user's permits",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Current user's permits.",
+  })
+  list(@Req() req: AuthenticatedRequest) {
+    return this.listPermitsUseCase.execute(req.user.id);
+  }
+
+  @Get(":permitId")
+  @ApiOperation({
+    summary: "Get permit details",
+    description:
+      "Returns permit details, passengers, vehicles, and QR token. Only the permit owner can access it.",
+  })
+  @ApiParam({
+    name: "permitId",
+    format: "uuid",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Permit details.",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Permit not found.",
+  })
+  get(
+    @Param("permitId", ParseUUIDPipe) permitId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.getPermitUseCase.execute({
+      userId: req.user.id,
+      permitId,
+    });
+  }
+
+  @Patch(":permitId/end")
+  @ApiOperation({
+    summary: "End a permit",
+    description:
+      "Ends a confirmed or expired permit. Ending a permit does not refund its payment.",
+  })
+  @ApiParam({
+    name: "permitId",
+    format: "uuid",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Permit ended successfully.",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Permit not found.",
+  })
+  @ApiResponse({
+    status: 409,
+    description: "Permit cannot be ended in its current status.",
+  })
+  end(
+    @Param("permitId", ParseUUIDPipe) permitId: string,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    return this.endPermitUseCase.execute({
+      userId: req.user.id,
+      permitId,
     });
   }
 }

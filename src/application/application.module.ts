@@ -55,6 +55,9 @@ import { AdminGetLocationUseCase } from "./use-cases/admin-locations/get-locatio
 import { GetLocationAvailabilityUseCase } from "./use-cases/locations/get-location-availability.use-case";
 
 import { CreatePermitUseCase } from "./use-cases/permits/create-permit.use-case";
+import { ListPermitsUseCase } from "./use-cases/permits/list-permits.use-case";
+import { GetPermitUseCase } from "./use-cases/permits/get-permit.use-case";
+import { EndPermitUseCase } from "./use-cases/permits/end-permit.use-case";
 
 /**
  * Registers application use cases. Infrastructure bindings are supplied by
@@ -114,7 +117,11 @@ import { CreatePermitUseCase } from "./use-cases/permits/create-permit.use-case"
 
     GetPermitSettingsUseCase,
     UpdatePermitSettingsUseCase,
+
     CreatePermitUseCase,
+    ListPermitsUseCase,
+    GetPermitUseCase,
+    EndPermitUseCase,
 
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,
@@ -177,7 +184,11 @@ import { CreatePermitUseCase } from "./use-cases/permits/create-permit.use-case"
 
     GetPermitSettingsUseCase,
     UpdatePermitSettingsUseCase,
+
     CreatePermitUseCase,
+    ListPermitsUseCase,
+    GetPermitUseCase,
+    EndPermitUseCase,
 
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,
