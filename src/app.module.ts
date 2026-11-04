@@ -13,7 +13,6 @@ import { LocationsModule } from "./api/locations/locations.module";
 import { PermitsModule } from "./api/permits/permits.module";
 
 import { InfrastructureModule } from "./infrastructure/infrastructure.module";
-
 import {
   AcceptLanguageResolver,
   HeaderResolver,
@@ -25,6 +24,7 @@ import { PagesModule } from "@api/pages/pages.module";
 import { ApplicationModule } from "@application/application.module";
 
 import { LocationSyncScheduler } from "./infrastructure/services/location-sync.scheduler";
+import { PermitExpirationScheduler } from "./infrastructure/services/permit-expiration.scheduler";
 
 @Module({
   imports: [
@@ -68,6 +68,7 @@ import { LocationSyncScheduler } from "./infrastructure/services/location-sync.s
       useClass: ThrottlerGuard,
     },
     LocationSyncScheduler,
+    PermitExpirationScheduler,
   ],
 })
 export class AppModule {}

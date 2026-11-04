@@ -38,7 +38,7 @@ export class Permit {
     public readonly startDate: string,
     public readonly endDate: string,
     public status: PermitStatus,
-    public readonly totalAmount: string,
+    public totalAmount: string,
     public readonly currency: PaymentCurrency,
     public readonly qrToken: string,
     public readonly createdAt: Date,
@@ -77,6 +77,11 @@ export class Permit {
       props.createdAt,
       props.updatedAt,
     );
+  }
+
+  updateTotalAmount(totalAmount: string): void {
+    this.totalAmount = totalAmount;
+    this.updatedAt = new Date();
   }
 
   end(): void {

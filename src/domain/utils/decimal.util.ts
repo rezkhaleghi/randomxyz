@@ -29,6 +29,21 @@ export function subtractDecimal(a: string, b: string): string {
   return formatDecimal(aValue - bValue, scale);
 }
 
+export function divideDecimalByInteger(value: string, divisor: number): string {
+  if (!Number.isSafeInteger(divisor) || divisor <= 0) {
+    throw new Error("Divisor must be a positive safe integer.");
+  }
+
+  const parts = parseDecimal(value);
+  const divisorValue = BigInt(divisor);
+
+  if (parts.value % divisorValue !== 0n) {
+    throw new Error("Decimal value cannot be divided evenly.");
+  }
+
+  return formatDecimal(parts.value / divisorValue, parts.scale);
+}
+
 export function isNegativeDecimal(value: string): boolean {
   return parseDecimal(value).value < 0n;
 }
