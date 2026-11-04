@@ -1,16 +1,24 @@
 import { Injectable } from "@nestjs/common";
-import { DataSource } from "typeorm";
+import { InjectRepository } from "@nestjs/typeorm";
+import { DataSource, Repository } from "typeorm";
 
 import {
+  LocationFilters,
+  LocationRecord,
   LocationRepository,
   LocationSyncRecord,
 } from "@domain/repositories/location.repository";
+import { PageQuery, PageResult } from "@shared/pagination/page-query";
 
 import { LocationOrmEntity } from "../orm-entities/location.orm-entity";
 
 @Injectable()
 export class LocationRepositoryImpl extends LocationRepository {
-  constructor(private readonly dataSource: DataSource) {
+  constructor(
+    private readonly dataSource: DataSource,
+    @InjectRepository(LocationOrmEntity)
+    private readonly repository: Repository<LocationOrmEntity>,
+  ) {
     super();
   }
 
@@ -30,8 +38,6 @@ export class LocationRepositoryImpl extends LocationRepository {
           isAvailable: true,
         }));
 
-        // Only the supplied canonical fields are updated.
-        // Local settings such as isEnabled are intentionally untouched.
         await repository.upsert(rows, {
           conflictPaths: ["externalId"],
           skipUpdateIfNoValuesChanged: true,
@@ -52,5 +58,62 @@ export class LocationRepositoryImpl extends LocationRepository {
 
       await updateQuery.execute();
     });
+  }
+
+  async findPage(
+    filters: LocationFilters,
+    params: PageQuery<"name" | "province" | "city" | "createdAt">,
+  ): Promise<PageResult<LocationRecord>> {
+    const query = this.repository.createQueryBuilder("location");
+
+    if (filters.search?.trim()) {
+      query.andWhere(
+        `(
+          LOWER(location.name) LIKE LOWER(:search)
+          OR LOWER(location.city) LIKE LOWER(:search)
+          OR LOWER(location.province) LIKE LOWER(:search)
+          OR LOWER(location.slug) LIKE LOWER(:search)
+        )`,
+        { search: `%${filters.search.trim()}%` },
+      );
+    }
+
+    if (filters.isAvailable !== undefined) {
+      query.andWhere("location.isAvailable = :isAvailable", {
+        isAvailable: filters.isAvailable,
+      });
+    }
+
+    if (filters.isEnabled !== undefined) {
+      query.andWhere("location.isEnabled = :isEnabled", {
+        isEnabled: filters.isEnabled,
+      });
+    }
+
+    const sortColumns = {
+      name: "location.name",
+      province: "location.province",
+      city: "location.city",
+      createdAt: "location.createdAt",
+    } as const;
+
+    const sortBy = params.sortBy ?? "name";
+    const sortDirection = params.sortDirection ?? "ASC";
+
+    query
+      .orderBy(sortColumns[sortBy], sortDirection)
+      .addOrderBy("location.id", "ASC")
+      .skip((params.page - 1) * params.limit)
+      .take(params.limit);
+
+    const [rows, total] = await query.getManyAndCount();
+
+    return {
+      data: rows,
+      page: params.page,
+      limit: params.limit,
+      total,
+      totalPages: Math.ceil(total / params.limit),
+    };
   }
 }

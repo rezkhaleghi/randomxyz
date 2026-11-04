@@ -41,6 +41,7 @@ import { DeletePageUseCase } from "./use-cases/admin-pages/delete-page.use-case"
 import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
 
 import { SyncLocationsUseCase } from "@application/use-cases/locations/sync-locations.use-case";
+import { ListLocationsUseCase } from "./use-cases/admin-locations/list-locations.use-case";
 /**
  * Registers application use cases. Infrastructure bindings are supplied by
  * the composition root and injected through application interfaces.
@@ -77,6 +78,9 @@ import { SyncLocationsUseCase } from "@application/use-cases/locations/sync-loca
 
     // Location
     SyncLocationsUseCase,
+
+    // Admin Locations
+    ListLocationsUseCase,
 
     // Admin Pages
     CreatePageUseCase,
@@ -135,6 +139,9 @@ import { SyncLocationsUseCase } from "@application/use-cases/locations/sync-loca
 
     // Location
     SyncLocationsUseCase,
+
+    // Admin Locations
+    ListLocationsUseCase,
 
     // Admin Page
     CreatePageUseCase,
