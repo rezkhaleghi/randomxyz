@@ -23,25 +23,8 @@ export class DepositRepositoryImpl extends DepositRepository {
   async create(deposit: Deposit): Promise<Deposit> {
     try {
       const saved = await this.repository.save(this.toOrm(deposit));
-
       return this.toDomain(saved);
     } catch (error) {
-      /*
-       * The idempotency key has a database-level unique constraint.
-       *
-       * Two requests can legitimately reach INSERT at the same time:
-       *
-       *   Request A -> INSERT succeeds
-       *   Request B -> INSERT hits unique constraint
-       *
-       * PostgreSQL resolves that race at the database level. Once the
-       * winning transaction is committed, the losing request can safely
-       * retrieve the existing deposit and let the application layer decide
-       * whether its parameters match.
-       *
-       * Keep the PostgreSQL-specific error handling here rather than leaking
-       * QueryFailedError / error code "23505" into the application layer.
-       */
       if (this.isUniqueConstraintViolation(error)) {
         const existing = await this.findByUserIdAndIdempotencyKey(
           deposit.userId,
@@ -59,24 +42,17 @@ export class DepositRepositoryImpl extends DepositRepository {
 
   async save(deposit: Deposit): Promise<Deposit> {
     const saved = await this.repository.save(this.toOrm(deposit));
-
     return this.toDomain(saved);
   }
 
   async findById(id: string): Promise<Deposit | null> {
-    const row = await this.repository.findOne({
-      where: { id },
-    });
-
+    const row = await this.repository.findOne({ where: { id } });
     return row ? this.toDomain(row) : null;
   }
 
   async findByUserIdAndId(userId: string, id: string): Promise<Deposit | null> {
     const row = await this.repository.findOne({
-      where: {
-        id,
-        userId,
-      },
+      where: { id, userId },
     });
 
     return row ? this.toDomain(row) : null;
@@ -87,10 +63,7 @@ export class DepositRepositoryImpl extends DepositRepository {
     idempotencyKey: string,
   ): Promise<Deposit | null> {
     const row = await this.repository.findOne({
-      where: {
-        userId,
-        idempotencyKey,
-      },
+      where: { userId, idempotencyKey },
     });
 
     return row ? this.toDomain(row) : null;
@@ -110,10 +83,7 @@ export class DepositRepositoryImpl extends DepositRepository {
     id: string,
   ): Promise<Deposit | null> {
     const row = await this.repository.findOne({
-      where: {
-        id,
-        userId,
-      },
+      where: { id, userId },
       lock: { mode: "pessimistic_write" },
     });
 
@@ -180,7 +150,6 @@ export class DepositRepositoryImpl extends DepositRepository {
       params.sortBy === "amount" ? "deposit.amount" : "deposit.createdAt";
 
     qb.orderBy(sortColumn, params.sortDirection ?? "DESC");
-
     qb.skip((params.page - 1) * params.limit);
     qb.take(params.limit);
 
@@ -205,6 +174,7 @@ export class DepositRepositoryImpl extends DepositRepository {
       status: row.status,
       referenceId: row.referenceId,
       providerPaymentId: row.providerPaymentId,
+      paymentUrl: row.paymentUrl,
       transactionId: row.transactionId,
       idempotencyKey: row.idempotencyKey,
       createdAt: row.createdAt,
@@ -224,6 +194,7 @@ export class DepositRepositoryImpl extends DepositRepository {
     row.status = deposit.status;
     row.referenceId = deposit.referenceId;
     row.providerPaymentId = deposit.providerPaymentId;
+    row.paymentUrl = deposit.paymentUrl;
     row.transactionId = deposit.transactionId;
     row.idempotencyKey = deposit.idempotencyKey;
     row.createdAt = deposit.createdAt;

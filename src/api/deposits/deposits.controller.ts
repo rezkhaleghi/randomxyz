@@ -11,6 +11,7 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 import { CreateDepositUseCase } from "@application/use-cases/deposits/create-deposit.use-case";
@@ -22,6 +23,7 @@ import { TmarAuthGuard } from "../auth/tmar-auth.guard";
 import { ListDepositsQueryDto } from "./dtos/list-deposits.query.dto";
 import { CreateDepositDto } from "./dtos/create-deposit.dto";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
+import { EnvironmentConfig } from "@infrastructure/config/environment.config";
 
 @ApiTags("deposits")
 @Controller("deposits")
@@ -32,6 +34,7 @@ export class DepositsController {
     private readonly verifyDepositUseCase: VerifyDepositUseCase,
     private readonly listDepositsUseCase: ListDepositsUseCase,
     private readonly getDepositUseCase: GetDepositUseCase,
+    private readonly configService: ConfigService<EnvironmentConfig>,
   ) {}
 
   @Get()
@@ -79,11 +82,13 @@ export class DepositsController {
   ) {
     const normalizedIdempotencyKey = idempotencyKey?.trim();
 
-    // The idempotency key is an HTTP request requirement, not a domain rule.
-    // Reject it here so the application layer never receives an empty key.
     if (!normalizedIdempotencyKey) {
       throw new BadRequestException("Idempotency-Key header is required.");
     }
+
+    const backendUrl = this.configService
+      .getOrThrow("BACKEND_URL")
+      .replace(/\/+$/, "");
 
     return this.createDepositUseCase.execute({
       userId: req.user.id,
@@ -91,6 +96,7 @@ export class DepositsController {
       amount: dto.amount,
       provider: dto.provider,
       idempotencyKey: normalizedIdempotencyKey,
+      callbackUrl: `${backendUrl}/deposits/parsian/callback`,
     });
   }
 

@@ -96,3 +96,30 @@ function formatDecimal(value: bigint, scale: number): string {
     decimalPart ? `.${decimalPart}` : ""
   }`;
 }
+
+/**
+ * Internal IRT values are Toman.
+ * Parsian expects Rial, so one Toman is converted to ten Rial.
+ *
+ * BigInt is used to avoid floating-point money calculations.
+ */
+export function tomanToRialAmount(tomanAmount: string): string {
+  const normalized = tomanAmount.trim();
+
+  if (!/^\d+(\.\d+)?$/.test(normalized)) {
+    throw new Error("Invalid Toman amount for Parsian payment.");
+  }
+
+  const [integerPart, decimalPart = ""] = normalized.split(".");
+  const scaledToman = BigInt(`${integerPart}${decimalPart}`);
+  const multiplier = 10n;
+  const divisor = 10n ** BigInt(decimalPart.length);
+
+  const rialValue = scaledToman * multiplier;
+
+  if (rialValue % divisor !== 0n) {
+    throw new Error("Parsian payment amount must be a whole Rial value.");
+  }
+
+  return (rialValue / divisor).toString();
+}

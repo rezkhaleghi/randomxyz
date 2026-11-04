@@ -41,6 +41,7 @@
     "rxjs": "^7.8.1",
     "sanitize-html": "^2.17.5",
     "sharp": "^0.35.4",
+    "soap": "^1.6.4",
     "swagger-ui-express": "^5.0.1",
     "tsconfig-paths": "^4.2.0",
     "typeorm": "^0.3.20"

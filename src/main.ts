@@ -33,15 +33,22 @@ async function bootstrap() {
   app.use(helmet());
 
   /**
-   * Reject cross-origin state-changing requests.
+   * Parsian sends its callback from its own server and does not send the
+   * frontend Origin header. Exempt only this exact endpoint.
    *
-   * The frontend is the only trusted browser origin.
-   * Safe methods are not subject to this check.
+   * All other state-changing requests must still originate from the frontend.
    */
   app.use((request: Request, response: Response, next: NextFunction) => {
     const safeMethods = ["GET", "HEAD", "OPTIONS"];
 
     if (safeMethods.includes(request.method)) {
+      return next();
+    }
+
+    if (
+      request.method === "POST" &&
+      request.path === "/deposits/parsian/callback"
+    ) {
       return next();
     }
 

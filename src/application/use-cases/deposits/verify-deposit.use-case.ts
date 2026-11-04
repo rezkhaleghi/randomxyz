@@ -23,6 +23,7 @@ import {
 export interface VerifyDepositInput {
   depositId: string;
   userId: string;
+  transactionId?: string;
 }
 
 @Injectable()
@@ -75,6 +76,7 @@ export class VerifyDepositUseCase {
       referenceId: deposit.referenceId,
       amount: deposit.amount,
       currency: deposit.currency,
+      transactionId: input.transactionId,
     });
 
     if (
@@ -102,6 +104,7 @@ export class VerifyDepositUseCase {
           throw new DepositNotFoundException();
         }
 
+        // Makes repeated verification/callback requests safe.
         if (currentDeposit.status === DepositStatus.COMPLETED) {
           return currentDeposit;
         }
@@ -128,6 +131,7 @@ export class VerifyDepositUseCase {
 
         const balanceBefore = balance.amount;
 
+        // The deposit amount remains in Toman (IRT), not Rial.
         balance.credit(currentDeposit.amount);
 
         const savedBalance = await userBalanceRepository.save(balance);

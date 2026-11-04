@@ -15,6 +15,7 @@ import { UpdateUserBalanceUseCase } from "./use-cases/admin-financials/update-us
 import { ListLedgersUseCase } from "./use-cases/admin-financials/list-ledgers.use-case";
 import { CreateDepositUseCase } from "./use-cases/deposits/create-deposit.use-case";
 import { VerifyDepositUseCase } from "./use-cases/deposits/verify-deposit.use-case";
+import { HandleParsianCallbackUseCase } from "./use-cases/deposits/handle-parsian-callback.use-case";
 import { AdminListDepositsUseCase } from "./use-cases/admin-financials/list-deposits.use-case";
 import { AdminGetDepositUseCase } from "./use-cases/admin-financials/get-deposit.use-case";
 import { CreateWithdrawalUseCase } from "./use-cases/withdrawals/create-withdrawal.use-case";
@@ -65,10 +66,6 @@ import { AdminGetPermitUseCase } from "./use-cases/admin-permits/get-permit.use-
 import { AdminUpdatePermitUseCase } from "./use-cases/admin-permits/update-permit.use-case";
 import { AdminRevokePermitUseCase } from "./use-cases/admin-permits/revoke-permit.use-case";
 
-/**
- * Registers application use cases. Infrastructure bindings are supplied by
- * the composition root and injected through application interfaces.
- */
 @Module({
   imports: [],
 
@@ -80,6 +77,7 @@ import { AdminRevokePermitUseCase } from "./use-cases/admin-permits/revoke-permi
 
     CreateDepositUseCase,
     VerifyDepositUseCase,
+    HandleParsianCallbackUseCase,
     ListDepositsUseCase,
     GetDepositUseCase,
 
@@ -154,6 +152,7 @@ import { AdminRevokePermitUseCase } from "./use-cases/admin-permits/revoke-permi
 
     CreateDepositUseCase,
     VerifyDepositUseCase,
+    HandleParsianCallbackUseCase,
     ListDepositsUseCase,
     GetDepositUseCase,
 

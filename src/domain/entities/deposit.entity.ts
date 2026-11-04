@@ -22,6 +22,7 @@ export interface CreateDepositProps {
   status?: DepositStatus;
   referenceId?: string;
   providerPaymentId?: string | null;
+  paymentUrl?: string | null;
   transactionId?: string | null;
   completedAt?: Date | null;
   createdAt?: Date;
@@ -38,6 +39,7 @@ export interface RestoreDepositProps {
   status: DepositStatus;
   referenceId: string;
   providerPaymentId: string | null;
+  paymentUrl?: string | null;
   transactionId: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -55,19 +57,13 @@ export class Deposit {
     public status: DepositStatus,
     public readonly referenceId: string,
     public providerPaymentId: string | null,
+    public paymentUrl: string | null,
     public transactionId: string | null,
     public readonly createdAt: Date,
     public updatedAt: Date,
     public completedAt: Date | null,
   ) {}
 
-  /**
-   * Creates a new deposit.
-   *
-   * Idempotency is part of creation because the key identifies the
-   * client operation that produced this deposit. A retry must be able
-   * to resolve back to the same business record.
-   */
   static create(props: CreateDepositProps): Deposit {
     if (isNegativeDecimal(props.amount) || isZeroDecimal(props.amount)) {
       throw new InvalidDepositAmountException();
@@ -89,6 +85,7 @@ export class Deposit {
       props.status ?? DepositStatus.PENDING,
       props.referenceId ?? randomUUID(),
       props.providerPaymentId ?? null,
+      props.paymentUrl ?? null,
       props.transactionId ?? null,
       props.createdAt ?? now,
       props.updatedAt ?? now,
@@ -96,12 +93,6 @@ export class Deposit {
     );
   }
 
-  /**
-   * Rehydrates persisted state without applying creation defaults.
-   *
-   * Existing deposits may predate idempotency support, therefore the
-   * persisted key is nullable during this compatibility period.
-   */
   static restore(props: RestoreDepositProps): Deposit {
     return new Deposit(
       props.id,
@@ -113,6 +104,7 @@ export class Deposit {
       props.status,
       props.referenceId,
       props.providerPaymentId,
+      props.paymentUrl ?? null,
       props.transactionId,
       props.createdAt,
       props.updatedAt,
@@ -120,8 +112,9 @@ export class Deposit {
     );
   }
 
-  setProviderPayment(providerPaymentId: string): void {
+  setProviderPayment(providerPaymentId: string, paymentUrl?: string): void {
     this.providerPaymentId = providerPaymentId;
+    this.paymentUrl = paymentUrl ?? null;
     this.updatedAt = new Date();
   }
 

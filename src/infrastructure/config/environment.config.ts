@@ -66,4 +66,8 @@ export interface EnvironmentConfig {
 
   TMAR_JWT_SECRET: string;
   TMAR_TRAVEL_API_URL: string;
+
+  PARSIAN_PIN: string;
+  PARSIAN_SALE_URL: string;
+  PARSIAN_CONFIRM_URL: string;
 }

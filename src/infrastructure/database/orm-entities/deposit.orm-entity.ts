@@ -28,7 +28,6 @@ export class DepositOrmEntity {
   @Column({ type: "uuid" })
   userId!: string;
 
-  // Persistence-level FK. The domain continues to depend only on userId.
   @ManyToOne(() => UserOrmEntity, {
     nullable: false,
     onDelete: "RESTRICT",
@@ -55,13 +54,6 @@ export class DepositOrmEntity {
   })
   provider!: PaymentProvider;
 
-  /**
-   * Nullable temporarily because existing development databases may
-   * contain deposits created before idempotency support was introduced.
-   *
-   * New deposits always receive a non-empty key through Deposit.create().
-   * Once migrations are introduced, this column can be made NOT NULL.
-   */
   @Column({
     type: "varchar",
     length: 255,
@@ -74,6 +66,9 @@ export class DepositOrmEntity {
 
   @Column({ type: "varchar", nullable: true })
   providerPaymentId!: string | null;
+
+  @Column({ type: "text", nullable: true })
+  paymentUrl!: string | null;
 
   @Column({ type: "varchar", nullable: true })
   transactionId!: string | null;

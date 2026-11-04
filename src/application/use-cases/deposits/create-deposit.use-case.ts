@@ -24,6 +24,7 @@ export interface CreateDepositInput {
   currency: PaymentCurrency;
   amount: string;
   idempotencyKey: string;
+  callbackUrl: string;
 }
 
 @Injectable()
@@ -47,11 +48,6 @@ export class CreateDepositUseCase {
       throw new InvalidDepositAmountException();
     }
 
-    /*
-     * The idempotency lookup and creation happen inside the same database
-     * transaction. The database unique constraint remains the final
-     * concurrency guard when two requests reach INSERT simultaneously.
-     */
     const deposit = await this.unitOfWork.execute(
       async ({ userRepository, depositRepository }) => {
         const user = await userRepository.findById(input.userId);
@@ -67,7 +63,6 @@ export class CreateDepositUseCase {
 
         if (existing) {
           this.assertSameIdempotentRequest(existing, input);
-
           return existing;
         }
 
@@ -80,11 +75,6 @@ export class CreateDepositUseCase {
           idempotencyKey: input.idempotencyKey,
         });
 
-        /*
-         * If another concurrent request wins the unique constraint race,
-         * DepositRepositoryImpl.create() returns that existing deposit
-         * instead of exposing the database error.
-         */
         const created = await depositRepository.create(newDeposit);
 
         this.assertSameIdempotentRequest(created, input);
@@ -93,11 +83,7 @@ export class CreateDepositUseCase {
       },
     );
 
-    /*
-     * A retry may reach this point with a deposit that already has a
-     * provider payment ID. Never create another external payment in that
-     * case.
-     */
+    // A retry returns the same checkout URL instead of creating another payment.
     if (deposit.providerPaymentId) {
       return deposit;
     }
@@ -107,15 +93,14 @@ export class CreateDepositUseCase {
       currency: deposit.currency,
       provider: deposit.provider,
       referenceId: deposit.referenceId,
-      callbackUrl: "",
+      callbackUrl: input.callbackUrl,
       idempotencyKey: input.idempotencyKey,
     });
 
-    /*
-     * Another request may have attached the provider payment while this
-     * request was waiting on the external provider. Lock before writing and
-     * never overwrite the winner's provider payment ID.
-     */
+    if (!payment.providerPaymentId) {
+      throw new Error("Payment provider did not return a payment identifier.");
+    }
+
     return this.unitOfWork.execute(async ({ depositRepository }) => {
       const currentDeposit = await depositRepository.findByIdForUpdate(
         deposit.id,
@@ -129,7 +114,10 @@ export class CreateDepositUseCase {
         return currentDeposit;
       }
 
-      currentDeposit.setProviderPayment(payment.providerPaymentId);
+      currentDeposit.setProviderPayment(
+        payment.providerPaymentId,
+        payment.paymentUrl,
+      );
 
       return depositRepository.save(currentDeposit);
     });

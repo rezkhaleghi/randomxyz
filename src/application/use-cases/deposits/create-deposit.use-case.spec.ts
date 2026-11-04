@@ -64,6 +64,7 @@ describe("CreateDepositUseCase", () => {
       amount: string;
       provider: PaymentProvider;
       idempotencyKey: string;
+      callbackUrl: string;
     }> = {},
   ) => ({
     userId: "user-1",
@@ -71,6 +72,7 @@ describe("CreateDepositUseCase", () => {
     amount: "100",
     provider: PaymentProvider.FAKE_PROVIDER,
     idempotencyKey: "client-key-1",
+    callbackUrl: "",
     ...overrides,
   });
 
@@ -224,7 +226,6 @@ describe("CreateDepositUseCase", () => {
     expect(depositRepositoryMock.create).not.toHaveBeenCalled();
     expect(paymentProviderMock.createPayment).not.toHaveBeenCalled();
 
-    // Returning the existing deposit must not open another transaction.
     expect(unitOfWorkMock.execute).toHaveBeenCalledTimes(1);
   });
 

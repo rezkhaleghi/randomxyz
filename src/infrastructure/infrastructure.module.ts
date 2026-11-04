@@ -54,6 +54,7 @@ import { TypeOrmUnitOfWork } from "./database/unit-of-work.typeorm";
 import { UnitOfWork } from "@application/interfaces/unit-of-work.interface";
 
 import { FakePaymentProvider } from "./services/fake-payment-provider.service";
+import { ParsianPaymentProvider } from "./services/parsian-payment-provider.service";
 import {
   PAYMENT_PROVIDERS,
   PAYMENT_PROVIDER_RESOLVER,
@@ -87,38 +88,26 @@ import { PermitOrmEntity } from "./database/orm-entities/permit.orm-entity";
 import { PermitRepository } from "@domain/repositories/permit.repository";
 import { PermitRepositoryImpl } from "./database/repositories/permit.repository.impl";
 
-/**
- * Infrastructure composition root.
- *
- * This is the boundary where application/domain abstractions are connected
- * to concrete infrastructure implementations such as TypeORM, Redis,
- * SMTP, MinIO and bcrypt.
- *
- * Environment validation also lives here so the application fails fast
- * during startup instead of discovering a missing configuration later.
- */
 @Global()
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       load: [typeormConfig],
-
       validationSchema: Joi.object({
-        // -------------------------------------------------------------------
-        // Application
-        // -------------------------------------------------------------------
-
         NODE_ENV: Joi.string()
           .valid("development", "test", "production")
           .default("development"),
 
         PORT: Joi.number().port().default(5001),
-
         TRUST_PROXY: Joi.number().integer().min(0).default(1),
 
         FRONTEND_URL: Joi.string().uri().default("http://localhost:8080"),
         BACKEND_URL: Joi.string().uri().default("http://localhost:5001"),
+
+        PARSIAN_PIN: Joi.string().allow("").default(""),
+        PARSIAN_SALE_URL: Joi.string().uri().allow("").default(""),
+        PARSIAN_CONFIRM_URL: Joi.string().uri().allow("").default(""),
 
         SWAGGER_ENABLED: Joi.boolean()
           .truthy("true")
@@ -129,115 +118,58 @@ import { PermitRepositoryImpl } from "./database/repositories/permit.repository.
           .valid(...Object.values(PaymentCurrency))
           .default(PaymentCurrency.IRT),
 
-        // -------------------------------------------------------------------
-        // PostgreSQL
-        // -------------------------------------------------------------------
-
         DB_HOST: Joi.string().required(),
-
         DB_PORT: Joi.number().port().default(5432),
-
         DB_USERNAME: Joi.string().required(),
-
         DB_PASSWORD: Joi.string().required(),
-
         DB_NAME: Joi.string().required(),
 
-        // -------------------------------------------------------------------
-        // Redis
-        // -------------------------------------------------------------------
-
         REDIS_HOST: Joi.string().required(),
-
         REDIS_PORT: Joi.number().port().default(6379),
-
         REDIS_PASSWORD: Joi.string().allow("").default(""),
-
         REDIS_TLS: Joi.boolean().truthy("true").falsy("false").default(false),
-
-        // -------------------------------------------------------------------
-        // OTP / authentication protection
-        // -------------------------------------------------------------------
 
         OTP_EXPIRY_SECONDS: Joi.number()
           .integer()
           .min(60)
           .max(900)
           .default(300),
-
         OTP_MAX_ATTEMPTS: Joi.number().integer().min(1).max(10).default(5),
-
         OTP_RESEND_COOLDOWN_SECONDS: Joi.number().integer().min(1).default(60),
-
         OTP_LOG_CODE: Joi.boolean()
           .truthy("true")
           .falsy("false")
           .default(false),
 
         LOGIN_MAX_ATTEMPTS: Joi.number().integer().min(1).default(5),
-
         LOGIN_ATTEMPT_WINDOW_SECONDS: Joi.number()
           .integer()
           .min(60)
           .default(900),
-
         LOGIN_LOCK_SECONDS: Joi.number().integer().min(60).default(900),
 
-        // -------------------------------------------------------------------
-        // SMTP
-        // -------------------------------------------------------------------
-
         SMTP_HOST: Joi.string().required(),
-
         SMTP_PORT: Joi.number().port().default(587),
-
         SMTP_SECURE: Joi.boolean().truthy("true").falsy("false").default(false),
-
         SMTP_USER: Joi.string().required(),
-
         SMTP_PASSWORD: Joi.string().required(),
-
         SMTP_FROM: Joi.string().email().required(),
-
-        // -------------------------------------------------------------------
-        // Tmar authentication
-        // -------------------------------------------------------------------
 
         TMAR_JWT_SECRET: Joi.string().min(32).required(),
         TMAR_TRAVEL_API_URL: Joi.string().required(),
 
-        // -------------------------------------------------------------------
-        // Initial administrator (temporarily retained)
-        // -------------------------------------------------------------------
-
         INITIAL_ADMIN_EMAIL: Joi.string().email().allow("").default(""),
-
         INITIAL_ADMIN_PASSWORD: Joi.string().min(12).allow("").default(""),
 
-        // -------------------------------------------------------------------
-        // Google OAuth
-        // -------------------------------------------------------------------
-
         GOOGLE_CLIENT_ID: Joi.string().required(),
-
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
-
         GOOGLE_CALLBACK_URL: Joi.string().uri().required(),
 
-        // -------------------------------------------------------------------
-        // MinIO
-        // -------------------------------------------------------------------
-
         MINIO_ENDPOINT: Joi.string().required(),
-
         MINIO_PORT: Joi.number().port().default(9000),
-
         MINIO_ACCESS_KEY: Joi.string().required(),
-
         MINIO_SECRET_KEY: Joi.string().required(),
-
         MINIO_BUCKET: Joi.string().required(),
-
         MINIO_USE_SSL: Joi.boolean()
           .truthy("true")
           .falsy("false")
@@ -283,8 +215,6 @@ import { PermitRepositoryImpl } from "./database/repositories/permit.repository.
         });
 
         client.on("error", (error) => {
-          // Redis emits connection errors asynchronously.
-          // Keeping a listener prevents an unhandled Redis "error" event.
           console.error("Redis client error:", error);
         });
 
@@ -296,101 +226,65 @@ import { PermitRepositoryImpl } from "./database/repositories/permit.repository.
 
     RedisClientLifecycle,
 
-    {
-      provide: UserRepository,
-      useClass: UserRepositoryImpl,
-    },
-
-    {
-      provide: PasswordHasher,
-      useClass: BcryptPasswordHasher,
-    },
+    { provide: UserRepository, useClass: UserRepositoryImpl },
+    { provide: PasswordHasher, useClass: BcryptPasswordHasher },
 
     RedisOtpStore,
-
     SmtpNotificationService,
-
     {
       provide: NotificationService,
       useExisting: SmtpNotificationService,
     },
-
-    {
-      provide: OtpService,
-      useClass: OtpServiceImpl,
-    },
+    { provide: OtpService, useClass: OtpServiceImpl },
 
     SeedAdminService,
-
     TmarJwtService,
-
     MinioService,
-
-    {
-      provide: FileStorage,
-      useExisting: MinioService,
-    },
+    { provide: FileStorage, useExisting: MinioService },
 
     ImageProcessingService,
-
-    {
-      provide: ImageProcessing,
-      useClass: ImageProcessingService,
-    },
+    { provide: ImageProcessing, useClass: ImageProcessingService },
 
     AdminStatisticsServiceImpl,
-
     {
       provide: AdminStatisticsService,
       useExisting: AdminStatisticsServiceImpl,
     },
 
-    {
-      provide: AuditLogRepository,
-      useClass: AuditLogRepositoryImpl,
-    },
-
-    {
-      provide: UserBalanceRepository,
-      useClass: UserBalanceRepositoryImpl,
-    },
-
-    {
-      provide: UnitOfWork,
-      useClass: TypeOrmUnitOfWork,
-    },
-
-    {
-      provide: LedgerRepository,
-      useClass: LedgerRepositoryImpl,
-    },
-
-    {
-      provide: DepositRepository,
-      useClass: DepositRepositoryImpl,
-    },
-
-    {
-      provide: WithdrawalRepository,
-      useClass: WithdrawalRepositoryImpl,
-    },
+    { provide: AuditLogRepository, useClass: AuditLogRepositoryImpl },
+    { provide: UserBalanceRepository, useClass: UserBalanceRepositoryImpl },
+    { provide: UnitOfWork, useClass: TypeOrmUnitOfWork },
+    { provide: LedgerRepository, useClass: LedgerRepositoryImpl },
+    { provide: DepositRepository, useClass: DepositRepositoryImpl },
+    { provide: WithdrawalRepository, useClass: WithdrawalRepositoryImpl },
 
     FakePaymentProvider,
+    ParsianPaymentProvider,
 
     {
       provide: PAYMENT_PROVIDERS,
-      inject: [ConfigService, FakePaymentProvider],
+      inject: [ConfigService, FakePaymentProvider, ParsianPaymentProvider],
       useFactory: (
-        configService: ConfigService,
+        configService: ConfigService<EnvironmentConfig>,
         fakePaymentProvider: FakePaymentProvider,
+        parsianPaymentProvider: ParsianPaymentProvider,
       ): PaymentProviderInterface[] => {
-        const nodeEnv = configService.get<string>("NODE_ENV");
+        const providers: PaymentProviderInterface[] = [];
+        const nodeEnv = configService.get("NODE_ENV");
 
-        if (nodeEnv !== "development" && nodeEnv !== "test") {
-          return [];
+        if (nodeEnv === "development" || nodeEnv === "test") {
+          providers.push(fakePaymentProvider);
         }
 
-        return [fakePaymentProvider];
+        const parsianPin = configService.get("PARSIAN_PIN");
+        const parsianSaleUrl = configService.get("PARSIAN_SALE_URL");
+        const parsianConfirmUrl = configService.get("PARSIAN_CONFIRM_URL");
+
+        if (parsianPin && parsianSaleUrl && parsianConfirmUrl) {
+          providers.push(parsianPaymentProvider);
+        }
+
+        return providers;
       },
     },
 
@@ -399,20 +293,9 @@ import { PermitRepositoryImpl } from "./database/repositories/permit.repository.
       useClass: PaymentProviderResolverService,
     },
 
-    {
-      provide: NotificationRepository,
-      useClass: NotificationRepositoryImpl,
-    },
-
-    {
-      provide: PageRepository,
-      useClass: PageRepositoryImpl,
-    },
-
-    {
-      provide: HtmlSanitizer,
-      useClass: HtmlSanitizerService,
-    },
+    { provide: NotificationRepository, useClass: NotificationRepositoryImpl },
+    { provide: PageRepository, useClass: PageRepositoryImpl },
+    { provide: HtmlSanitizer, useClass: HtmlSanitizerService },
 
     { provide: LocationRepository, useClass: LocationRepositoryImpl },
     {
@@ -423,10 +306,7 @@ import { PermitRepositoryImpl } from "./database/repositories/permit.repository.
       provide: LocationDateOverrideRepository,
       useClass: LocationDateOverrideRepositoryImpl,
     },
-    {
-      provide: PermitRepository,
-      useClass: PermitRepositoryImpl,
-    },
+    { provide: PermitRepository, useClass: PermitRepositoryImpl },
   ],
 
   exports: [
