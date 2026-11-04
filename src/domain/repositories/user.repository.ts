@@ -1,5 +1,4 @@
 import { User } from "../entities/user.entity";
-import { UserSearchResult } from "./user-search-result";
 import { AdminUserSearchFilters } from "./admin-user-search-filters";
 import { PageQuery, PageResult } from "@shared/pagination/page-query";
 import { UserRole } from "@domain/enums/user-role.enum";
@@ -22,11 +21,6 @@ export abstract class UserRepository {
   abstract findPage(
     params: PageQuery<"createdAt" | "email" | "role">,
   ): Promise<PageResult<User>>;
-
-  abstract search(
-    query: string,
-    params: PageQuery<"createdAt">,
-  ): Promise<PageResult<UserSearchResult>>;
 
   abstract searchAdminUsers(
     filters: AdminUserSearchFilters,

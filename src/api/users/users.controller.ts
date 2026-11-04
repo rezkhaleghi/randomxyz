@@ -22,7 +22,6 @@ import { MarkNotificationReadUseCase } from "@application/use-cases/notification
 import { AuthenticatedUserResponseDto } from "../auth/dtos/authenticated-user.response.dto";
 
 import { ListUserBalancesQueryDto } from "./dtos/list-user-balances.query.dto";
-import { SearchUsersQueryDto } from "./dtos/search-users.query.dto";
 import { ListNotificationsQueryDto } from "./dtos/list-notifications.query.dto";
 import { NotificationResponseDto } from "./dtos/notification.response.dto";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
