@@ -118,6 +118,7 @@ import { PermitRepositoryImpl } from "./database/repositories/permit.repository.
         TRUST_PROXY: Joi.number().integer().min(0).default(1),
 
         FRONTEND_URL: Joi.string().uri().default("http://localhost:8080"),
+        BACKEND_URL: Joi.string().uri().default("http://localhost:5001"),
 
         SWAGGER_ENABLED: Joi.boolean()
           .truthy("true")

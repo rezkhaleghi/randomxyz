@@ -11,6 +11,7 @@ export interface EnvironmentConfig {
   PORT: number;
   TRUST_PROXY: number;
   FRONTEND_URL: string;
+  BACKEND_URL: string;
   SWAGGER_ENABLED: boolean;
   DEFAULT_CURRENCY: string;
 
