@@ -28,20 +28,18 @@ export class FakePaymentProvider implements PaymentProviderInterface {
     const providerPaymentId = `fake-payment-${randomUUID()}`;
 
     return {
-      provider: this.name,
       providerPaymentId,
       paymentUrl: `https://fake-payment.example/pay/${providerPaymentId}?reference=${input.referenceId}`,
     };
   }
 
-  async verifyPayment(input: VerifyPaymentInput): Promise<VerifyPaymentResult> {
+  async verifyPayment(
+    _input: VerifyPaymentInput,
+  ): Promise<VerifyPaymentResult> {
     this.assertEnabledOutsideProduction();
 
     return {
-      providerPaymentId: input.providerPaymentId,
       transactionId: `fake-tx-${randomUUID()}`,
-      amount: input.amount,
-      currency: input.currency,
     };
   }
 
@@ -49,8 +47,6 @@ export class FakePaymentProvider implements PaymentProviderInterface {
    * This provider simulates successful payments; it does not contact a real
    * payment gateway. Allow it only in explicitly identified development/test
    * environments so it cannot credit real balances in production.
-   *
-   * Default to disabled when the environment is missing or unrecognized.
    */
   private assertEnabledOutsideProduction(): void {
     const nodeEnv =

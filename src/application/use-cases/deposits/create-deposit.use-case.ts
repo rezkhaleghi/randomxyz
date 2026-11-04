@@ -83,7 +83,6 @@ export class CreateDepositUseCase {
       },
     );
 
-    // A retry returns the same checkout URL instead of creating another payment.
     if (deposit.providerPaymentId) {
       return deposit;
     }
@@ -91,10 +90,8 @@ export class CreateDepositUseCase {
     const payment = await paymentProvider.createPayment({
       amount: deposit.amount,
       currency: deposit.currency,
-      provider: deposit.provider,
       referenceId: deposit.referenceId,
       callbackUrl: input.callbackUrl,
-      idempotencyKey: input.idempotencyKey,
     });
 
     if (!payment.providerPaymentId) {

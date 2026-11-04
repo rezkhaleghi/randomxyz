@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 
 import { DepositStatus } from "@domain/enums/deposit-status.enum";
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
@@ -17,7 +17,6 @@ export interface ParsianCallbackInput {
   Token?: unknown;
   Amount?: unknown;
   status?: unknown;
-  RRN?: unknown;
 }
 
 @Injectable()
@@ -32,7 +31,6 @@ export class HandleParsianCallbackUseCase {
     const token = this.toStringValue(input.Token);
     const amount = this.toStringValue(input.Amount);
     const status = this.toStringValue(input.status);
-    const rrn = this.toStringValue(input.RRN);
 
     if (!orderId || !token || !amount) {
       throw new NotMatchException("Parsian callback fields", "Deposit");
@@ -59,8 +57,7 @@ export class HandleParsianCallbackUseCase {
       throw new NotMatchException("Parsian token", "Deposit");
     }
 
-    // Parsian callback status 0 means the customer completed the payment step.
-    // It is not proof of settlement; ConfirmPayment is still required.
+    // Callback success is not proof of settlement. Server-side confirmation is required.
     if (status !== "0") {
       throw new NotMatchException("Successful Parsian callback", "Deposit");
     }
@@ -77,7 +74,6 @@ export class HandleParsianCallbackUseCase {
     return this.verifyDepositUseCase.execute({
       userId: deposit.userId,
       depositId: deposit.id,
-      transactionId: rrn || undefined,
     });
   }
 

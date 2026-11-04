@@ -23,7 +23,6 @@ import {
 export interface VerifyDepositInput {
   depositId: string;
   userId: string;
-  transactionId?: string;
 }
 
 @Injectable()
@@ -73,19 +72,7 @@ export class VerifyDepositUseCase {
 
     const verification = await paymentProvider.verifyPayment({
       providerPaymentId: deposit.providerPaymentId,
-      referenceId: deposit.referenceId,
-      amount: deposit.amount,
-      currency: deposit.currency,
-      transactionId: input.transactionId,
     });
-
-    if (
-      verification.providerPaymentId !== deposit.providerPaymentId ||
-      verification.amount !== deposit.amount ||
-      verification.currency !== deposit.currency
-    ) {
-      throw new NotMatchException("Verified payment", "Deposit");
-    }
 
     return this.unitOfWork.execute(
       async ({
@@ -104,17 +91,13 @@ export class VerifyDepositUseCase {
           throw new DepositNotFoundException();
         }
 
-        // Makes repeated verification/callback requests safe.
         if (currentDeposit.status === DepositStatus.COMPLETED) {
           return currentDeposit;
         }
 
-        if (!currentDeposit.providerPaymentId) {
-          throw new NotMatchException("Provider payment ID", "Deposit");
-        }
-
         if (
-          currentDeposit.providerPaymentId !== verification.providerPaymentId
+          !currentDeposit.providerPaymentId ||
+          currentDeposit.providerPaymentId !== deposit.providerPaymentId
         ) {
           throw new NotMatchException("Provider payment ID", "Deposit");
         }
@@ -131,7 +114,7 @@ export class VerifyDepositUseCase {
 
         const balanceBefore = balance.amount;
 
-        // The deposit amount remains in Toman (IRT), not Rial.
+        // Internal IRT amounts remain in Toman.
         balance.credit(currentDeposit.amount);
 
         const savedBalance = await userBalanceRepository.save(balance);
@@ -147,7 +130,7 @@ export class VerifyDepositUseCase {
             referenceId: currentDeposit.referenceId,
             metadata: {
               depositId: currentDeposit.id,
-              providerPaymentId: verification.providerPaymentId,
+              providerPaymentId: currentDeposit.providerPaymentId,
               transactionId: verification.transactionId,
             },
           }),

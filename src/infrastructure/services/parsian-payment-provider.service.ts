@@ -91,7 +91,6 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
       const token = String(result.Token);
 
       return {
-        provider: this.name,
         providerPaymentId: token,
         paymentUrl: `https://pec.shaparak.ir/NewIPG/?token=${encodeURIComponent(token)}`,
       };
@@ -124,12 +123,9 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
         throw new Error("Parsian did not confirm the payment.");
       }
 
-      return {
-        providerPaymentId: input.providerPaymentId,
-        transactionId: input.transactionId,
-        amount: input.amount,
-        currency: input.currency,
-      };
+      // The current known SOAP response contract only exposes Status.
+      // Do not treat callback-provided RRN as a confirmed transaction ID.
+      return {};
     } catch {
       throw new Error("Unable to confirm Parsian payment.");
     }
