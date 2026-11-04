@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Patch,
@@ -15,6 +16,7 @@ import { CreatePermitUseCase } from "@application/use-cases/permits/create-permi
 import { EndPermitUseCase } from "@application/use-cases/permits/end-permit.use-case";
 import { GetPermitUseCase } from "@application/use-cases/permits/get-permit.use-case";
 import { ListPermitsUseCase } from "@application/use-cases/permits/list-permits.use-case";
+import { VerifyPermitUseCase } from "@application/use-cases/permits/verify-permit.use-case";
 
 import { TmarAuthGuard } from "../auth/tmar-auth.guard";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
@@ -23,16 +25,17 @@ import { CreatePermitDto } from "./dtos/create-permit.dto";
 
 @ApiTags("permits")
 @Controller("permits")
-@UseGuards(TmarAuthGuard)
 export class PermitsController {
   constructor(
     private readonly createPermitUseCase: CreatePermitUseCase,
     private readonly listPermitsUseCase: ListPermitsUseCase,
     private readonly getPermitUseCase: GetPermitUseCase,
     private readonly endPermitUseCase: EndPermitUseCase,
+    private readonly verifyPermitUseCase: VerifyPermitUseCase,
   ) {}
 
   @Post()
+  @UseGuards(TmarAuthGuard)
   @ApiOperation({
     summary: "Create and pay for a permit",
   })
@@ -68,6 +71,7 @@ export class PermitsController {
   }
 
   @Get()
+  @UseGuards(TmarAuthGuard)
   @ApiOperation({
     summary: "List the current user's permits",
   })
@@ -79,7 +83,30 @@ export class PermitsController {
     return this.listPermitsUseCase.execute(req.user.id);
   }
 
+  @Get("verify/:qrToken")
+  @ApiOperation({
+    summary: "Verify a permit QR token",
+    description:
+      "Public endpoint. Returns permit status, location, passenger count, and leader details only.",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "Permit verification details.",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "Permit not found.",
+  })
+  verify(@Param("qrToken") qrToken: string) {
+    if (!/^[a-f0-9]{64}$/i.test(qrToken)) {
+      throw new NotFoundException("Permit not found.");
+    }
+
+    return this.verifyPermitUseCase.execute(qrToken);
+  }
+
   @Get(":permitId")
+  @UseGuards(TmarAuthGuard)
   @ApiOperation({
     summary: "Get permit details",
     description:
@@ -108,6 +135,7 @@ export class PermitsController {
   }
 
   @Patch(":permitId/end")
+  @UseGuards(TmarAuthGuard)
   @ApiOperation({
     summary: "End a permit",
     description:
