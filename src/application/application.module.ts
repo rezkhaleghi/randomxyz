@@ -41,7 +41,7 @@ import { DeletePageUseCase } from "./use-cases/admin-pages/delete-page.use-case"
 import { GetPublicPageUseCase } from "./use-cases/pages/get-page.use-case";
 
 import { SyncLocationsUseCase } from "@application/use-cases/locations/sync-locations.use-case";
-import { ListLocationsUseCase } from "./use-cases/admin-locations/list-locations.use-case";
+import { AdminListLocationsUseCase } from "./use-cases/admin-locations/list-locations.use-case";
 import { UpdateLocationUseCase } from "./use-cases/admin-locations/update-location.use-case";
 import { ListLocationDateOverridesUseCase } from "./use-cases/admin-locations/list-location-date-overrides.use-case";
 import { CreateLocationDateOverrideUseCase } from "./use-cases/admin-locations/create-location-date-override.use-case";
@@ -50,6 +50,9 @@ import { DeleteLocationDateOverrideUseCase } from "./use-cases/admin-locations/d
 
 import { GetPermitSettingsUseCase } from "./use-cases/admin-settings/get-permit-setting.use-case";
 import { UpdatePermitSettingsUseCase } from "./use-cases/admin-settings/update-permit-setting.use-case";
+import { GetLocationUseCase } from "./use-cases/locations/get-location.use-case";
+import { ListLocationsUseCase } from "./use-cases/locations/list-locations.use-case";
+import { AdminGetLocationUseCase } from "./use-cases/admin-locations/get-location.use-case";
 
 /**
  * Registers application use cases. Infrastructure bindings are supplied by
@@ -103,6 +106,10 @@ import { UpdatePermitSettingsUseCase } from "./use-cases/admin-settings/update-p
     CreateLocationDateOverrideUseCase,
     UpdateLocationDateOverrideUseCase,
     DeleteLocationDateOverrideUseCase,
+    AdminListLocationsUseCase,
+    AdminGetLocationUseCase,
+    GetLocationUseCase,
+    ListLocationsUseCase,
 
     GetPermitSettingsUseCase,
     UpdatePermitSettingsUseCase,
@@ -161,6 +168,11 @@ import { UpdatePermitSettingsUseCase } from "./use-cases/admin-settings/update-p
     CreateLocationDateOverrideUseCase,
     UpdateLocationDateOverrideUseCase,
     DeleteLocationDateOverrideUseCase,
+    AdminListLocationsUseCase,
+    AdminGetLocationUseCase,
+    ListLocationsUseCase,
+    GetLocationUseCase,
+    ListLocationsUseCase,
 
     GetPermitSettingsUseCase,
     UpdatePermitSettingsUseCase,

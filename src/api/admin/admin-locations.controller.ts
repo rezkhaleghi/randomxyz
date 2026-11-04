@@ -21,7 +21,8 @@ import {
 
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 
-import { ListLocationsUseCase } from "@application/use-cases/admin-locations/list-locations.use-case";
+import { AdminListLocationsUseCase } from "@application/use-cases/admin-locations/list-locations.use-case";
+import { AdminGetLocationUseCase } from "@application/use-cases/admin-locations/get-location.use-case";
 import { UpdateLocationUseCase } from "@application/use-cases/admin-locations/update-location.use-case";
 import { ListLocationDateOverridesUseCase } from "@application/use-cases/admin-locations/list-location-date-overrides.use-case";
 import { CreateLocationDateOverrideUseCase } from "@application/use-cases/admin-locations/create-location-date-override.use-case";
@@ -40,7 +41,8 @@ import { ListLocationDateOverridesQueryDto } from "./dtos/location-date-override
 @UseGuards(AdminAuthGuard)
 export class AdminLocationsController {
   constructor(
-    private readonly listLocationsUseCase: ListLocationsUseCase,
+    private readonly listLocationsUseCase: AdminListLocationsUseCase,
+    private readonly adminGetLocationUseCase: AdminGetLocationUseCase,
     private readonly updateLocationUseCase: UpdateLocationUseCase,
     private readonly listLocationDateOverridesUseCase: ListLocationDateOverridesUseCase,
     private readonly createLocationDateOverrideUseCase: CreateLocationDateOverrideUseCase,
@@ -67,6 +69,15 @@ export class AdminLocationsController {
       sortBy: query.sortBy,
       sortDirection: query.sortDirection,
     });
+  }
+
+  @Get(":locationId")
+  @ApiOperation({ summary: "Get location details for administrators" })
+  @ApiParam({ name: "locationId", format: "uuid" })
+  @ApiResponse({ status: 200, description: "Location details" })
+  @ApiResponse({ status: 404, description: "Location not found" })
+  get(@Param("locationId", ParseUUIDPipe) locationId: string) {
+    return this.adminGetLocationUseCase.execute(locationId);
   }
 
   @Patch(":locationId")

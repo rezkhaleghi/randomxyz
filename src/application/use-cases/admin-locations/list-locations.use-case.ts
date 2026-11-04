@@ -14,7 +14,7 @@ export interface ListLocationsInput extends LocationFilters {
 }
 
 @Injectable()
-export class ListLocationsUseCase {
+export class AdminListLocationsUseCase {
   constructor(private readonly locationRepository: LocationRepository) {}
 
   execute(input: ListLocationsInput) {
