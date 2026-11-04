@@ -64,4 +64,5 @@ export interface EnvironmentConfig {
   MINIO_USE_SSL: boolean;
 
   TMAR_JWT_SECRET: string;
+  TMAR_TRAVEL_API_URL: string;
 }

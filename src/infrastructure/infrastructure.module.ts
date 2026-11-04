@@ -79,6 +79,7 @@ import { LocationRepositoryImpl } from "./database/repositories/location.reposit
 import { TmarTravelLocationsClient } from "@application/interfaces/tmar-locations-client.interface";
 import { LocationSyncScheduler } from "./services/location-sync.scheduler";
 import { TmarTravelLocationsClientService } from "./services/tmar-locations-client.service";
+import { LocationOrmEntity } from "./database/orm-entities/location.orm-entity";
 
 /**
  * Infrastructure composition root.
@@ -196,6 +197,7 @@ import { TmarTravelLocationsClientService } from "./services/tmar-locations-clie
         // -------------------------------------------------------------------
 
         TMAR_JWT_SECRET: Joi.string().min(32).required(),
+        TMAR_TRAVEL_API_URL: Joi.string().required(),
 
         // -------------------------------------------------------------------
         // Initial administrator (temporarily retained)
@@ -249,6 +251,7 @@ import { TmarTravelLocationsClientService } from "./services/tmar-locations-clie
       WithdrawalOrmEntity,
       NotificationOrmEntity,
       PageOrmEntity,
+      LocationOrmEntity,
     ]),
   ],
 
@@ -407,7 +410,6 @@ import { TmarTravelLocationsClientService } from "./services/tmar-locations-clie
       provide: TmarTravelLocationsClient,
       useClass: TmarTravelLocationsClientService,
     },
-    LocationSyncScheduler,
   ],
 
   exports: [
@@ -431,6 +433,7 @@ import { TmarTravelLocationsClientService } from "./services/tmar-locations-clie
     HtmlSanitizer,
     TmarJwtService,
     LocationRepository,
+    TmarTravelLocationsClient,
   ],
 })
 export class InfrastructureModule {}

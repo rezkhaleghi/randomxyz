@@ -14,7 +14,7 @@ export class TmarTravelLocationsClientService extends TmarTravelLocationsClient 
 
   async fetchAvailableLocations(): Promise<unknown> {
     const baseUrl = this.configService
-      .getOrThrow("FRONTEND_URL")
+      .getOrThrow("TMAR_TRAVEL_API_URL")
       .replace(/\/+$/, "");
 
     // maybe /destinations/sync

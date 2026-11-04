@@ -17,7 +17,8 @@ import {
 } from "nestjs-i18n";
 import * as path from "path";
 import { PagesModule } from "@api/pages/pages.module";
-
+import { ApplicationModule } from "@application/application.module";
+import { LocationSyncScheduler } from "./infrastructure/services/location-sync.scheduler";
 /**
  * Root application module.
  *
@@ -58,6 +59,8 @@ import { PagesModule } from "@api/pages/pages.module";
      */
     InfrastructureModule,
 
+    ApplicationModule,
+
     // Authentication and authorization.
     AuthModule,
     AdminModule,
@@ -85,6 +88,7 @@ import { PagesModule } from "@api/pages/pages.module";
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
     },
+    LocationSyncScheduler,
   ],
 })
 export class AppModule {}
