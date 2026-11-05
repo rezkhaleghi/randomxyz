@@ -10,7 +10,6 @@ import { I18nContext } from "nestjs-i18n";
 import { Request, Response } from "express";
 
 import {
-  CannotDeleteSelfException,
   CannotRemoveLastAdminException,
   DecimalScaleExceededException,
   DepositChangeStatusNotAllowedException,
@@ -87,10 +86,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (!(exception instanceof DomainException)) {
       return HttpStatus.INTERNAL_SERVER_ERROR;
-    }
-
-    if (exception instanceof CannotDeleteSelfException) {
-      return HttpStatus.FORBIDDEN;
     }
 
     if (

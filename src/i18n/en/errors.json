@@ -9,7 +9,6 @@
   "GoogleAccountConflictException": "This Google account cannot be linked to the requested user.",
   "UserNotFoundException": "User not found.",
   "CannotRemoveLastAdminException": "The last administrator cannot be removed or demoted.",
-  "CannotDeleteSelfException": "An administrator cannot delete their own account.",
   "FileNotFoundException": "File not found.",
   "UserBalanceNotFoundException": "The requested user balance was not found.",
   "UserBalanceAlreadyExistsException": "This user balance already exists.",

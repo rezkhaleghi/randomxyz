@@ -9,7 +9,6 @@
   "GoogleAccountConflictException": "این حساب گوگل را نمی‌توان به کاربر موردنظر متصل کرد.",
   "UserNotFoundException": "کاربر پیدا نشد.",
   "CannotRemoveLastAdminException": "آخرین مدیر را نمی‌توان حذف کرد یا دسترسی مدیریتی او را گرفت.",
-  "CannotDeleteSelfException": "مدیر نمی‌تواند حساب کاربری خودش را حذف کند.",
   "FileNotFoundException": "فایل پیدا نشد.",
   "UserBalanceNotFoundException": "موجودی موردنظر کاربر پیدا نشد.",
   "UserBalanceAlreadyExistsException": "این موجودی برای کاربر از قبل وجود دارد.",

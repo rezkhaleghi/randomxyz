@@ -171,9 +171,6 @@ import { ListUserLedgersUseCase } from "./use-cases/users/list-user-ledgers.use-
 
     SyncLocationsUseCase,
 
-    ListLocationsUseCase,
-    UpdateLocationUseCase,
-
     CreatePageUseCase,
     UpdatePageUseCase,
     DeletePageUseCase,
@@ -198,6 +195,7 @@ import { ListUserLedgersUseCase } from "./use-cases/users/list-user-ledgers.use-
     ListLocationsUseCase,
     GetLocationUseCase,
     GetLocationAvailabilityUseCase,
+    UpdateLocationUseCase,
 
     GetPermitSettingsUseCase,
     UpdatePermitSettingsUseCase,

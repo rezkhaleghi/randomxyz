@@ -46,12 +46,6 @@ export class CannotRemoveLastAdminException extends DomainException {
   }
 }
 
-export class CannotDeleteSelfException extends DomainException {
-  constructor() {
-    super("An administrator cannot delete their own account.");
-  }
-}
-
 export class UserBalanceNotFoundException extends DomainException {
   constructor(currency: string) {
     super(`Balance for ${currency} does not exist for this user.`);
