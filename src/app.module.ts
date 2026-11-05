@@ -11,6 +11,7 @@ import { WithdrawalsModule } from "./api/withdrawals/withdrawals.module";
 import { LocationsModule } from "./api/locations/locations.module";
 import { PermitsModule } from "./api/permits/permits.module";
 
+import { ApplicationModule } from "./application/application.module";
 import { InfrastructureModule } from "./infrastructure/infrastructure.module";
 
 import {
@@ -44,6 +45,7 @@ import { PermitExpirationScheduler } from "./infrastructure/services/permit-expi
     }),
 
     InfrastructureModule,
+    ApplicationModule,
 
     AuthModule,
     AdminModule,
