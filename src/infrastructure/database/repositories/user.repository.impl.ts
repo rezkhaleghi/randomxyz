@@ -307,6 +307,8 @@ export class UserRepositoryImpl implements UserRepository {
       email: row.email,
       hashedPassword: row.hashedPassword,
       role: row.role,
+      tmarTravelRole: row.tmarTravelRole ?? UserRole.USER,
+
       emailVerified: row.emailVerified,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -329,6 +331,7 @@ export class UserRepositoryImpl implements UserRepository {
     row.email = user.email;
     row.hashedPassword = user.hashedPassword;
     row.role = user.role;
+    row.tmarTravelRole = user.tmarTravelRole;
     row.emailVerified = user.emailVerified;
     row.googleId = user.googleId;
     row.firstName = user.firstName;

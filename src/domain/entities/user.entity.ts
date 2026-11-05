@@ -19,6 +19,7 @@ export interface CreateUserProps {
   email: string;
   hashedPassword: string | null;
   role?: UserRole;
+  tmarTravelRole?: UserRole;
   emailVerified?: boolean;
   googleId?: string | null;
 }
@@ -29,6 +30,7 @@ export interface RestoreUserProps {
   email: string;
   hashedPassword: string | null;
   role: UserRole;
+  tmarTravelRole?: UserRole;
   emailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -53,6 +55,7 @@ export class User {
     public email: string,
     public hashedPassword: string | null,
     public role: UserRole,
+    public tmarTravelRole: UserRole,
     emailVerified: boolean,
     public readonly createdAt: Date,
     updatedAt: Date,
@@ -95,6 +98,7 @@ export class User {
       params.email,
       params.hashedPassword,
       params.role ?? UserRole.USER,
+      params.tmarTravelRole ?? UserRole.USER,
       params.emailVerified ?? false,
       now,
       now,
@@ -116,6 +120,7 @@ export class User {
       params.email,
       params.hashedPassword,
       params.role,
+      params.tmarTravelRole ?? UserRole.USER,
       params.emailVerified,
       params.createdAt,
       params.updatedAt,
@@ -158,17 +163,12 @@ export class User {
     this.touch();
   }
 
-  /**
-   * Synchronizes identity/profile data received from Tmar-Travel.
-   *
-   * This deliberately does not change the local role, local status,
-   * password, Google identity, or local user ID.
-   */
   synchronizeTmarTravelProfile(params: {
     externalUserId: string;
     email: string;
     firstName: string | null;
     lastName: string | null;
+    role: UserRole;
   }): void {
     if (this.externalUserId && this.externalUserId !== params.externalUserId) {
       throw new Error("External user identity cannot be changed.");
@@ -178,7 +178,9 @@ export class User {
     this.email = params.email;
     this.firstName = params.firstName;
     this.lastName = params.lastName;
+    this.tmarTravelRole = params.role;
     this._emailVerified = true;
+
     this.touch();
   }
 

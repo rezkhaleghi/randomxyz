@@ -19,6 +19,7 @@ import { GetUserUseCase } from "@application/use-cases/admin-users/get-user.use-
 import { ListUsersUseCase } from "@application/use-cases/admin-users/list-users.use-case";
 import { GetAuditLogsUseCase } from "@application/use-cases/admin-users/get-audit-logs.use-case";
 import { GetAdminStatisticsUseCase } from "@application/use-cases/admin-users/get-statistics.use-case";
+import { UpdateUserRoleUseCase } from "@application/use-cases/admin-users/update-user-role.use-case";
 
 import { AdminAuthGuard } from "./admin-auth.guard";
 
@@ -29,19 +30,8 @@ import { UserStatus } from "@domain/enums/user-status.enum";
 import { ListAuditLogsQueryDto } from "./dtos/audit-logs/list-audit-logs.query.dto";
 import { ListUsersQueryDto } from "./dtos/users/list-users.query.dto";
 import { CreateUserDto } from "./dtos/users/create-user.dto";
-import { UpdateUserDto } from "./dtos/users/update-user.dto";
+import { UpdateUserRoleDto } from "./dtos/users/update-user-role.dto";
 
-/**
- * HTTP controller for administrator user management.
- *
- * Responsibilities:
- * - Receive and validate HTTP requests through DTOs.
- * - Extract route, query, body, and authenticated-user data.
- * - Delegate business operations to application use cases.
- * - Convert domain users into API response DTOs.
- *
- * The controller does not contain domain business rules.
- */
 @Controller("admin/users")
 @ApiTags("admin-users")
 @UseGuards(AdminAuthGuard)
@@ -52,6 +42,7 @@ export class AdminUsersController {
     private readonly createUserUseCase: CreateAdminUserUseCase,
     private readonly getAdminStatisticsUseCase: GetAdminStatisticsUseCase,
     private readonly getAuditLogsUseCase: GetAuditLogsUseCase,
+    private readonly updateUserRoleUseCase: UpdateUserRoleUseCase,
   ) {}
 
   @Get("statistics")
@@ -149,6 +140,44 @@ export class AdminUsersController {
     return this.toResponse(await this.getUserUseCase.execute(id));
   }
 
+  @Patch(":id/role")
+  @ApiOperation({
+    summary: "Update a user's Tmar-Cert role",
+    description:
+      "Changes only the locally managed Tmar-Cert role. The TmarTravel role is synchronized separately from the user's JWT.",
+  })
+  @ApiParam({
+    name: "id",
+    description: "User UUID",
+    format: "uuid",
+  })
+  @ApiResponse({
+    status: 200,
+    description: "User role updated",
+    type: AdminUserResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Administrator access required",
+  })
+  @ApiResponse({
+    status: 404,
+    description: "User not found",
+  })
+  async updateRole(
+    @Param("id", ParseUUIDPipe) id: string,
+    @Body() dto: UpdateUserRoleDto,
+    @Req() req: AuthenticatedRequest,
+  ) {
+    const user = await this.updateUserRoleUseCase.execute(
+      id,
+      dto.role,
+      req.user.id,
+    );
+
+    return this.toResponse(user);
+  }
+
   @Post()
   @ApiOperation({
     summary: "Create a user or administrator",
@@ -172,6 +201,7 @@ export class AdminUsersController {
     id: string;
     email: string;
     role: string;
+    tmarTravelRole: string;
     emailVerified: boolean;
     firstName: string | null;
     lastName: string | null;
@@ -187,6 +217,8 @@ export class AdminUsersController {
       id: user.id,
       email: user.email,
       role: user.role as AdminUserResponseDto["role"],
+      tmarTravelRole:
+        user.tmarTravelRole as AdminUserResponseDto["tmarTravelRole"],
       emailVerified: user.emailVerified,
       firstName: user.firstName,
       lastName: user.lastName,

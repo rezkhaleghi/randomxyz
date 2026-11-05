@@ -65,6 +65,7 @@ import { AdminListPermitsUseCase } from "./use-cases/admin-permits/list-permits.
 import { AdminGetPermitUseCase } from "./use-cases/admin-permits/get-permit.use-case";
 import { AdminUpdatePermitUseCase } from "./use-cases/admin-permits/update-permit.use-case";
 import { AdminRevokePermitUseCase } from "./use-cases/admin-permits/revoke-permit.use-case";
+import { UpdateUserRoleUseCase } from "./use-cases/admin-users/update-user-role.use-case";
 
 @Module({
   imports: [],
@@ -110,6 +111,7 @@ import { AdminRevokePermitUseCase } from "./use-cases/admin-permits/revoke-permi
     CreateAdminUserUseCase,
     GetAdminStatisticsUseCase,
     GetAuditLogsUseCase,
+    UpdateUserRoleUseCase,
 
     ListLocationDateOverridesUseCase,
     UpsertLocationDateOverrideUseCase,
@@ -185,6 +187,7 @@ import { AdminRevokePermitUseCase } from "./use-cases/admin-permits/revoke-permi
     CreateAdminUserUseCase,
     GetAdminStatisticsUseCase,
     GetAuditLogsUseCase,
+    UpdateUserRoleUseCase,
 
     ListLocationDateOverridesUseCase,
     UpsertLocationDateOverrideUseCase,

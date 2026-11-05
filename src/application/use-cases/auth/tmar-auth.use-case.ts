@@ -52,20 +52,19 @@ export class TmarAuthUseCase {
             email,
             firstName: identity.firstName,
             lastName: identity.lastName,
+            role: identity.role,
           });
 
           user =
             await userRepository.createIfNotExistsByExternalUserId(newUser);
         }
 
-        // Serialize first-login requests and balance creation for this user.
         user = (await userRepository.findByIdForUpdate(user.id)) ?? user;
 
         if (user.status !== UserStatus.ACTIVE) {
           throw new UnauthorizedException("Your account is restricted.");
         }
 
-        // Ensure every active user has a balance in the default currency.
         const existingBalance =
           await userBalanceRepository.findByUserIdAndCurrency(
             user.id,
@@ -87,6 +86,7 @@ export class TmarAuthUseCase {
           user.email !== email ||
           user.firstName !== identity.firstName ||
           user.lastName !== identity.lastName ||
+          user.tmarTravelRole !== identity.role ||
           !user.emailVerified;
 
         if (profileChanged) {
@@ -95,6 +95,7 @@ export class TmarAuthUseCase {
             email,
             firstName: identity.firstName,
             lastName: identity.lastName,
+            role: identity.role,
           });
 
           user = await userRepository.save(user);

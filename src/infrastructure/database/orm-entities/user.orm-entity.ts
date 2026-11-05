@@ -13,6 +13,7 @@ import { UserStatus } from "@domain/enums/user-status.enum";
 @Entity("users")
 @Index(["createdAt"])
 @Index(["role"])
+@Index(["tmarTravelRole"])
 @Index(["status"])
 @Index(["emailVerified"])
 export class UserOrmEntity {
@@ -47,12 +48,20 @@ export class UserOrmEntity {
   @Column({ nullable: true, type: "date" })
   dateOfBirth!: Date | null;
 
+  // Locally managed Tmar-Cert role.
   @Column({
     type: "enum",
     enum: UserRole,
     default: UserRole.USER,
   })
   role!: UserRole;
+
+  // Role synchronized from the verified TmarTravel JWT.
+  @Column({
+    type: "varchar",
+    default: UserRole.USER,
+  })
+  tmarTravelRole!: UserRole;
 
   @Column({ default: false })
   emailVerified!: boolean;

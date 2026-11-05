@@ -1,4 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
+
 import { UserRole } from "@domain/enums/user-role.enum";
 import { UserStatus } from "@domain/enums/user-status.enum";
 
@@ -9,8 +10,17 @@ export class AdminUserResponseDto {
   @ApiProperty()
   email!: string;
 
-  @ApiProperty({ enum: UserRole })
+  @ApiProperty({
+    description: "Role assigned locally by Tmar-Cert administrators.",
+    enum: UserRole,
+  })
   role!: UserRole;
+
+  @ApiProperty({
+    description: "Role synchronized from TmarTravel.",
+    enum: UserRole,
+  })
+  tmarTravelRole!: UserRole;
 
   @ApiProperty()
   emailVerified!: boolean;
@@ -31,14 +41,10 @@ export class AdminUserResponseDto {
   })
   dateOfBirth!: Date | null;
 
-  @ApiProperty({
-    nullable: true,
-  })
+  @ApiProperty({ nullable: true })
   avatar!: string | null;
 
-  @ApiProperty({
-    nullable: true,
-  })
+  @ApiProperty({ nullable: true })
   bio!: string | null;
 
   @ApiProperty()

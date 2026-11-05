@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config";
 import * as jwt from "jsonwebtoken";
 
 import { TmarIdentity } from "@application/interfaces/tmar-identity.interface";
+import { UserRole } from "@domain/enums/user-role.enum";
 import { EnvironmentConfig } from "@infrastructure/config/environment.config";
 
 @Injectable()
@@ -27,7 +28,9 @@ export class TmarJwtService {
         typeof payload._id !== "string" ||
         !payload._id.trim() ||
         typeof payload.email !== "string" ||
-        !payload.email.trim()
+        !payload.email.trim() ||
+        typeof payload.role !== "string" ||
+        !Object.values(UserRole).includes(payload.role as UserRole)
       ) {
         throw new Error("Invalid authentication token payload.");
       }
@@ -42,6 +45,7 @@ export class TmarJwtService {
         lastName:
           typeof payload.lastName === "string" ? payload.lastName.trim() : null,
         status: typeof payload.status === "string" ? payload.status : null,
+        role: payload.role as UserRole,
       };
     } catch {
       throw new UnauthorizedException(

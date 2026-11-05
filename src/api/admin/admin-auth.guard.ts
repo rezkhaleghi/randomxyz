@@ -24,14 +24,16 @@ export class AdminAuthGuard implements CanActivate {
     await this.tmarAuthGuard.canActivate(context);
 
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-
     const user = request.user;
 
     if (!user) {
       throw new UnauthorizedException();
     }
 
-    if (user.role !== UserRole.ADMIN) {
+    const isAdmin =
+      user.role === UserRole.ADMIN || user.tmarTravelRole === UserRole.ADMIN;
+
+    if (!isAdmin) {
       throw new ForbiddenException("Administrator access required.");
     }
 
