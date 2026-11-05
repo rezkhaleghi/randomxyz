@@ -279,7 +279,17 @@ export class UserRepositoryImpl implements UserRepository {
       totalPages: Math.ceil(total / params.limit),
     };
   }
-
+  async countEffectiveAdmins(): Promise<number> {
+    return this.repo
+      .createQueryBuilder("user")
+      .where("user.role = :localAdminRole", {
+        localAdminRole: UserRole.ADMIN,
+      })
+      .orWhere("LOWER(user.tmarTravelRole) = :externalAdminRole", {
+        externalAdminRole: "admin",
+      })
+      .getCount();
+  }
   private throwUserUniqueViolation(error: unknown): void {
     if (!isPostgresUniqueViolation(error)) {
       return;

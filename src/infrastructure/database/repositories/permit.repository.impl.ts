@@ -8,6 +8,7 @@ import {
   AdminPermitFilters,
   AdminPermitSortBy,
   PermitRepository,
+  PermitSortBy,
 } from "@domain/repositories/permit.repository";
 
 import { PageQuery, PageResult } from "@shared/pagination/page-query";
@@ -60,6 +61,45 @@ export class PermitRepositoryImpl extends PermitRepository {
     });
 
     return rows.map((row) => this.toDomain(row));
+  }
+
+  async findUserPage(
+    userId: string,
+    statuses: PermitStatus[] | undefined,
+    params: PageQuery<PermitSortBy>,
+  ): Promise<PageResult<Permit>> {
+    const query = this.repository
+      .createQueryBuilder("permit")
+      .where("permit.userId = :userId", { userId });
+
+    if (statuses?.length) {
+      query.andWhere("permit.status IN (:...statuses)", { statuses });
+    }
+
+    const columns: Record<PermitSortBy, string> = {
+      createdAt: "permit.createdAt",
+      startDate: "permit.startDate",
+      endDate: "permit.endDate",
+    };
+
+    query
+      .orderBy(
+        columns[params.sortBy ?? "createdAt"],
+        params.sortDirection ?? "DESC",
+      )
+      .addOrderBy("permit.id", "ASC")
+      .skip((params.page - 1) * params.limit)
+      .take(params.limit);
+
+    const [rows, total] = await query.getManyAndCount();
+
+    return {
+      data: rows.map((row) => this.toDomain(row)),
+      page: params.page,
+      limit: params.limit,
+      total,
+      totalPages: Math.ceil(total / params.limit),
+    };
   }
 
   async findAdminPage(

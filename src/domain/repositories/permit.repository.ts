@@ -10,7 +10,8 @@ export interface AdminPermitFilters {
   startDateTo?: string;
 }
 
-export type AdminPermitSortBy = "createdAt" | "startDate" | "endDate";
+export type PermitSortBy = "createdAt" | "startDate" | "endDate";
+export type AdminPermitSortBy = PermitSortBy;
 
 export abstract class PermitRepository {
   abstract create(permit: Permit): Promise<Permit>;
@@ -19,6 +20,12 @@ export abstract class PermitRepository {
   abstract findByIdForUpdate(id: string): Promise<Permit | null>;
   abstract findByQrToken(qrToken: string): Promise<Permit | null>;
   abstract findByUserId(userId: string): Promise<Permit[]>;
+
+  abstract findUserPage(
+    userId: string,
+    statuses: PermitStatus[] | undefined,
+    params: PageQuery<PermitSortBy>,
+  ): Promise<PageResult<Permit>>;
 
   abstract findAdminPage(
     filters: AdminPermitFilters,

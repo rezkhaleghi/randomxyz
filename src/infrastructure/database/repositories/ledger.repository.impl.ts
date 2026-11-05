@@ -4,10 +4,12 @@ import { Repository } from "typeorm";
 
 import { Ledger } from "@domain/entities/ledger.entity";
 import { LedgerRepository } from "@domain/repositories/ledger.repository";
+import { AdminLedgerSearchFilters } from "@domain/repositories/admin-ledger-search-filters";
+import { UserLedgerSearchFilters } from "@domain/repositories/user-ledger-search-filters";
+
+import { PageQuery, PageResult } from "@shared/pagination/page-query";
 
 import { LedgerOrmEntity } from "../orm-entities/ledger.orm-entity";
-import { AdminLedgerSearchFilters } from "@domain/repositories/admin-ledger-search-filters";
-import { PageQuery, PageResult } from "@shared/pagination/page-query";
 
 @Injectable()
 export class LedgerRepositoryImpl extends LedgerRepository {
@@ -65,6 +67,65 @@ export class LedgerRepositoryImpl extends LedgerRepository {
     return rows.map((row) => this.toDomain(row));
   }
 
+  async searchUserLedgers(
+    userId: string,
+    filters: UserLedgerSearchFilters,
+    params: PageQuery<"createdAt" | "amount">,
+  ): Promise<PageResult<Ledger>> {
+    const query = this.repository
+      .createQueryBuilder("ledger")
+      .where("ledger.userId = :userId", { userId });
+
+    if (filters.currency) {
+      query.andWhere("ledger.currency = :currency", {
+        currency: filters.currency,
+      });
+    }
+
+    if (filters.type) {
+      query.andWhere("ledger.type = :type", {
+        type: filters.type,
+      });
+    }
+
+    if (filters.referenceId) {
+      query.andWhere("ledger.referenceId = :referenceId", {
+        referenceId: filters.referenceId,
+      });
+    }
+
+    if (filters.from) {
+      query.andWhere("ledger.createdAt >= :from", {
+        from: filters.from,
+      });
+    }
+
+    if (filters.to) {
+      query.andWhere("ledger.createdAt <= :to", {
+        to: filters.to,
+      });
+    }
+
+    const sortColumn =
+      params.sortBy === "amount" ? "ledger.amount" : "ledger.createdAt";
+
+    query
+      .orderBy(sortColumn, params.sortDirection ?? "DESC")
+      .addOrderBy("ledger.id", "ASC")
+      .skip((params.page - 1) * params.limit)
+      .take(params.limit);
+
+    const [rows, total] = await query.getManyAndCount();
+
+    return {
+      data: rows.map((row) => this.toDomain(row)),
+      total,
+      page: params.page,
+      limit: params.limit,
+      totalPages: Math.ceil(total / params.limit),
+    };
+  }
+
   async searchAdminLedgers(
     filters: AdminLedgerSearchFilters,
     params: PageQuery<"createdAt" | "amount">,
@@ -116,10 +177,11 @@ export class LedgerRepositoryImpl extends LedgerRepository {
     const sortColumn =
       params.sortBy === "amount" ? "ledger.amount" : "ledger.createdAt";
 
-    query.orderBy(sortColumn, params.sortDirection ?? "DESC");
-
-    query.skip((params.page - 1) * params.limit);
-    query.take(params.limit);
+    query
+      .orderBy(sortColumn, params.sortDirection ?? "DESC")
+      .addOrderBy("ledger.id", "ASC")
+      .skip((params.page - 1) * params.limit)
+      .take(params.limit);
 
     const [rows, total] = await query.getManyAndCount();
 

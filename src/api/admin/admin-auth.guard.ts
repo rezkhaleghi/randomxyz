@@ -31,7 +31,8 @@ export class AdminAuthGuard implements CanActivate {
     }
 
     const isAdmin =
-      user.role === UserRole.ADMIN || user.tmarTravelRole === UserRole.ADMIN;
+      user.role === UserRole.ADMIN ||
+      user.tmarTravelRole.toLowerCase() === "admin";
 
     if (!isAdmin) {
       throw new ForbiddenException("Administrator access required.");

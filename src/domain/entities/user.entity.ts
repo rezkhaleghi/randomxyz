@@ -19,7 +19,7 @@ export interface CreateUserProps {
   email: string;
   hashedPassword: string | null;
   role?: UserRole;
-  tmarTravelRole?: UserRole;
+  tmarTravelRole?: string;
   emailVerified?: boolean;
   googleId?: string | null;
 }
@@ -30,7 +30,7 @@ export interface RestoreUserProps {
   email: string;
   hashedPassword: string | null;
   role: UserRole;
-  tmarTravelRole?: UserRole;
+  tmarTravelRole?: string;
   emailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -55,7 +55,7 @@ export class User {
     public email: string,
     public hashedPassword: string | null,
     public role: UserRole,
-    public tmarTravelRole: UserRole,
+    public tmarTravelRole: string,
     emailVerified: boolean,
     public readonly createdAt: Date,
     updatedAt: Date,
@@ -168,7 +168,7 @@ export class User {
     email: string;
     firstName: string | null;
     lastName: string | null;
-    role: UserRole;
+    role: string;
   }): void {
     if (this.externalUserId && this.externalUserId !== params.externalUserId) {
       throw new Error("External user identity cannot be changed.");

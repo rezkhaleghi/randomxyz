@@ -7,6 +7,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from "@nestjs/common";
@@ -22,6 +23,7 @@ import { TmarAuthGuard } from "../auth/tmar-auth.guard";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 
 import { CreatePermitDto } from "./dtos/create-permit.dto";
+import { ListPermitsQueryDto } from "./dtos/list-permits.query.dto";
 
 @ApiTags("permits")
 @Controller("permits")
@@ -74,13 +76,22 @@ export class PermitsController {
   @UseGuards(TmarAuthGuard)
   @ApiOperation({
     summary: "List the current user's permits",
+    description:
+      "Returns a paginated list. Repeat the status query parameter to filter by multiple statuses.",
   })
   @ApiResponse({
     status: 200,
-    description: "Current user's permits.",
+    description: "Paginated current user's permits.",
   })
-  list(@Req() req: AuthenticatedRequest) {
-    return this.listPermitsUseCase.execute(req.user.id);
+  list(@Req() req: AuthenticatedRequest, @Query() query: ListPermitsQueryDto) {
+    return this.listPermitsUseCase.execute({
+      userId: req.user.id,
+      page: query.page,
+      limit: query.limit,
+      statuses: query.status,
+      sortBy: query.sortBy,
+      sortDirection: query.sortDirection,
+    });
   }
 
   @Get("verify/:qrToken")

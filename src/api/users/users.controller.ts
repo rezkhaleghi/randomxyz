@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Get,
-  Patch,
-  Query,
-  Req,
-  UseGuards,
-  Param,
-  ParseUUIDPipe,
-} from "@nestjs/common";
+import { Controller, Get, Query, Req, UseGuards } from "@nestjs/common";
 
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
@@ -16,15 +7,14 @@ import { User } from "@domain/entities/user.entity";
 import { TmarAuthGuard } from "../auth/tmar-auth.guard";
 import { GetCurrentUserUseCase } from "@application/use-cases/users/get-current-user.use-case";
 import { GetUserBalancesUseCase } from "@application/use-cases/users/get-user-balances.use-case";
-import { ListUserNotificationsUseCase } from "@application/use-cases/notifications/list-user-notifications.use-case";
-import { MarkNotificationReadUseCase } from "@application/use-cases/notifications/mark-notification-read.use-case";
+import { ListUserLedgersUseCase } from "@application/use-cases/users/list-user-ledgers.use-case";
 
 import { AuthenticatedUserResponseDto } from "../auth/dtos/authenticated-user.response.dto";
 
 import { ListUserBalancesQueryDto } from "./dtos/list-user-balances.query.dto";
-import { ListNotificationsQueryDto } from "./dtos/list-notifications.query.dto";
-import { NotificationResponseDto } from "./dtos/notification.response.dto";
+import { ListUserLedgersQueryDto } from "./dtos/list-user-ledgers.query.dto";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
+
 @ApiTags("users")
 @Controller("users")
 @UseGuards(TmarAuthGuard)
@@ -32,8 +22,7 @@ export class UsersController {
   constructor(
     private readonly getCurrentUserUseCase: GetCurrentUserUseCase,
     private readonly getCurrentUserBalancesUseCase: GetUserBalancesUseCase,
-    private readonly listUserNotificationsUseCase: ListUserNotificationsUseCase,
-    private readonly markNotificationReadUseCase: MarkNotificationReadUseCase,
+    private readonly listUserLedgersUseCase: ListUserLedgersUseCase,
   ) {}
 
   @Get("me")
@@ -81,54 +70,32 @@ export class UsersController {
     });
   }
 
-  @Get("me/notifications")
+  @Get("me/ledgers")
   @ApiOperation({
-    summary: "List the current user's notifications",
+    summary: "List the current user's ledger entries",
+    description:
+      "Returns paginated financial ledger entries belonging only to the authenticated user.",
   })
   @ApiResponse({
     status: 200,
-    description: "Current user's notifications",
+    description: "Paginated ledger entries",
   })
-  @ApiResponse({
-    status: 401,
-    description: "Not authenticated",
-  })
-  async getMyNotifications(
-    @Query() query: ListNotificationsQueryDto,
+  async getMyLedgers(
+    @Query() query: ListUserLedgersQueryDto,
     @Req() req: AuthenticatedRequest,
   ) {
-    return this.listUserNotificationsUseCase.execute({
+    return this.listUserLedgersUseCase.execute({
       userId: req.user.id,
       page: query.page,
       limit: query.limit,
-      sortDirection: query.sortDirection,
-      channel: query.channel,
       type: query.type,
+      currency: query.currency,
+      referenceId: query.referenceId,
+      from: query.from ? new Date(query.from) : undefined,
+      to: query.to ? new Date(query.to) : undefined,
+      sortBy: query.sortBy,
+      sortDirection: query.sortDirection,
     });
-  }
-
-  @Patch("me/notifications/:id/read")
-  @ApiOperation({
-    summary: "Mark one of the current user's in-app notifications as read",
-  })
-  @ApiResponse({
-    status: 200,
-    description: "Notification marked as read",
-    type: NotificationResponseDto,
-  })
-  @ApiResponse({
-    status: 404,
-    description: "Notification not found",
-  })
-  @ApiResponse({
-    status: 400,
-    description: "Notification cannot be marked as read",
-  })
-  async markNotificationAsRead(
-    @Param("id", ParseUUIDPipe) id: string,
-    @Req() req: AuthenticatedRequest,
-  ) {
-    return this.markNotificationReadUseCase.execute(req.user.id, id);
   }
 
   private toUserResponse(user: User) {

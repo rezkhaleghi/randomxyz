@@ -19,6 +19,7 @@ import { GetWithdrawalUseCase } from "@application/use-cases/withdrawals/get-wit
 import { ListWithdrawalsQueryDto } from "./dtos/list-withdrawals.query.dto";
 import { CreateWithdrawalDto } from "./dtos/create-withdrawal.dto";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
+
 @ApiTags("withdrawals")
 @Controller("withdrawals")
 @UseGuards(TmarAuthGuard)
@@ -40,6 +41,11 @@ export class WithdrawalsController {
       userId: req.user.id,
       page: query.page,
       limit: query.limit,
+      currency: query.currency,
+      status: query.status,
+      referenceId: query.referenceId,
+      from: query.from ? new Date(query.from) : undefined,
+      to: query.to ? new Date(query.to) : undefined,
       sortBy: query.sortBy,
       sortDirection: query.sortDirection,
     });

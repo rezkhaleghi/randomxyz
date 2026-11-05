@@ -1,5 +1,6 @@
 import { Ledger } from "../entities/ledger.entity";
 import { AdminLedgerSearchFilters } from "./admin-ledger-search-filters";
+import { UserLedgerSearchFilters } from "./user-ledger-search-filters";
 import { PageQuery, PageResult } from "@shared/pagination/page-query";
 
 export abstract class LedgerRepository {
@@ -16,6 +17,12 @@ export abstract class LedgerRepository {
   ): Promise<Ledger[]>;
 
   abstract countByUserId(userId: string): Promise<number>;
+
+  abstract searchUserLedgers(
+    userId: string,
+    filters: UserLedgerSearchFilters,
+    params: PageQuery<"createdAt" | "amount">,
+  ): Promise<PageResult<Ledger>>;
 
   abstract searchAdminLedgers(
     filters: AdminLedgerSearchFilters,

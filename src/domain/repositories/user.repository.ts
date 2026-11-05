@@ -29,6 +29,8 @@ export abstract class UserRepository {
 
   abstract countByRole(role: UserRole): Promise<number>;
 
+  abstract countEffectiveAdmins(): Promise<number>;
+
   abstract save(user: User): Promise<User>;
 
   abstract saveAdminMutation(

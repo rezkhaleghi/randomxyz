@@ -56,12 +56,12 @@ export class UserOrmEntity {
   })
   role!: UserRole;
 
-  // Role synchronized from the verified TmarTravel JWT.
+  // Exact role synchronized from the verified TmarTravel JWT.
   @Column({
     type: "varchar",
     default: UserRole.USER,
   })
-  tmarTravelRole!: UserRole;
+  tmarTravelRole!: string;
 
   @Column({ default: false })
   emailVerified!: boolean;

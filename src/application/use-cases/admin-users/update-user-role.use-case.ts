@@ -36,14 +36,17 @@ export class UpdateUserRoleUseCase {
           return user;
         }
 
-        const isLosingLastLocalAdmin =
+        const remainsExternalAdmin =
+          user.tmarTravelRole.toLowerCase() === "admin";
+
+        const isLosingLastEffectiveAdmin =
           previousRole === UserRole.ADMIN &&
           role !== UserRole.ADMIN &&
-          user.tmarTravelRole !== UserRole.ADMIN;
+          !remainsExternalAdmin;
 
         if (
-          isLosingLastLocalAdmin &&
-          (await userRepository.countByRole(UserRole.ADMIN)) <= 1
+          isLosingLastEffectiveAdmin &&
+          (await userRepository.countEffectiveAdmins()) <= 1
         ) {
           throw new CannotRemoveLastAdminException();
         }

@@ -17,10 +17,11 @@ export class AdminUserResponseDto {
   role!: UserRole;
 
   @ApiProperty({
-    description: "Role synchronized from TmarTravel.",
-    enum: UserRole,
+    description: "Exact role synchronized from the TmarTravel JWT.",
+    type: String,
+    example: "admin",
   })
-  tmarTravelRole!: UserRole;
+  tmarTravelRole!: string;
 
   @ApiProperty()
   emailVerified!: boolean;
