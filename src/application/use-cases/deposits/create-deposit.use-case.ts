@@ -56,6 +56,11 @@ export class CreateDepositUseCase {
           throw new UserNotFoundException();
         }
 
+        await depositRepository.lockByUserIdAndIdempotencyKey(
+          input.userId,
+          input.idempotencyKey,
+        );
+
         const existing = await depositRepository.findByUserIdAndIdempotencyKey(
           input.userId,
           input.idempotencyKey,
@@ -87,18 +92,12 @@ export class CreateDepositUseCase {
       return deposit;
     }
 
-    const payment = await paymentProvider.createPayment({
-      amount: deposit.amount,
-      currency: deposit.currency,
-      referenceId: deposit.referenceId,
-      callbackUrl: input.callbackUrl,
-    });
-
-    if (!payment.providerPaymentId) {
-      throw new Error("Payment provider did not return a payment identifier.");
-    }
-
     return this.unitOfWork.execute(async ({ depositRepository }) => {
+      await depositRepository.lockByUserIdAndIdempotencyKey(
+        input.userId,
+        input.idempotencyKey,
+      );
+
       const currentDeposit = await depositRepository.findByIdForUpdate(
         deposit.id,
       );
@@ -107,8 +106,23 @@ export class CreateDepositUseCase {
         throw new DepositNotFoundException();
       }
 
+      this.assertSameIdempotentRequest(currentDeposit, input);
+
       if (currentDeposit.providerPaymentId) {
         return currentDeposit;
+      }
+
+      const payment = await paymentProvider.createPayment({
+        amount: currentDeposit.amount,
+        currency: currentDeposit.currency,
+        referenceId: currentDeposit.referenceId,
+        callbackUrl: input.callbackUrl,
+      });
+
+      if (!payment.providerPaymentId) {
+        throw new Error(
+          "Payment provider did not return a payment identifier.",
+        );
       }
 
       currentDeposit.setProviderPayment(

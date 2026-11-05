@@ -21,23 +21,8 @@ export class DepositRepositoryImpl extends DepositRepository {
   }
 
   async create(deposit: Deposit): Promise<Deposit> {
-    try {
-      const saved = await this.repository.save(this.toOrm(deposit));
-      return this.toDomain(saved);
-    } catch (error) {
-      if (this.isUniqueConstraintViolation(error)) {
-        const existing = await this.findByUserIdAndIdempotencyKey(
-          deposit.userId,
-          deposit.idempotencyKey ?? "",
-        );
-
-        if (existing) {
-          return existing;
-        }
-      }
-
-      throw error;
-    }
+    const saved = await this.repository.save(this.toOrm(deposit));
+    return this.toDomain(saved);
   }
 
   async save(deposit: Deposit): Promise<Deposit> {
@@ -67,6 +52,16 @@ export class DepositRepositoryImpl extends DepositRepository {
     });
 
     return row ? this.toDomain(row) : null;
+  }
+
+  async lockByUserIdAndIdempotencyKey(
+    userId: string,
+    idempotencyKey: string,
+  ): Promise<void> {
+    await this.repository.query(
+      "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+      [`${userId}:${idempotencyKey}`],
+    );
   }
 
   async findByIdForUpdate(id: string): Promise<Deposit | null> {
@@ -202,19 +197,5 @@ export class DepositRepositoryImpl extends DepositRepository {
     row.completedAt = deposit.completedAt;
 
     return row;
-  }
-
-  private isUniqueConstraintViolation(error: unknown): boolean {
-    if (!error || typeof error !== "object") {
-      return false;
-    }
-
-    const driverError = error as {
-      driverError?: {
-        code?: string;
-      };
-    };
-
-    return driverError.driverError?.code === "23505";
   }
 }

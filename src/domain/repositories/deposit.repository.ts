@@ -30,6 +30,11 @@ export abstract class DepositRepository {
     idempotencyKey: string,
   ): Promise<Deposit | null>;
 
+  abstract lockByUserIdAndIdempotencyKey(
+    userId: string,
+    idempotencyKey: string,
+  ): Promise<void>;
+
   abstract findByIdForUpdate(id: string): Promise<Deposit | null>;
 
   abstract findByUserIdAndIdForUpdate(
