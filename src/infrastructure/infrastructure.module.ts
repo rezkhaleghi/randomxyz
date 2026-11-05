@@ -68,6 +68,7 @@ import { HtmlSanitizerService } from "./services/html-sanitizer.service";
 import { TmarJwtService } from "./services/tmar-jwt.service";
 import { TmarTravelLocationsClient } from "@application/interfaces/tmar-locations-client.interface";
 import { TmarTravelLocationsClientService } from "./services/tmar-locations-client.service";
+import { TmarTokenVerifier } from "@application/interfaces/tmar-token-verifier.interface";
 
 @Global()
 @Module({
@@ -224,7 +225,7 @@ import { TmarTravelLocationsClientService } from "./services/tmar-locations-clie
     NotificationRepository,
     PageRepository,
     HtmlSanitizer,
-    TmarJwtService,
+    TmarTokenVerifier,
     LocationRepository,
     TmarTravelLocationsClient,
     LocationDateOverrideRepository,

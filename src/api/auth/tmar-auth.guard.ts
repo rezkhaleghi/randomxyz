@@ -9,7 +9,7 @@ import type { Request } from "express";
 import { User } from "@domain/entities/user.entity";
 
 import { TmarAuthUseCase } from "@application/use-cases/auth/tmar-auth.use-case";
-import { TmarJwtService } from "@infrastructure/services/tmar-jwt.service";
+import { TmarTokenVerifier } from "@application/interfaces/tmar-token-verifier.interface";
 
 type AuthenticatedRequest = Request & {
   user?: User;
@@ -18,7 +18,7 @@ type AuthenticatedRequest = Request & {
 @Injectable()
 export class TmarAuthGuard implements CanActivate {
   constructor(
-    private readonly tmarJwtService: TmarJwtService,
+    private readonly tokenVerifier: TmarTokenVerifier,
     private readonly tmarAuthUseCase: TmarAuthUseCase,
   ) {}
 
@@ -27,7 +27,7 @@ export class TmarAuthGuard implements CanActivate {
 
     const token = this.extractAccessToken(request);
 
-    const identity = this.tmarJwtService.verify(token);
+    const identity = this.tokenVerifier.verify(token);
     const user = await this.tmarAuthUseCase.execute(identity);
 
     request.user = user;
@@ -47,8 +47,6 @@ export class TmarAuthGuard implements CanActivate {
       .map((cookie) => cookie.trim())
       .filter((cookie) => cookie.startsWith("accessToken="));
 
-    // Reject duplicate accessToken cookies rather than choosing one
-    // ambiguously.
     if (matchingCookies.length !== 1) {
       throw new UnauthorizedException("Authentication required.");
     }

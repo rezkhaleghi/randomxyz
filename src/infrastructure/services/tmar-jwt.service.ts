@@ -3,13 +3,16 @@ import { ConfigService } from "@nestjs/config";
 import * as jwt from "jsonwebtoken";
 
 import { TmarIdentity } from "@application/interfaces/tmar-identity.interface";
+import { TmarTokenVerifier } from "@application/interfaces/tmar-token-verifier.interface";
 import { EnvironmentConfig } from "@infrastructure/config/environment.config";
 
 @Injectable()
-export class TmarJwtService {
+export class TmarJwtService extends TmarTokenVerifier {
   constructor(
     private readonly configService: ConfigService<EnvironmentConfig>,
-  ) {}
+  ) {
+    super();
+  }
 
   verify(token: string): TmarIdentity {
     try {

@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
+import { Injectable } from "@nestjs/common";
 
 import { TmarIdentity } from "@application/interfaces/tmar-identity.interface";
 import { UnitOfWork } from "@application/interfaces/unit-of-work.interface";
+import { ApplicationUnauthorizedException } from "@application/exceptions/application-unauthorized.exception";
 
 import { User } from "@domain/entities/user.entity";
 import { UserBalance } from "@domain/entities/user-balance.entity";
@@ -10,30 +10,25 @@ import { UserBalance } from "@domain/entities/user-balance.entity";
 import { UserStatus } from "@domain/enums/user-status.enum";
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
 
-import { EnvironmentConfig } from "@infrastructure/config/environment.config";
-
 @Injectable()
 export class TmarAuthUseCase {
-  constructor(
-    private readonly unitOfWork: UnitOfWork,
-    private readonly configService: ConfigService<EnvironmentConfig>,
-  ) {}
+  constructor(private readonly unitOfWork: UnitOfWork) {}
 
   async execute(identity: TmarIdentity): Promise<User> {
     const externalUserId = identity._id.trim();
     const email = identity.email.trim().toLowerCase();
 
     if (!externalUserId || !email) {
-      throw new UnauthorizedException("Invalid authentication identity.");
+      throw new ApplicationUnauthorizedException(
+        "Invalid authentication identity.",
+      );
     }
 
     if (identity.status === "blocked") {
-      throw new UnauthorizedException("Your Tmar-Travel account is blocked.");
+      throw new ApplicationUnauthorizedException(
+        "Your Tmar-Travel account is blocked.",
+      );
     }
-
-    const currency = this.configService.getOrThrow(
-      "DEFAULT_CURRENCY",
-    ) as PaymentCurrency;
 
     return this.unitOfWork.execute(
       async ({ userRepository, userBalanceRepository }) => {
@@ -61,20 +56,22 @@ export class TmarAuthUseCase {
         user = (await userRepository.findByIdForUpdate(user.id)) ?? user;
 
         if (user.status !== UserStatus.ACTIVE) {
-          throw new UnauthorizedException("Your account is restricted.");
+          throw new ApplicationUnauthorizedException(
+            "Your account is restricted.",
+          );
         }
 
         const existingBalance =
           await userBalanceRepository.findByUserIdAndCurrency(
             user.id,
-            currency,
+            PaymentCurrency.IRT,
           );
 
         if (!existingBalance) {
           await userBalanceRepository.create(
             UserBalance.create({
               userId: user.id,
-              currency,
+              currency: PaymentCurrency.IRT,
               amount: "0",
             }),
           );

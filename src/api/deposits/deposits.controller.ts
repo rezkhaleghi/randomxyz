@@ -21,7 +21,6 @@ import { TmarAuthGuard } from "../auth/tmar-auth.guard";
 import { ListDepositsQueryDto } from "./dtos/list-deposits.query.dto";
 import { CreateDepositDto } from "./dtos/create-deposit.dto";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
-import { EnvironmentConfig } from "@infrastructure/config/environment.config";
 
 @ApiTags("deposits")
 @Controller("deposits")
@@ -32,7 +31,7 @@ export class DepositsController {
     private readonly verifyDepositUseCase: VerifyDepositUseCase,
     private readonly listDepositsUseCase: ListDepositsUseCase,
     private readonly getDepositUseCase: GetDepositUseCase,
-    private readonly configService: ConfigService<EnvironmentConfig>,
+    private readonly configService: ConfigService,
   ) {}
 
   @Get()
@@ -78,7 +77,7 @@ export class DepositsController {
     @Req() req: AuthenticatedRequest,
   ) {
     const backendUrl = this.configService
-      .getOrThrow("BACKEND_URL")
+      .getOrThrow<string>("BACKEND_URL")
       .replace(/\/+$/, "");
 
     return this.createDepositUseCase.execute({

@@ -9,6 +9,8 @@ import {
 import { I18nContext } from "nestjs-i18n";
 import { Request, Response } from "express";
 
+import { ApplicationUnauthorizedException } from "@application/exceptions/application-unauthorized.exception";
+
 import {
   CannotRemoveLastAdminException,
   DecimalScaleExceededException,
@@ -48,8 +50,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const requestId =
       response.getHeader("X-Request-Id")?.toString() ?? "unknown";
 
-    // Only unexpected 5xx errors are logged here.
-    // Expected domain/application errors are normal API control flow.
     if (status >= HttpStatus.INTERNAL_SERVER_ERROR) {
       if (exception instanceof Error) {
         this.logger.error(
@@ -74,14 +74,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
     });
   }
 
-  /**
-   * Domain exceptions stay independent from HTTP.
-   * This API-layer mapping converts business/application failures
-   * into the appropriate REST semantics.
-   */
   private statusFor(exception: unknown): number {
     if (exception instanceof HttpException) {
       return exception.getStatus();
+    }
+
+    if (exception instanceof ApplicationUnauthorizedException) {
+      return HttpStatus.UNAUTHORIZED;
     }
 
     if (!(exception instanceof DomainException)) {
@@ -125,11 +124,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return HttpStatus.BAD_REQUEST;
     }
 
-    // New domain exceptions default to 400 until explicitly classified.
     return HttpStatus.BAD_REQUEST;
   }
 
   private messageFor(exception: unknown, status: number): string | string[] {
+    if (exception instanceof ApplicationUnauthorizedException) {
+      return exception.message;
+    }
+
     if (exception instanceof DomainException) {
       const key = `errors.${exception.name}`;
       const translated = I18nContext.current()?.translate(key);
@@ -174,6 +176,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
   }
 
   private errorFor(exception: unknown, status: number): string {
+    if (exception instanceof ApplicationUnauthorizedException) {
+      return exception.name;
+    }
+
     if (exception instanceof HttpException) {
       const body = exception.getResponse();
 
