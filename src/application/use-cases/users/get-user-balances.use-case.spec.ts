@@ -64,7 +64,20 @@ describe("GetUserBalancesUseCase", () => {
 
     const response = await useCase.execute("user-1", query);
 
-    expect(response).toBe(result);
+    expect(response).toEqual({
+      data: [
+        {
+          id: balance.id,
+          userId: balance.userId,
+          currency: balance.currency,
+          amount: balance.amount,
+        },
+      ],
+      page: result.page,
+      limit: result.limit,
+      total: result.total,
+      totalPages: result.totalPages,
+    });
 
     expect(userRepository.findById).toHaveBeenCalledWith("user-1");
 

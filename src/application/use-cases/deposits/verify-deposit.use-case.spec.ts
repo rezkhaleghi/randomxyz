@@ -86,6 +86,24 @@ describe("VerifyDepositUseCase", () => {
     );
   }
 
+  function createPendingDeposit(overrides: Partial<Deposit> = {}): Deposit {
+    return {
+      id: "deposit-1",
+      userId: "user-1",
+      status: DepositStatus.PENDING,
+      providerPaymentId: "payment-1",
+      referenceId: "reference-1",
+      amount: "100",
+      currency,
+      provider: undefined,
+      markCompleted: jest.fn(function (this: Deposit, transactionId?: string) {
+        this.status = DepositStatus.COMPLETED;
+        this.transactionId = transactionId ?? null;
+      }),
+      ...overrides,
+    } as unknown as Deposit;
+  }
+
   it("should return already completed deposit without verifying it again", async () => {
     const deposit = {
       id: "deposit-1",
@@ -125,15 +143,9 @@ describe("VerifyDepositUseCase", () => {
   });
 
   it("should throw when provider payment ID is missing", async () => {
-    const deposit = {
-      id: "deposit-1",
-      userId: "user-1",
-      status: DepositStatus.PENDING,
+    const deposit = createPendingDeposit({
       providerPaymentId: null,
-      referenceId: "reference-1",
-      amount: "100",
-      currency,
-    } as Deposit;
+    });
 
     setupFirstTransaction(deposit);
 
@@ -149,18 +161,7 @@ describe("VerifyDepositUseCase", () => {
   });
 
   it("should verify payment and complete the deposit", async () => {
-    const deposit = {
-      id: "deposit-1",
-      userId: "user-1",
-      status: DepositStatus.PENDING,
-      providerPaymentId: "payment-1",
-      referenceId: "reference-1",
-      amount: "100",
-      currency,
-      markCompleted: jest.fn(function (this: Deposit) {
-        this.status = DepositStatus.COMPLETED;
-      }),
-    } as unknown as Deposit;
+    const deposit = createPendingDeposit();
 
     const balance = UserBalance.create({
       userId: "user-1",
@@ -168,16 +169,11 @@ describe("VerifyDepositUseCase", () => {
       amount: "50",
     });
 
-    const verification = {
-      providerPaymentId: "payment-1",
-      amount: "100",
-      currency,
-      transactionId: "transaction-1",
-    };
-
     setupFirstTransaction(deposit);
 
-    paymentProviderMock.verifyPayment.mockResolvedValue(verification);
+    paymentProviderMock.verifyPayment.mockResolvedValue({
+      transactionId: "transaction-1",
+    });
 
     setupSecondTransaction();
 
@@ -212,9 +208,6 @@ describe("VerifyDepositUseCase", () => {
 
     expect(paymentProviderMock.verifyPayment).toHaveBeenCalledWith({
       providerPaymentId: "payment-1",
-      referenceId: "reference-1",
-      amount: "100",
-      currency,
     });
 
     expect(
@@ -248,54 +241,38 @@ describe("VerifyDepositUseCase", () => {
     );
   });
 
-  it("should throw when provider verification does not match the deposit", async () => {
-    const deposit = {
-      id: "deposit-1",
-      userId: "user-1",
-      status: DepositStatus.PENDING,
-      providerPaymentId: "payment-1",
-      referenceId: "reference-1",
-      amount: "100",
-      currency,
-    } as Deposit;
+  it("should throw when provider verification fails", async () => {
+    const deposit = createPendingDeposit();
 
     setupFirstTransaction(deposit);
 
-    paymentProviderMock.verifyPayment.mockResolvedValue({
-      providerPaymentId: "different-payment",
-      amount: "100",
-      currency,
-      transactionId: "transaction-1",
-    });
+    paymentProviderMock.verifyPayment.mockRejectedValue(
+      new Error("Payment verification failed"),
+    );
 
     await expect(
       useCase.execute({
         userId: "user-1",
         depositId: "deposit-1",
       }),
-    ).rejects.toBeInstanceOf(NotMatchException);
+    ).rejects.toThrow("Payment verification failed");
+
+    expect(
+      userBalanceRepositoryMock.findByUserIdAndCurrencyForUpdate,
+    ).not.toHaveBeenCalled();
 
     expect(userBalanceRepositoryMock.save).not.toHaveBeenCalled();
     expect(ledgerRepositoryMock.create).not.toHaveBeenCalled();
+    expect(depositRepositoryMock.save).not.toHaveBeenCalled();
+    expect(auditLogRepositoryMock.create).not.toHaveBeenCalled();
   });
 
   it("should throw when the balance does not exist", async () => {
-    const deposit = {
-      id: "deposit-1",
-      userId: "user-1",
-      status: DepositStatus.PENDING,
-      providerPaymentId: "payment-1",
-      referenceId: "reference-1",
-      amount: "100",
-      currency,
-    } as Deposit;
+    const deposit = createPendingDeposit();
 
     setupFirstTransaction(deposit);
 
     paymentProviderMock.verifyPayment.mockResolvedValue({
-      providerPaymentId: "payment-1",
-      amount: "100",
-      currency,
       transactionId: "transaction-1",
     });
 
@@ -319,37 +296,27 @@ describe("VerifyDepositUseCase", () => {
     expect(depositRepositoryMock.save).not.toHaveBeenCalled();
   });
 
-  it("should not mutate the balance before a valid provider verification", async () => {
-    const deposit = {
-      id: "deposit-1",
-      userId: "user-1",
-      status: DepositStatus.PENDING,
-      providerPaymentId: "payment-1",
-      referenceId: "reference-1",
-      amount: "100",
-      currency,
-    } as Deposit;
+  it("should not mutate the balance before provider verification succeeds", async () => {
+    const deposit = createPendingDeposit();
 
     setupFirstTransaction(deposit);
 
-    paymentProviderMock.verifyPayment.mockResolvedValue({
-      providerPaymentId: "payment-1",
-      amount: "999",
-      currency,
-      transactionId: "transaction-1",
-    });
+    paymentProviderMock.verifyPayment.mockRejectedValue(
+      new Error("Provider confirmation rejected"),
+    );
 
     await expect(
       useCase.execute({
         userId: "user-1",
         depositId: "deposit-1",
       }),
-    ).rejects.toBeInstanceOf(NotMatchException);
+    ).rejects.toThrow("Provider confirmation rejected");
 
     expect(
       userBalanceRepositoryMock.findByUserIdAndCurrencyForUpdate,
     ).not.toHaveBeenCalled();
 
+    expect(userBalanceRepositoryMock.save).not.toHaveBeenCalled();
     expect(ledgerRepositoryMock.create).not.toHaveBeenCalled();
   });
 });

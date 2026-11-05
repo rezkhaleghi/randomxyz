@@ -89,6 +89,7 @@ describe("CreateDepositUseCase", () => {
       provider: createdDeposit.provider,
       status: createdDeposit.status,
       referenceId: createdDeposit.referenceId,
+      providerOrderId: createdDeposit.providerOrderId,
       providerPaymentId: "payment-123",
       paymentUrl: "https://payment.test",
       transactionId: null,
@@ -145,6 +146,7 @@ describe("CreateDepositUseCase", () => {
       amount: "100",
       currency,
       referenceId: createdDeposit.referenceId,
+      providerOrderId: createdDeposit.providerOrderId,
       callbackUrl: "https://backend.test/deposits/parsian/callback",
     });
 

@@ -209,6 +209,10 @@ import { TmarTokenVerifier } from "@application/interfaces/tmar-token-verifier.i
     { provide: PermitRepository, useClass: PermitRepositoryImpl },
 
     TmarJwtService,
+    {
+      provide: TmarTokenVerifier,
+      useExisting: TmarJwtService,
+    },
   ],
 
   exports: [
