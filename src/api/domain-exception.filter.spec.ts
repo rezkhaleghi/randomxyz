@@ -4,7 +4,6 @@ import { describe, expect, it, jest } from "@jest/globals";
 import { HttpExceptionFilter } from "./http-exception.filter";
 import {
   DepositNotFoundException,
-  InvalidCredentialsException,
   UserAlreadyExistsException,
   UserNotFoundException,
 } from "@domain/exceptions/domain.exception";
@@ -62,14 +61,6 @@ describe("HttpExceptionFilter", () => {
     filter.catch(new DepositNotFoundException(), host);
 
     expect(status).toHaveBeenCalledWith(404);
-  });
-
-  it("maps authentication failures to 401", () => {
-    const { host, status } = createHost("/auth/login");
-
-    filter.catch(new InvalidCredentialsException(), host);
-
-    expect(status).toHaveBeenCalledWith(401);
   });
 
   it("maps duplicate resources to 409", () => {

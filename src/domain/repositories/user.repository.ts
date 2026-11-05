@@ -12,8 +12,6 @@ export abstract class UserRepository {
 
   abstract findByExternalUserId(externalUserId: string): Promise<User | null>;
 
-  abstract findByGoogleId(googleId: string): Promise<User | null>;
-
   abstract findByUserName(userName: string): Promise<User | null>;
 
   abstract createIfNotExistsByExternalUserId(user: User): Promise<User>;

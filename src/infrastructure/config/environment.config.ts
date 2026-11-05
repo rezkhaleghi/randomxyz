@@ -1,9 +1,7 @@
 /**
  * Compile-time contract for all environment configuration used by the app.
  *
- * Runtime validation is still handled by Joi in InfrastructureModule.
- * This interface prevents configuration consumers from accidentally using
- * misspelled keys or incorrect value types.
+ * Runtime validation is handled by Joi in InfrastructureModule.
  */
 export interface EnvironmentConfig {
   // Application
@@ -22,24 +20,7 @@ export interface EnvironmentConfig {
   DB_PASSWORD: string;
   DB_NAME: string;
 
-  // Redis
-  REDIS_HOST: string;
-  REDIS_PORT: number;
-  REDIS_PASSWORD: string;
-  REDIS_TLS: boolean;
-
-  // OTP
-  OTP_EXPIRY_SECONDS: number;
-  OTP_MAX_ATTEMPTS: number;
-  OTP_RESEND_COOLDOWN_SECONDS: number;
-  OTP_LOG_CODE: boolean;
-
-  // Login protection
-  LOGIN_MAX_ATTEMPTS: number;
-  LOGIN_ATTEMPT_WINDOW_SECONDS: number;
-  LOGIN_LOCK_SECONDS: number;
-
-  // SMTP
+  // SMTP notifications
   SMTP_HOST: string;
   SMTP_PORT: number;
   SMTP_SECURE: boolean;
@@ -47,26 +28,11 @@ export interface EnvironmentConfig {
   SMTP_PASSWORD: string;
   SMTP_FROM: string;
 
-  // Initial administrator
-  INITIAL_ADMIN_EMAIL: string;
-  INITIAL_ADMIN_PASSWORD: string;
-
-  // Google OAuth
-  GOOGLE_CLIENT_ID: string;
-  GOOGLE_CLIENT_SECRET: string;
-  GOOGLE_CALLBACK_URL: string;
-
-  // MinIO
-  MINIO_ENDPOINT: string;
-  MINIO_PORT: number;
-  MINIO_ACCESS_KEY: string;
-  MINIO_SECRET_KEY: string;
-  MINIO_BUCKET: string;
-  MINIO_USE_SSL: boolean;
-
+  // TmarTravel authentication and integration
   TMAR_JWT_SECRET: string;
   TMAR_TRAVEL_API_URL: string;
 
+  // Parsian payment gateway
   PARSIAN_PIN: string;
   PARSIAN_SALE_URL: string;
   PARSIAN_CONFIRM_URL: string;

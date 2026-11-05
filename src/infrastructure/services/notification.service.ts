@@ -5,13 +5,6 @@ import * as nodemailer from "nodemailer";
 import { NotificationService as NotificationPort } from "@application/interfaces/notification.service.interface";
 import { EnvironmentConfig } from "@infrastructure/config/environment.config";
 
-/**
- * Escapes untrusted values before they are inserted into an HTML email.
- *
- * We intentionally escape at the point where values cross into HTML rather
- * than sanitizing the complete email. The template itself is trusted HTML;
- * only dynamic values need protection.
- */
 function escapeHtml(value: string): string {
   return value
     .replaceAll("&", "&amp;")
@@ -78,26 +71,6 @@ export class SmtpNotificationService implements NotificationPort, OnModuleInit {
         throw error;
       }
     }
-  }
-
-  async sendOtp(
-    email: string,
-    otp: string,
-    expirySeconds: number,
-  ): Promise<void> {
-    const expiryMinutes = expirySeconds / 60;
-
-    // OTP is normally numeric, but escaping here keeps this method safe even
-    // if the OTP format changes in the future.
-    const safeOtp = escapeHtml(otp);
-    const safeExpiryMinutes = escapeHtml(String(Math.ceil(expiryMinutes)));
-
-    await this.sendEmail(
-      email,
-      "Your verification code",
-      `Your verification code is ${otp}. It expires in ${Math.ceil(expiryMinutes)} minutes.`,
-      `<p>Your verification code is <strong>${safeOtp}</strong>.</p><p>It expires in ${safeExpiryMinutes} minutes.</p>`,
-    );
   }
 
   async sendWithdrawalApproved(
@@ -199,9 +172,6 @@ export class SmtpNotificationService implements NotificationPort, OnModuleInit {
     message: string;
     details: Array<[string, string]>;
   }): string {
-    // Escape every dynamic field at the final HTML boundary. This prevents a
-    // user-controlled value such as `<img src=x onerror=...>` from becoming
-    // executable markup while leaving the trusted email structure untouched.
     const title = escapeHtml(params.title);
     const heading = escapeHtml(params.heading);
     const message = escapeHtml(params.message);

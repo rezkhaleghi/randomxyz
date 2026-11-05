@@ -43,9 +43,6 @@ export class AdminUserResponseDto {
   dateOfBirth!: Date | null;
 
   @ApiProperty({ nullable: true })
-  avatar!: string | null;
-
-  @ApiProperty({ nullable: true })
   bio!: string | null;
 
   @ApiProperty()

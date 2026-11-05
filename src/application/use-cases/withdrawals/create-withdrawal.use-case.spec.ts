@@ -28,7 +28,6 @@ describe("CreateWithdrawalUseCase", () => {
   const user = User.create({
     id: "user-id",
     email: "user@example.com",
-    hashedPassword: "hashed",
   });
 
   const userRepository = {

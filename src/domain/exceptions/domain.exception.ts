@@ -22,18 +22,6 @@ export class NotMatchException extends DomainException {
   }
 }
 
-export class InvalidOtpException extends DomainException {
-  constructor() {
-    super("The provided OTP is invalid or has expired.");
-  }
-}
-
-export class OtpCooldownException extends DomainException {
-  constructor() {
-    super("Please wait before requesting another OTP.");
-  }
-}
-
 export class UserAlreadyExistsException extends DomainException {
   constructor(email: string) {
     super(`A user with email "${email}" already exists.`);
@@ -43,18 +31,6 @@ export class UserAlreadyExistsException extends DomainException {
 export class UsernameAlreadyExistsException extends DomainException {
   constructor(userName: string) {
     super(`A user with username "${userName}" already exists.`);
-  }
-}
-
-export class InvalidCredentialsException extends DomainException {
-  constructor() {
-    super("Invalid email or password.");
-  }
-}
-
-export class GoogleAccountConflictException extends DomainException {
-  constructor() {
-    super("This Google account cannot be linked to the requested user.");
   }
 }
 
@@ -75,14 +51,6 @@ export class CannotDeleteSelfException extends DomainException {
     super("An administrator cannot delete their own account.");
   }
 }
-
-export class FileNotFoundException extends DomainException {
-  constructor() {
-    super("File not found.");
-  }
-}
-
-//userBalance
 
 export class UserBalanceNotFoundException extends DomainException {
   constructor(currency: string) {
@@ -107,6 +75,7 @@ export class InsufficientBalanceException extends DomainException {
     super("Insufficient Balance!");
   }
 }
+
 export class InvalidLedgerEntryException extends DomainException {
   constructor() {
     super(
@@ -114,13 +83,12 @@ export class InvalidLedgerEntryException extends DomainException {
     );
   }
 }
+
 export class UnsupportedPaymentCurrencyException extends DomainException {
   constructor(currency: string) {
     super(`Currency ${currency} is not supported by the payment provider.`);
   }
 }
-
-//withdrawal
 
 export class InvalidWithdrawalAmountException extends DomainException {
   constructor() {
@@ -140,18 +108,18 @@ export class WithdrawalStatusChangeNotAllowedException extends DomainException {
   }
 }
 
-//deposit
-
 export class InvalidDepositAmountException extends DomainException {
   constructor() {
     super("Deposit amount must be positive.");
   }
 }
+
 export class DepositNotFoundException extends DomainException {
   constructor() {
     super("Deposit not found.");
   }
 }
+
 export class DepositChangeStatusNotAllowedException extends DomainException {
   constructor(status: string) {
     super(`Deposit status change is not allowed from ${status}.`);
@@ -163,7 +131,7 @@ export class DepositCannotFailException extends DomainException {
     super(`Deposit cannot be marked as failed from status ${status}.`);
   }
 }
-// Decimal utility exceptions
+
 export class InvalidDecimalValueException extends DomainException {
   constructor(value: string) {
     super(`Invalid decimal value: ${value}`);
@@ -178,20 +146,17 @@ export class DecimalScaleExceededException extends DomainException {
   }
 }
 
-// Payment provider exceptions
 export class UnsupportedPaymentProviderException extends DomainException {
   constructor(provider: string) {
     super(`Payment provider ${provider} is not supported.`);
   }
 }
 
-// Notification
 export class NotificationNotFoundException extends DomainException {
   constructor() {
     super("Notification not found.");
   }
 }
-// Page
 
 export class PageNotFoundException extends DomainException {
   constructor() {

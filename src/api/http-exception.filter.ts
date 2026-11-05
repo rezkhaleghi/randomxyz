@@ -17,19 +17,14 @@ import {
   DepositCannotFailException,
   DepositNotFoundException,
   DomainException,
-  FileNotFoundException,
   FieldMustExistException,
-  GoogleAccountConflictException,
   InsufficientBalanceException,
-  InvalidCredentialsException,
   InvalidDecimalValueException,
   InvalidDepositAmountException,
   InvalidLedgerEntryException,
-  InvalidOtpException,
   InvalidUserBalanceException,
   InvalidWithdrawalAmountException,
   NotMatchException,
-  OtpCooldownException,
   UnsupportedPaymentCurrencyException,
   UnsupportedPaymentProviderException,
   UserAlreadyExistsException,
@@ -94,23 +89,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
-    // Authentication
-    if (
-      exception instanceof InvalidCredentialsException ||
-      exception instanceof InvalidOtpException
-    ) {
-      return HttpStatus.UNAUTHORIZED;
-    }
-
-    // Authorization
     if (exception instanceof CannotDeleteSelfException) {
       return HttpStatus.FORBIDDEN;
     }
 
-    // Resources that do not exist
     if (
       exception instanceof UserNotFoundException ||
-      exception instanceof FileNotFoundException ||
       exception instanceof UserBalanceNotFoundException ||
       exception instanceof DepositNotFoundException ||
       exception instanceof WithdrawalNotFoundException
@@ -118,12 +102,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return HttpStatus.NOT_FOUND;
     }
 
-    // Resource/state conflicts
     if (
       exception instanceof UserAlreadyExistsException ||
       exception instanceof UsernameAlreadyExistsException ||
       exception instanceof UserBalanceAlreadyExistsException ||
-      exception instanceof GoogleAccountConflictException ||
       exception instanceof CannotRemoveLastAdminException ||
       exception instanceof DepositChangeStatusNotAllowedException ||
       exception instanceof DepositCannotFailException ||
@@ -132,12 +114,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return HttpStatus.CONFLICT;
     }
 
-    // Rate limiting / temporal constraint
-    if (exception instanceof OtpCooldownException) {
-      return HttpStatus.TOO_MANY_REQUESTS;
-    }
-
-    // Invalid input or a business-rule violation
     if (
       exception instanceof FieldMustExistException ||
       exception instanceof NotMatchException ||

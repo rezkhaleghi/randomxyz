@@ -36,7 +36,6 @@ describe("GetUserBalancesUseCase", () => {
     const user = User.create({
       id: "user-1",
       email: "user@example.com",
-      hashedPassword: "hashed",
     });
 
     const balance = UserBalance.create({

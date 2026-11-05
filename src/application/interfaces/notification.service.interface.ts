@@ -1,10 +1,4 @@
 export abstract class NotificationService {
-  abstract sendOtp(
-    email: string,
-    otp: string,
-    expirySeconds: number,
-  ): Promise<void>;
-
   abstract sendEmail(
     to: string,
     subject: string,

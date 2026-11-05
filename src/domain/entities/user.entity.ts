@@ -2,14 +2,12 @@ import { randomUUID } from "crypto";
 
 import { UserStatus } from "@domain/enums/user-status.enum";
 import { UserRole } from "../enums/user-role.enum";
-import { GoogleAccountConflictException } from "../exceptions/domain.exception";
 
 export type UpdateUserParams = Partial<{
   firstName: string | null;
   lastName: string | null;
   userName: string | null;
   dateOfBirth: Date | null;
-  avatar: string | null;
   bio: string | null;
 }>;
 
@@ -17,68 +15,54 @@ export interface CreateUserProps {
   id?: string;
   externalUserId?: string | null;
   email: string;
-  hashedPassword: string | null;
   role?: UserRole;
   tmarTravelRole?: string;
   emailVerified?: boolean;
-  googleId?: string | null;
 }
 
 export interface RestoreUserProps {
   id: string;
   externalUserId?: string | null;
   email: string;
-  hashedPassword: string | null;
   role: UserRole;
   tmarTravelRole?: string;
   emailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
-  googleId: string | null;
   firstName: string | null;
   lastName: string | null;
   userName: string | null;
   dateOfBirth: Date | null;
-  avatar: string | null;
   bio: string | null;
   status: UserStatus;
 }
 
 export class User {
   private _emailVerified: boolean;
-  private _googleId: string | null;
   private _updatedAt: Date;
 
   private constructor(
     public readonly id: string,
     public externalUserId: string | null,
     public email: string,
-    public hashedPassword: string | null,
     public role: UserRole,
     public tmarTravelRole: string,
     emailVerified: boolean,
     public readonly createdAt: Date,
     updatedAt: Date,
-    googleId: string | null,
     public firstName: string | null,
     public lastName: string | null,
     public userName: string | null,
     public dateOfBirth: Date | null,
-    public avatar: string | null,
     public bio: string | null,
     public status: UserStatus,
   ) {
     this._emailVerified = emailVerified;
-    this._googleId = googleId;
     this._updatedAt = updatedAt;
   }
 
   get emailVerified(): boolean {
     return this._emailVerified;
-  }
-
-  get googleId(): string | null {
-    return this._googleId;
   }
 
   get updatedAt(): Date {
@@ -96,14 +80,11 @@ export class User {
       params.id ?? randomUUID(),
       params.externalUserId ?? null,
       params.email,
-      params.hashedPassword,
       params.role ?? UserRole.USER,
       params.tmarTravelRole ?? UserRole.USER,
       params.emailVerified ?? false,
       now,
       now,
-      params.googleId ?? null,
-      null,
       null,
       null,
       null,
@@ -118,18 +99,15 @@ export class User {
       params.id,
       params.externalUserId ?? null,
       params.email,
-      params.hashedPassword,
       params.role,
       params.tmarTravelRole ?? UserRole.USER,
       params.emailVerified,
       params.createdAt,
       params.updatedAt,
-      params.googleId,
       params.firstName,
       params.lastName,
       params.userName,
       params.dateOfBirth,
-      params.avatar,
       params.bio,
       params.status,
     );
@@ -150,10 +128,6 @@ export class User {
 
     if (params.dateOfBirth !== undefined) {
       this.dateOfBirth = params.dateOfBirth;
-    }
-
-    if (params.avatar !== undefined) {
-      this.avatar = params.avatar;
     }
 
     if (params.bio !== undefined) {
@@ -191,30 +165,6 @@ export class User {
 
   changeRole(role: UserRole): void {
     this.role = role;
-    this.touch();
-  }
-
-  setEmailVerified(verified: boolean): void {
-    this._emailVerified = verified;
-    this.touch();
-  }
-
-  changePassword(hashedPassword: string): void {
-    this.hashedPassword = hashedPassword;
-    this.touch();
-  }
-
-  verifyEmail(): void {
-    this._emailVerified = true;
-    this.touch();
-  }
-
-  linkGoogleAccount(googleId: string): void {
-    if (this.googleId && this.googleId !== googleId) {
-      throw new GoogleAccountConflictException();
-    }
-
-    this._googleId = googleId;
     this.touch();
   }
 

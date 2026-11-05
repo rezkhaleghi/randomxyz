@@ -4,7 +4,6 @@ import { Repository } from "typeorm";
 
 import { User } from "@domain/entities/user.entity";
 import {
-  GoogleAccountConflictException,
   UserAlreadyExistsException,
   UsernameAlreadyExistsException,
 } from "@domain/exceptions/domain.exception";
@@ -55,11 +54,6 @@ export class UserRepositoryImpl implements UserRepository {
       where: { externalUserId },
     });
 
-    return row ? this.toDomain(row) : null;
-  }
-
-  async findByGoogleId(googleId: string): Promise<User | null> {
-    const row = await this.repo.findOne({ where: { googleId } });
     return row ? this.toDomain(row) : null;
   }
 
@@ -134,6 +128,7 @@ export class UserRepositoryImpl implements UserRepository {
 
     return existingUser;
   }
+
   async saveAdminMutation(user: User, wasAdmin: boolean): Promise<User | null> {
     if (!wasAdmin || user.role === UserRole.ADMIN) {
       return this.save(user);
@@ -279,6 +274,7 @@ export class UserRepositoryImpl implements UserRepository {
       totalPages: Math.ceil(total / params.limit),
     };
   }
+
   async countEffectiveAdmins(): Promise<number> {
     return this.repo
       .createQueryBuilder("user")
@@ -290,6 +286,7 @@ export class UserRepositoryImpl implements UserRepository {
       })
       .getCount();
   }
+
   private throwUserUniqueViolation(error: unknown): void {
     if (!isPostgresUniqueViolation(error)) {
       return;
@@ -304,10 +301,6 @@ export class UserRepositoryImpl implements UserRepository {
     if (columns.length === 1 && columns[0] === "userName") {
       throw new UsernameAlreadyExistsException("the requested username");
     }
-
-    if (columns.length === 1 && columns[0] === "googleId") {
-      throw new GoogleAccountConflictException();
-    }
   }
 
   private toDomain(row: UserOrmEntity): User {
@@ -315,19 +308,15 @@ export class UserRepositoryImpl implements UserRepository {
       id: row.id,
       externalUserId: row.externalUserId,
       email: row.email,
-      hashedPassword: row.hashedPassword,
       role: row.role,
       tmarTravelRole: row.tmarTravelRole ?? UserRole.USER,
-
       emailVerified: row.emailVerified,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
-      googleId: row.googleId,
       firstName: row.firstName,
       lastName: row.lastName,
       userName: row.userName,
       dateOfBirth: row.dateOfBirth,
-      avatar: row.avatar,
       bio: row.bio,
       status: row.status,
     });
@@ -339,18 +328,15 @@ export class UserRepositoryImpl implements UserRepository {
     row.id = user.id;
     row.externalUserId = user.externalUserId;
     row.email = user.email;
-    row.hashedPassword = user.hashedPassword;
     row.role = user.role;
     row.tmarTravelRole = user.tmarTravelRole;
     row.emailVerified = user.emailVerified;
-    row.googleId = user.googleId;
     row.firstName = user.firstName;
     row.lastName = user.lastName;
     row.userName = user.userName;
     row.dateOfBirth = user.dateOfBirth;
     row.createdAt = user.createdAt;
     row.updatedAt = user.updatedAt;
-    row.avatar = user.avatar;
     row.bio = user.bio;
     row.status = user.status;
 

@@ -43,7 +43,6 @@ export class TmarAuthUseCase {
           const newUser = User.create({
             externalUserId,
             email,
-            hashedPassword: null,
             emailVerified: true,
           });
 

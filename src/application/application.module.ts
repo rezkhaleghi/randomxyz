@@ -7,7 +7,6 @@ import { GetUserBalancesUseCase } from "./use-cases/users/get-user-balances.use-
 
 import { ListUsersUseCase } from "./use-cases/admin-users/list-users.use-case";
 import { GetUserUseCase } from "./use-cases/admin-users/get-user.use-case";
-import { CreateAdminUserUseCase } from "./use-cases/admin-users/create-user.use-case";
 import { GetAdminStatisticsUseCase } from "./use-cases/admin-users/get-statistics.use-case";
 import { GetAuditLogsUseCase } from "./use-cases/admin-users/get-audit-logs.use-case";
 
@@ -34,6 +33,7 @@ import { MarkNotificationReadUseCase } from "./use-cases/notifications/mark-noti
 
 import { AdminListNotificationsUseCase } from "./use-cases/admin-notifications/list-notifications.use-case";
 import { AdminGetNotificationUseCase } from "./use-cases/admin-notifications/get-notification.use-case";
+
 import { CreatePageUseCase } from "./use-cases/admin-pages/create-page.use-case";
 import { ListPagesUseCase } from "./use-cases/admin-pages/list-pages.use-case";
 import { GetPageUseCase } from "./use-cases/admin-pages/get-page.use-case";
@@ -109,7 +109,6 @@ import { ListUserLedgersUseCase } from "./use-cases/users/list-user-ledgers.use-
 
     ListUsersUseCase,
     GetUserUseCase,
-    CreateAdminUserUseCase,
     GetAdminStatisticsUseCase,
     GetAuditLogsUseCase,
     UpdateUserRoleUseCase,
@@ -186,7 +185,6 @@ import { ListUserLedgersUseCase } from "./use-cases/users/list-user-ledgers.use-
 
     ListUsersUseCase,
     GetUserUseCase,
-    CreateAdminUserUseCase,
     GetAdminStatisticsUseCase,
     GetAuditLogsUseCase,
     UpdateUserRoleUseCase,

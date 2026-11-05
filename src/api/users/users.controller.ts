@@ -107,7 +107,6 @@ export class UsersController {
       lastName: user.lastName,
       userName: user.userName,
       dateOfBirth: user.dateOfBirth,
-      avatar: user.avatar,
       bio: user.bio,
     };
   }

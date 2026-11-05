@@ -59,7 +59,6 @@ describe("AdminUpdateWithdrawalStatusUseCase", () => {
   const createUser = () =>
     User.create({
       email: "user@example.com",
-      hashedPassword: "hashed-password",
     });
 
   const createWithdrawal = () =>

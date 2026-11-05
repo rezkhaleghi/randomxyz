@@ -5,7 +5,6 @@ import { ThrottlerGuard, ThrottlerModule } from "@nestjs/throttler";
 import { AdminModule } from "./api/admin/admin.module";
 import { AuthModule } from "./api/auth/auth.module";
 import { DepositsModule } from "./api/deposits/deposits.module";
-import { FilesModule } from "./api/files/files.module";
 import { HealthModule } from "./api/health/health.module";
 import { UsersModule } from "./api/users/users.module";
 import { WithdrawalsModule } from "./api/withdrawals/withdrawals.module";
@@ -13,6 +12,7 @@ import { LocationsModule } from "./api/locations/locations.module";
 import { PermitsModule } from "./api/permits/permits.module";
 
 import { InfrastructureModule } from "./infrastructure/infrastructure.module";
+
 import {
   AcceptLanguageResolver,
   HeaderResolver,
@@ -21,7 +21,6 @@ import {
 import * as path from "path";
 
 import { PagesModule } from "@api/pages/pages.module";
-import { ApplicationModule } from "@application/application.module";
 
 import { LocationSyncScheduler } from "./infrastructure/services/location-sync.scheduler";
 import { PermitExpirationScheduler } from "./infrastructure/services/permit-expiration.scheduler";
@@ -45,13 +44,11 @@ import { PermitExpirationScheduler } from "./infrastructure/services/permit-expi
     }),
 
     InfrastructureModule,
-    ApplicationModule,
 
     AuthModule,
     AdminModule,
 
     UsersModule,
-    FilesModule,
     LocationsModule,
     PermitsModule,
 

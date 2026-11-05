@@ -5,31 +5,26 @@ import {
   Param,
   ParseUUIDPipe,
   Patch,
-  Post,
   Query,
   Req,
   UseGuards,
 } from "@nestjs/common";
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from "@nestjs/swagger";
 
-import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
-
-import { CreateAdminUserUseCase } from "@application/use-cases/admin-users/create-user.use-case";
+import { User } from "@domain/entities/user.entity";
 import { GetUserUseCase } from "@application/use-cases/admin-users/get-user.use-case";
 import { ListUsersUseCase } from "@application/use-cases/admin-users/list-users.use-case";
 import { GetAuditLogsUseCase } from "@application/use-cases/admin-users/get-audit-logs.use-case";
 import { GetAdminStatisticsUseCase } from "@application/use-cases/admin-users/get-statistics.use-case";
 import { UpdateUserRoleUseCase } from "@application/use-cases/admin-users/update-user-role.use-case";
 
-import { AdminAuthGuard } from "./admin-auth.guard";
+import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 
+import { AdminAuthGuard } from "./admin-auth.guard";
 import { AdminUserResponseDto } from "./dtos/users/admin-user.response.dto";
 import { AdminUserListResponseDto } from "./dtos/users/admin-user-list.response.dto";
-
-import { UserStatus } from "@domain/enums/user-status.enum";
 import { ListAuditLogsQueryDto } from "./dtos/audit-logs/list-audit-logs.query.dto";
 import { ListUsersQueryDto } from "./dtos/users/list-users.query.dto";
-import { CreateUserDto } from "./dtos/users/create-user.dto";
 import { UpdateUserRoleDto } from "./dtos/users/update-user-role.dto";
 
 @Controller("admin/users")
@@ -39,7 +34,6 @@ export class AdminUsersController {
   constructor(
     private readonly listUsersUseCase: ListUsersUseCase,
     private readonly getUserUseCase: GetUserUseCase,
-    private readonly createUserUseCase: CreateAdminUserUseCase,
     private readonly getAdminStatisticsUseCase: GetAdminStatisticsUseCase,
     private readonly getAuditLogsUseCase: GetAuditLogsUseCase,
     private readonly updateUserRoleUseCase: UpdateUserRoleUseCase,
@@ -178,41 +172,7 @@ export class AdminUsersController {
     return this.toResponse(user);
   }
 
-  @Post()
-  @ApiOperation({
-    summary: "Create a user or administrator",
-  })
-  @ApiResponse({
-    status: 201,
-    description: "User created",
-    type: AdminUserResponseDto,
-  })
-  @ApiResponse({
-    status: 409,
-    description: "Email already exists",
-  })
-  async create(@Body() dto: CreateUserDto, @Req() req: AuthenticatedRequest) {
-    return this.toResponse(
-      await this.createUserUseCase.execute(dto, req.user.id),
-    );
-  }
-
-  private toResponse(user: {
-    id: string;
-    email: string;
-    role: string;
-    tmarTravelRole: string;
-    emailVerified: boolean;
-    firstName: string | null;
-    lastName: string | null;
-    userName: string | null;
-    dateOfBirth: Date | null;
-    avatar: string | null;
-    bio: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    status: UserStatus;
-  }): AdminUserResponseDto {
+  private toResponse(user: User): AdminUserResponseDto {
     return {
       id: user.id,
       email: user.email,
@@ -224,7 +184,6 @@ export class AdminUsersController {
       lastName: user.lastName,
       userName: user.userName,
       dateOfBirth: user.dateOfBirth,
-      avatar: user.avatar,
       bio: user.bio,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,

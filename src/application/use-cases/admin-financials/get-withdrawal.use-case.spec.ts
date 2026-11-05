@@ -14,7 +14,6 @@ describe("AdminGetWithdrawalUseCase", () => {
     const user = User.create({
       id: "user-id",
       email: "user@example.com",
-      hashedPassword: "hashed",
     });
 
     const withdrawal = Withdrawal.create({

@@ -1,7 +1,6 @@
 import { Global, Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { createClient } from "redis";
 import * as Joi from "joi";
 
 import typeormConfig from "./config/typeorm.config";
@@ -12,6 +11,11 @@ import { UserBalanceOrmEntity } from "./database/orm-entities/user-balance.orm-e
 import { LedgerOrmEntity } from "./database/orm-entities/ledger.orm-entity";
 import { DepositOrmEntity } from "./database/orm-entities/deposit.orm-entity";
 import { WithdrawalOrmEntity } from "./database/orm-entities/withdrawal.orm-entity";
+import { NotificationOrmEntity } from "./database/orm-entities/notification.orm-entity";
+import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
+import { LocationOrmEntity } from "./database/orm-entities/location.orm-entity";
+import { LocationDateOverrideOrmEntity } from "./database/orm-entities/location-date-override.orm-entity";
+import { PermitOrmEntity } from "./database/orm-entities/permit.orm-entity";
 
 import { UserRepositoryImpl } from "./database/repositories/user.repository.impl";
 import { AuditLogRepositoryImpl } from "./database/repositories/audit-log.repository.impl";
@@ -19,6 +23,11 @@ import { UserBalanceRepositoryImpl } from "./database/repositories/user-balance.
 import { LedgerRepositoryImpl } from "./database/repositories/ledger.repository.impl";
 import { DepositRepositoryImpl } from "./database/repositories/deposit.repository.impl";
 import { WithdrawalRepositoryImpl } from "./database/repositories/withdrawal.repository.impl";
+import { NotificationRepositoryImpl } from "./database/repositories/notification.repository.impl";
+import { PageRepositoryImpl } from "./database/repositories/page.repository.impl";
+import { LocationRepositoryImpl } from "./database/repositories/location.repository.impl";
+import { LocationDateOverrideRepositoryImpl } from "./database/repositories/location-date-override.repository.impl";
+import { PermitRepositoryImpl } from "./database/repositories/permit.repository.impl";
 
 import { UserRepository } from "@domain/repositories/user.repository";
 import { AuditLogRepository } from "@domain/repositories/audit-log.repository";
@@ -26,26 +35,14 @@ import { UserBalanceRepository } from "@domain/repositories/user-balance.reposit
 import { LedgerRepository } from "@domain/repositories/ledger.repository";
 import { DepositRepository } from "@domain/repositories/deposit.repository";
 import { WithdrawalRepository } from "@domain/repositories/withdrawal.repository";
-
-import { BcryptPasswordHasher } from "./services/bcrypt-password-hasher.service";
-import { PasswordHasher } from "@application/interfaces/password-hasher.interface";
-
-import { OtpServiceImpl } from "./services/otp.service.impl";
-import { RedisOtpStore } from "./services/redis-otp.store";
-import { OtpService } from "@application/interfaces/otp.service.interface";
-
-import { SeedAdminService } from "./database/seed-admin.service";
+import { NotificationRepository } from "@domain/repositories/notification.repository";
+import { PageRepository } from "@domain/repositories/page.repository";
+import { LocationRepository } from "@domain/repositories/location.repository";
+import { LocationDateOverrideRepository } from "@domain/repositories/location-date-override.repository";
+import { PermitRepository } from "@domain/repositories/permit.repository";
 
 import { NotificationService } from "@application/interfaces/notification.service.interface";
 import { SmtpNotificationService } from "./services/notification.service";
-
-import { RedisClientLifecycle } from "./services/redis-client.lifecycle";
-
-import { MinioService } from "./services/minio.service";
-import { FileStorage } from "@application/interfaces/file-storage.interface";
-
-import { ImageProcessingService } from "./services/image-processing.service";
-import { ImageProcessing } from "@application/interfaces/image-processing.interface";
 
 import { AdminStatisticsServiceImpl } from "./services/admin-statistics.service";
 import { AdminStatisticsService } from "@application/interfaces/admin-statistics.interface";
@@ -65,28 +62,12 @@ import { PaymentProviderInterface } from "@application/interfaces/payment-provid
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
 import { EnvironmentConfig } from "./config/environment.config";
 
-import { NotificationOrmEntity } from "./database/orm-entities/notification.orm-entity";
-import { NotificationRepositoryImpl } from "./database/repositories/notification.repository.impl";
-import { NotificationRepository } from "@domain/repositories/notification.repository";
-import { PageRepository } from "@domain/repositories/page.repository";
-import { PageRepositoryImpl } from "./database/repositories/page.repository.impl";
 import { HtmlSanitizer } from "@application/interfaces/html-sanitizer.interface";
 import { HtmlSanitizerService } from "./services/html-sanitizer.service";
-import { PageOrmEntity } from "./database/orm-entities/page.orm-entity";
 
 import { TmarJwtService } from "./services/tmar-jwt.service";
-import { LocationRepository } from "@domain/repositories/location.repository";
-import { LocationRepositoryImpl } from "./database/repositories/location.repository.impl";
 import { TmarTravelLocationsClient } from "@application/interfaces/tmar-locations-client.interface";
-import { LocationSyncScheduler } from "./services/location-sync.scheduler";
 import { TmarTravelLocationsClientService } from "./services/tmar-locations-client.service";
-import { LocationOrmEntity } from "./database/orm-entities/location.orm-entity";
-import { LocationDateOverrideRepository } from "@domain/repositories/location-date-override.repository";
-import { LocationDateOverrideRepositoryImpl } from "./database/repositories/location-date-override.repository.impl";
-import { LocationDateOverrideOrmEntity } from "./database/orm-entities/location-date-override.orm-entity";
-import { PermitOrmEntity } from "./database/orm-entities/permit.orm-entity";
-import { PermitRepository } from "@domain/repositories/permit.repository";
-import { PermitRepositoryImpl } from "./database/repositories/permit.repository.impl";
 
 @Global()
 @Module({
@@ -124,30 +105,6 @@ import { PermitRepositoryImpl } from "./database/repositories/permit.repository.
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
 
-        REDIS_HOST: Joi.string().required(),
-        REDIS_PORT: Joi.number().port().default(6379),
-        REDIS_PASSWORD: Joi.string().allow("").default(""),
-        REDIS_TLS: Joi.boolean().truthy("true").falsy("false").default(false),
-
-        OTP_EXPIRY_SECONDS: Joi.number()
-          .integer()
-          .min(60)
-          .max(900)
-          .default(300),
-        OTP_MAX_ATTEMPTS: Joi.number().integer().min(1).max(10).default(5),
-        OTP_RESEND_COOLDOWN_SECONDS: Joi.number().integer().min(1).default(60),
-        OTP_LOG_CODE: Joi.boolean()
-          .truthy("true")
-          .falsy("false")
-          .default(false),
-
-        LOGIN_MAX_ATTEMPTS: Joi.number().integer().min(1).default(5),
-        LOGIN_ATTEMPT_WINDOW_SECONDS: Joi.number()
-          .integer()
-          .min(60)
-          .default(900),
-        LOGIN_LOCK_SECONDS: Joi.number().integer().min(60).default(900),
-
         SMTP_HOST: Joi.string().required(),
         SMTP_PORT: Joi.number().port().default(587),
         SMTP_SECURE: Joi.boolean().truthy("true").falsy("false").default(false),
@@ -157,23 +114,6 @@ import { PermitRepositoryImpl } from "./database/repositories/permit.repository.
 
         TMAR_JWT_SECRET: Joi.string().min(32).required(),
         TMAR_TRAVEL_API_URL: Joi.string().required(),
-
-        INITIAL_ADMIN_EMAIL: Joi.string().email().allow("").default(""),
-        INITIAL_ADMIN_PASSWORD: Joi.string().min(12).allow("").default(""),
-
-        GOOGLE_CLIENT_ID: Joi.string().required(),
-        GOOGLE_CLIENT_SECRET: Joi.string().required(),
-        GOOGLE_CALLBACK_URL: Joi.string().uri().required(),
-
-        MINIO_ENDPOINT: Joi.string().required(),
-        MINIO_PORT: Joi.number().port().default(9000),
-        MINIO_ACCESS_KEY: Joi.string().required(),
-        MINIO_SECRET_KEY: Joi.string().required(),
-        MINIO_BUCKET: Joi.string().required(),
-        MINIO_USE_SSL: Joi.boolean()
-          .truthy("true")
-          .falsy("false")
-          .default(false),
       }),
     }),
 
@@ -197,53 +137,12 @@ import { PermitRepositoryImpl } from "./database/repositories/permit.repository.
   ],
 
   providers: [
-    {
-      provide: "REDIS_CLIENT",
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService<EnvironmentConfig>) => {
-        const redisTls = configService.get("REDIS_TLS");
-
-        const client = createClient({
-          socket: {
-            host: configService.getOrThrow("REDIS_HOST"),
-            port: configService.getOrThrow("REDIS_PORT"),
-            ...(redisTls ? { tls: true } : {}),
-            connectTimeout: 10_000,
-            reconnectStrategy: (retries) => Math.min(100 * 2 ** retries, 5_000),
-          },
-          password: configService.get("REDIS_PASSWORD") || undefined,
-        });
-
-        client.on("error", (error) => {
-          console.error("Redis client error:", error);
-        });
-
-        await client.connect();
-
-        return client;
-      },
-    },
-
-    RedisClientLifecycle,
-
     { provide: UserRepository, useClass: UserRepositoryImpl },
-    { provide: PasswordHasher, useClass: BcryptPasswordHasher },
-
-    RedisOtpStore,
     SmtpNotificationService,
     {
       provide: NotificationService,
       useExisting: SmtpNotificationService,
     },
-    { provide: OtpService, useClass: OtpServiceImpl },
-
-    SeedAdminService,
-    TmarJwtService,
-    MinioService,
-    { provide: FileStorage, useExisting: MinioService },
-
-    ImageProcessingService,
-    { provide: ImageProcessing, useClass: ImageProcessingService },
 
     AdminStatisticsServiceImpl,
     {
@@ -307,16 +206,13 @@ import { PermitRepositoryImpl } from "./database/repositories/permit.repository.
       useClass: LocationDateOverrideRepositoryImpl,
     },
     { provide: PermitRepository, useClass: PermitRepositoryImpl },
+
+    TmarJwtService,
   ],
 
   exports: [
     UserRepository,
-    PasswordHasher,
-    OtpService,
     NotificationService,
-    "REDIS_CLIENT",
-    FileStorage,
-    ImageProcessing,
     AdminStatisticsService,
     AuditLogRepository,
     UserBalanceRepository,

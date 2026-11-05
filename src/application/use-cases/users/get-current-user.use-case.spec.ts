@@ -25,7 +25,6 @@ describe("GetCurrentUserUseCase", () => {
     const user = User.create({
       id: "user-1",
       email: "user@example.com",
-      hashedPassword: "hashed",
     });
 
     userRepository.findById.mockResolvedValue(user);

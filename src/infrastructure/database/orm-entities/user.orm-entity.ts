@@ -31,12 +31,6 @@ export class UserOrmEntity {
   email!: string;
 
   @Column({ nullable: true, type: "varchar" })
-  hashedPassword!: string | null;
-
-  @Column({ nullable: true, unique: true, type: "varchar" })
-  googleId!: string | null;
-
-  @Column({ nullable: true, type: "varchar" })
   firstName!: string | null;
 
   @Column({ nullable: true, type: "varchar" })
@@ -48,7 +42,6 @@ export class UserOrmEntity {
   @Column({ nullable: true, type: "date" })
   dateOfBirth!: Date | null;
 
-  // Locally managed Tmar-Cert role.
   @Column({
     type: "enum",
     enum: UserRole,
@@ -56,7 +49,6 @@ export class UserOrmEntity {
   })
   role!: UserRole;
 
-  // Exact role synchronized from the verified TmarTravel JWT.
   @Column({
     type: "varchar",
     default: UserRole.USER,
@@ -71,9 +63,6 @@ export class UserOrmEntity {
 
   @UpdateDateColumn()
   updatedAt!: Date;
-
-  @Column({ nullable: true, type: "varchar" })
-  avatar!: string | null;
 
   @Column({ nullable: true, type: "varchar" })
   bio!: string | null;

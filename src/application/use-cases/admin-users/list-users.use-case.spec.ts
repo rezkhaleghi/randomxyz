@@ -17,7 +17,6 @@ describe("ListUsersUseCase", () => {
     const user = User.create({
       id: "id",
       email: "user@example.com",
-      hashedPassword: "hashed",
     });
 
     const page = {
