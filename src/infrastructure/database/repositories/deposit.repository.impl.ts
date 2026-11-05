@@ -43,27 +43,6 @@ export class DepositRepositoryImpl extends DepositRepository {
     return row ? this.toDomain(row) : null;
   }
 
-  async findByUserIdAndIdempotencyKey(
-    userId: string,
-    idempotencyKey: string,
-  ): Promise<Deposit | null> {
-    const row = await this.repository.findOne({
-      where: { userId, idempotencyKey },
-    });
-
-    return row ? this.toDomain(row) : null;
-  }
-
-  async lockByUserIdAndIdempotencyKey(
-    userId: string,
-    idempotencyKey: string,
-  ): Promise<void> {
-    await this.repository.query(
-      "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
-      [`${userId}:${idempotencyKey}`],
-    );
-  }
-
   async findByIdForUpdate(id: string): Promise<Deposit | null> {
     const row = await this.repository.findOne({
       where: { id },
@@ -171,7 +150,6 @@ export class DepositRepositoryImpl extends DepositRepository {
       providerPaymentId: row.providerPaymentId,
       paymentUrl: row.paymentUrl,
       transactionId: row.transactionId,
-      idempotencyKey: row.idempotencyKey,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       completedAt: row.completedAt,
@@ -191,7 +169,6 @@ export class DepositRepositoryImpl extends DepositRepository {
     row.providerPaymentId = deposit.providerPaymentId;
     row.paymentUrl = deposit.paymentUrl;
     row.transactionId = deposit.transactionId;
-    row.idempotencyKey = deposit.idempotencyKey;
     row.createdAt = deposit.createdAt;
     row.updatedAt = deposit.updatedAt;
     row.completedAt = deposit.completedAt;

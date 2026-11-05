@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import * as soap from "soap";
 
@@ -44,6 +44,8 @@ interface ParsianSoapClient {
 
 @Injectable()
 export class ParsianPaymentProvider implements PaymentProviderInterface {
+  private readonly logger = new Logger(ParsianPaymentProvider.name);
+
   readonly name = PaymentProvider.PARSIAN;
   readonly supportedCurrencies = [PaymentCurrency.IRT];
 
@@ -78,14 +80,18 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
         }
       )?.SalePaymentRequestResult;
 
+      if (!result || Number(result.Status) !== 0) {
+        throw new Error(
+          `Parsian rejected the sale payment request. Status: ${result?.Status ?? "missing"}`,
+        );
+      }
+
       if (
-        !result ||
-        Number(result.Status) !== 0 ||
         result.Token === undefined ||
         result.Token === null ||
         String(result.Token).trim() === ""
       ) {
-        throw new Error("Parsian did not create the payment.");
+        throw new Error("Parsian did not return a payment token.");
       }
 
       const token = String(result.Token);
@@ -94,8 +100,9 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
         providerPaymentId: token,
         paymentUrl: `https://pec.shaparak.ir/NewIPG/?token=${encodeURIComponent(token)}`,
       };
-    } catch {
-      // Never expose SOAP faults, credentials, or payment tokens in API errors.
+    } catch (error) {
+      this.logProviderError("SalePaymentRequest", error);
+
       throw new Error("Unable to create Parsian payment.");
     }
   }
@@ -120,14 +127,26 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
       )?.ConfirmPaymentResult;
 
       if (!result || Number(result.Status) !== 0) {
-        throw new Error("Parsian did not confirm the payment.");
+        throw new Error(
+          `Parsian did not confirm the payment. Status: ${result?.Status ?? "missing"}`,
+        );
       }
 
-      // The current known SOAP response contract only exposes Status.
-      // Do not treat callback-provided RRN as a confirmed transaction ID.
       return {};
-    } catch {
+    } catch (error) {
+      this.logProviderError("ConfirmPayment", error);
+
       throw new Error("Unable to confirm Parsian payment.");
     }
+  }
+
+  private logProviderError(operation: string, error: unknown): void {
+    const message =
+      error instanceof Error ? error.message : "Unknown provider error";
+
+    const pin = this.configService.get("PARSIAN_PIN") ?? "";
+    const safeMessage = pin ? message.replaceAll(pin, "[REDACTED]") : message;
+
+    this.logger.error(`${operation} failed: ${safeMessage}`);
   }
 }

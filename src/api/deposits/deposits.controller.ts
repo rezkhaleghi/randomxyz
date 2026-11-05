@@ -1,9 +1,7 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
-  Headers,
   Param,
   ParseUUIDPipe,
   Post,
@@ -12,7 +10,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { ApiHeader, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
 import { CreateDepositUseCase } from "@application/use-cases/deposits/create-deposit.use-case";
 import { GetDepositUseCase } from "@application/use-cases/deposits/get-deposit.use-case";
@@ -68,24 +66,11 @@ export class DepositsController {
 
   @Post()
   @ApiOperation({ summary: "Create a deposit" })
-  @ApiHeader({
-    name: "Idempotency-Key",
-    description:
-      "Client-generated key used to safely retry the same deposit creation request.",
-    required: true,
-  })
   @ApiResponse({ status: 201, description: "Deposit created" })
   async create(
     @Body() dto: CreateDepositDto,
     @Req() req: AuthenticatedRequest,
-    @Headers("Idempotency-Key") idempotencyKey: string | undefined,
   ) {
-    const normalizedIdempotencyKey = idempotencyKey?.trim();
-
-    if (!normalizedIdempotencyKey) {
-      throw new BadRequestException("Idempotency-Key header is required.");
-    }
-
     const backendUrl = this.configService
       .getOrThrow("BACKEND_URL")
       .replace(/\/+$/, "");
@@ -95,7 +80,6 @@ export class DepositsController {
       currency: dto.currency,
       amount: dto.amount,
       provider: dto.provider,
-      idempotencyKey: normalizedIdempotencyKey,
       callbackUrl: `${backendUrl}/deposits/parsian/callback`,
     });
   }

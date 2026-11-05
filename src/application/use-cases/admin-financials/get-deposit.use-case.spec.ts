@@ -28,7 +28,6 @@ describe("AdminGetDepositUseCase", () => {
       currency: PaymentCurrency.USD,
       amount: "100",
       provider: PaymentProvider.FAKE_PROVIDER,
-      idempotencyKey: "idempotency-key-1",
     });
 
     depositRepository.findById.mockResolvedValue(deposit);

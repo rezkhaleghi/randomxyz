@@ -15,7 +15,6 @@ import {
   DecimalScaleExceededException,
   DepositChangeStatusNotAllowedException,
   DepositCannotFailException,
-  DepositIdempotencyConflictException,
   DepositNotFoundException,
   DomainException,
   FileNotFoundException,
@@ -31,13 +30,6 @@ import {
   InvalidWithdrawalAmountException,
   NotMatchException,
   OtpCooldownException,
-  TicketAccessNotAllowedException,
-  TicketCategoryAlreadyExistsException,
-  TicketCategoryNotFoundException,
-  TicketClosedException,
-  TicketMustAssignToAdminException,
-  TicketNotFoundException,
-  TicketStatusTransitionException,
   UnsupportedPaymentCurrencyException,
   UnsupportedPaymentProviderException,
   UserAlreadyExistsException,
@@ -111,10 +103,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
 
     // Authorization
-    if (
-      exception instanceof TicketAccessNotAllowedException ||
-      exception instanceof CannotDeleteSelfException
-    ) {
+    if (exception instanceof CannotDeleteSelfException) {
       return HttpStatus.FORBIDDEN;
     }
 
@@ -124,9 +113,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       exception instanceof FileNotFoundException ||
       exception instanceof UserBalanceNotFoundException ||
       exception instanceof DepositNotFoundException ||
-      exception instanceof WithdrawalNotFoundException ||
-      exception instanceof TicketNotFoundException ||
-      exception instanceof TicketCategoryNotFoundException
+      exception instanceof WithdrawalNotFoundException
     ) {
       return HttpStatus.NOT_FOUND;
     }
@@ -138,13 +125,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
       exception instanceof UserBalanceAlreadyExistsException ||
       exception instanceof GoogleAccountConflictException ||
       exception instanceof CannotRemoveLastAdminException ||
-      exception instanceof DepositIdempotencyConflictException ||
       exception instanceof DepositChangeStatusNotAllowedException ||
       exception instanceof DepositCannotFailException ||
-      exception instanceof WithdrawalStatusChangeNotAllowedException ||
-      exception instanceof TicketClosedException ||
-      exception instanceof TicketStatusTransitionException ||
-      exception instanceof TicketCategoryAlreadyExistsException
+      exception instanceof WithdrawalStatusChangeNotAllowedException
     ) {
       return HttpStatus.CONFLICT;
     }
@@ -164,7 +147,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
       exception instanceof UnsupportedPaymentCurrencyException ||
       exception instanceof InvalidWithdrawalAmountException ||
       exception instanceof InvalidDepositAmountException ||
-      exception instanceof TicketMustAssignToAdminException ||
       exception instanceof InvalidDecimalValueException ||
       exception instanceof DecimalScaleExceededException ||
       exception instanceof UnsupportedPaymentProviderException

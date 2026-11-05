@@ -163,57 +163,6 @@ export class DepositCannotFailException extends DomainException {
     super(`Deposit cannot be marked as failed from status ${status}.`);
   }
 }
-
-export class DepositIdempotencyConflictException extends DomainException {
-  constructor() {
-    super(
-      "The idempotency key has already been used with different deposit parameters.",
-    );
-  }
-}
-
-//ticket
-export class TicketNotFoundException extends DomainException {
-  constructor() {
-    super("Ticket not found.");
-  }
-}
-
-export class TicketCategoryNotFoundException extends DomainException {
-  constructor() {
-    super("Ticket category not found.");
-  }
-}
-
-export class TicketMustAssignToAdminException extends DomainException {
-  constructor() {
-    super("Target user must be an admin/support user.");
-  }
-}
-export class TicketClosedException extends DomainException {
-  constructor() {
-    super("This ticket is closed and cannot receive new replies.");
-  }
-}
-
-export class TicketAccessNotAllowedException extends DomainException {
-  constructor() {
-    super("You cannot access this ticket.");
-  }
-}
-
-export class TicketStatusTransitionException extends DomainException {
-  constructor(current: string, next: string) {
-    super(`Invalid ticket status transition from ${current} to ${next}.`);
-  }
-}
-
-export class TicketCategoryAlreadyExistsException extends DomainException {
-  constructor(name: string) {
-    super(`A ticket category named "${name}" already exists.`);
-  }
-}
-
 // Decimal utility exceptions
 export class InvalidDecimalValueException extends DomainException {
   constructor(value: string) {

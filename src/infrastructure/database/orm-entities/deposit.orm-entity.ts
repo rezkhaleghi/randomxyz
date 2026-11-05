@@ -19,7 +19,6 @@ import { UserOrmEntity } from "./user.orm-entity";
 @Index(["userId", "createdAt"])
 @Index(["referenceId"], { unique: true })
 @Index(["providerPaymentId"], { unique: true })
-@Index(["userId", "idempotencyKey"], { unique: true })
 export class DepositOrmEntity {
   @PrimaryColumn("uuid")
   id!: string;
@@ -53,13 +52,6 @@ export class DepositOrmEntity {
     enum: PaymentProvider,
   })
   provider!: PaymentProvider;
-
-  @Column({
-    type: "varchar",
-    length: 255,
-    nullable: true,
-  })
-  idempotencyKey!: string | null;
 
   @Column({ type: "uuid" })
   referenceId!: string;

@@ -3,11 +3,8 @@ import { describe, expect, it, jest } from "@jest/globals";
 
 import { HttpExceptionFilter } from "./http-exception.filter";
 import {
-  DepositIdempotencyConflictException,
   DepositNotFoundException,
   InvalidCredentialsException,
-  TicketAccessNotAllowedException,
-  TicketStatusTransitionException,
   UserAlreadyExistsException,
   UserNotFoundException,
 } from "@domain/exceptions/domain.exception";
@@ -75,34 +72,10 @@ describe("HttpExceptionFilter", () => {
     expect(status).toHaveBeenCalledWith(401);
   });
 
-  it("maps authorization failures to 403", () => {
-    const { host, status } = createHost("/tickets/123");
-
-    filter.catch(new TicketAccessNotAllowedException(), host);
-
-    expect(status).toHaveBeenCalledWith(403);
-  });
-
   it("maps duplicate resources to 409", () => {
     const { host, status } = createHost("/users");
 
     filter.catch(new UserAlreadyExistsException("test@example.com"), host);
-
-    expect(status).toHaveBeenCalledWith(409);
-  });
-
-  it("maps idempotency conflicts to 409", () => {
-    const { host, status } = createHost("/deposits");
-
-    filter.catch(new DepositIdempotencyConflictException(), host);
-
-    expect(status).toHaveBeenCalledWith(409);
-  });
-
-  it("maps invalid state transitions to 409", () => {
-    const { host, status } = createHost("/tickets/123");
-
-    filter.catch(new TicketStatusTransitionException("closed", "open"), host);
 
     expect(status).toHaveBeenCalledWith(409);
   });

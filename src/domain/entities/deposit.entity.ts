@@ -18,7 +18,6 @@ export interface CreateDepositProps {
   currency: PaymentCurrency;
   amount: string;
   provider: PaymentProvider;
-  idempotencyKey: string;
   status?: DepositStatus;
   referenceId?: string;
   providerPaymentId?: string | null;
@@ -35,7 +34,6 @@ export interface RestoreDepositProps {
   currency: PaymentCurrency;
   amount: string;
   provider: PaymentProvider;
-  idempotencyKey: string | null;
   status: DepositStatus;
   referenceId: string;
   providerPaymentId: string | null;
@@ -53,7 +51,6 @@ export class Deposit {
     public readonly currency: PaymentCurrency,
     public readonly amount: string,
     public readonly provider: PaymentProvider,
-    public readonly idempotencyKey: string | null,
     public status: DepositStatus,
     public readonly referenceId: string,
     public providerPaymentId: string | null,
@@ -69,10 +66,6 @@ export class Deposit {
       throw new InvalidDepositAmountException();
     }
 
-    if (!props.idempotencyKey.trim()) {
-      throw new Error("Deposit idempotency key must not be empty.");
-    }
-
     const now = new Date();
 
     return new Deposit(
@@ -81,7 +74,6 @@ export class Deposit {
       props.currency,
       props.amount,
       props.provider,
-      props.idempotencyKey,
       props.status ?? DepositStatus.PENDING,
       props.referenceId ?? randomUUID(),
       props.providerPaymentId ?? null,
@@ -100,7 +92,6 @@ export class Deposit {
       props.currency,
       props.amount,
       props.provider,
-      props.idempotencyKey,
       props.status,
       props.referenceId,
       props.providerPaymentId,
