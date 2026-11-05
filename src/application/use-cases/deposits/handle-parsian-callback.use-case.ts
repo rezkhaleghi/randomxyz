@@ -32,11 +32,11 @@ export class HandleParsianCallbackUseCase {
     const amount = this.toStringValue(input.Amount);
     const status = this.toStringValue(input.status);
 
-    if (!orderId || !token || !amount) {
+    if (!orderId || !/^\d+$/.test(orderId) || !token || !amount) {
       throw new NotMatchException("Parsian callback fields", "Deposit");
     }
 
-    const deposit = await this.depositRepository.findByReferenceId(orderId);
+    const deposit = await this.depositRepository.findByProviderOrderId(orderId);
 
     if (!deposit) {
       throw new DepositNotFoundException();

@@ -72,6 +72,16 @@ export class DepositRepositoryImpl extends DepositRepository {
     return row ? this.toDomain(row) : null;
   }
 
+  async findByProviderOrderId(
+    providerOrderId: string,
+  ): Promise<Deposit | null> {
+    const row = await this.repository.findOne({
+      where: { providerOrderId },
+    });
+
+    return row ? this.toDomain(row) : null;
+  }
+
   async search(
     filters: DepositSearchFilters,
     params: PageQuery<"createdAt" | "amount">,
@@ -147,6 +157,7 @@ export class DepositRepositoryImpl extends DepositRepository {
       provider: row.provider,
       status: row.status,
       referenceId: row.referenceId,
+      providerOrderId: row.providerOrderId,
       providerPaymentId: row.providerPaymentId,
       paymentUrl: row.paymentUrl,
       transactionId: row.transactionId,
@@ -166,6 +177,7 @@ export class DepositRepositoryImpl extends DepositRepository {
     row.provider = deposit.provider;
     row.status = deposit.status;
     row.referenceId = deposit.referenceId;
+    row.providerOrderId = deposit.providerOrderId;
     row.providerPaymentId = deposit.providerPaymentId;
     row.paymentUrl = deposit.paymentUrl;
     row.transactionId = deposit.transactionId;

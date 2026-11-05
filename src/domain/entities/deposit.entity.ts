@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomInt, randomUUID } from "crypto";
 
 import { PaymentCurrency } from "../enums/payment-currency.enum";
 import { PaymentProvider } from "../enums/payment-provider.enum";
@@ -18,6 +18,7 @@ export interface CreateDepositProps {
   currency: PaymentCurrency;
   amount: string;
   provider: PaymentProvider;
+  providerOrderId?: string | null;
   status?: DepositStatus;
   referenceId?: string;
   providerPaymentId?: string | null;
@@ -36,6 +37,7 @@ export interface RestoreDepositProps {
   provider: PaymentProvider;
   status: DepositStatus;
   referenceId: string;
+  providerOrderId?: string | null;
   providerPaymentId: string | null;
   paymentUrl?: string | null;
   transactionId: string | null;
@@ -53,6 +55,7 @@ export class Deposit {
     public readonly provider: PaymentProvider,
     public status: DepositStatus,
     public readonly referenceId: string,
+    public readonly providerOrderId: string | null,
     public providerPaymentId: string | null,
     public paymentUrl: string | null,
     public transactionId: string | null,
@@ -66,6 +69,12 @@ export class Deposit {
       throw new InvalidDepositAmountException();
     }
 
+    const providerOrderId =
+      props.providerOrderId ??
+      (props.provider === PaymentProvider.PARSIAN
+        ? randomInt(1_000_000, 2_147_483_647).toString()
+        : null);
+
     const now = new Date();
 
     return new Deposit(
@@ -76,6 +85,7 @@ export class Deposit {
       props.provider,
       props.status ?? DepositStatus.PENDING,
       props.referenceId ?? randomUUID(),
+      providerOrderId,
       props.providerPaymentId ?? null,
       props.paymentUrl ?? null,
       props.transactionId ?? null,
@@ -94,6 +104,7 @@ export class Deposit {
       props.provider,
       props.status,
       props.referenceId,
+      props.providerOrderId ?? null,
       props.providerPaymentId,
       props.paymentUrl ?? null,
       props.transactionId,

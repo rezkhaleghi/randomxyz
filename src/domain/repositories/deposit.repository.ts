@@ -34,6 +34,10 @@ export abstract class DepositRepository {
 
   abstract findByReferenceId(referenceId: string): Promise<Deposit | null>;
 
+  abstract findByProviderOrderId(
+    providerOrderId: string,
+  ): Promise<Deposit | null>;
+
   abstract search(
     filters: DepositSearchFilters,
     params: PageQuery<DepositSortBy>,

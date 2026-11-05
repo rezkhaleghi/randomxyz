@@ -28,8 +28,8 @@ interface ParsianSoapClient {
   SalePaymentRequestAsync(input: {
     requestData: {
       LoginAccount: string;
-      OrderId: string;
-      Amount: string;
+      OrderId: number;
+      Amount: number;
       CallBackUrl: string;
     };
   }): Promise<unknown[]>;
@@ -58,7 +58,24 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
       throw new Error("Parsian supports IRT deposits only.");
     }
 
-    const amountInRial = tomanToRialAmount(input.amount);
+    if (!input.providerOrderId || !/^\d+$/.test(input.providerOrderId)) {
+      throw new Error("A numeric Parsian order ID is required.");
+    }
+
+    const orderId = Number(input.providerOrderId);
+    const amountInRial = Number(tomanToRialAmount(input.amount));
+
+    if (
+      !Number.isSafeInteger(orderId) ||
+      orderId <= 0 ||
+      orderId > 2_147_483_647
+    ) {
+      throw new Error("Invalid Parsian order ID.");
+    }
+
+    if (!Number.isSafeInteger(amountInRial) || amountInRial <= 0) {
+      throw new Error("Invalid Parsian payment amount.");
+    }
 
     try {
       const client = (await soap.createClientAsync(
@@ -68,7 +85,7 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
       const response = await client.SalePaymentRequestAsync({
         requestData: {
           LoginAccount: this.configService.getOrThrow("PARSIAN_PIN"),
-          OrderId: input.referenceId,
+          OrderId: orderId,
           Amount: amountInRial,
           CallBackUrl: input.callbackUrl,
         },

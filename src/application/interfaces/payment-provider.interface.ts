@@ -5,6 +5,7 @@ export interface CreatePaymentInput {
   amount: string;
   currency: PaymentCurrency;
   referenceId: string;
+  providerOrderId?: string | null;
   callbackUrl: string;
 }
 

@@ -72,6 +72,7 @@ export class CreateDepositUseCase {
       amount: deposit.amount,
       currency: deposit.currency,
       referenceId: deposit.referenceId,
+      providerOrderId: deposit.providerOrderId,
       callbackUrl: input.callbackUrl,
     });
 

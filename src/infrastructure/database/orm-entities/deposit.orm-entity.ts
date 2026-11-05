@@ -18,6 +18,7 @@ import { UserOrmEntity } from "./user.orm-entity";
 @Entity("deposits")
 @Index(["userId", "createdAt"])
 @Index(["referenceId"], { unique: true })
+@Index(["providerOrderId"], { unique: true })
 @Index(["providerPaymentId"], { unique: true })
 export class DepositOrmEntity {
   @PrimaryColumn("uuid")
@@ -55,6 +56,9 @@ export class DepositOrmEntity {
 
   @Column({ type: "uuid" })
   referenceId!: string;
+
+  @Column({ type: "varchar", length: 10, nullable: true })
+  providerOrderId!: string | null;
 
   @Column({ type: "varchar", nullable: true })
   providerPaymentId!: string | null;
