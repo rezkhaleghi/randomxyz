@@ -18,6 +18,8 @@ async function bootstrap() {
   const frontendOrigin = new URL(configService.getOrThrow("FRONTEND_URL"))
     .origin;
 
+  app.setGlobalPrefix("api/permit");
+
   app.enableShutdownHooks();
 
   app
