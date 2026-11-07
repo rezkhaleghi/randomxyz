@@ -20,6 +20,19 @@ async function bootstrap() {
 
   app.setGlobalPrefix("api/permit");
 
+  const allowedOrigins = [
+    frontendOrigin,
+    "http://localhost:3000",
+    "http://localhost:2892",
+  ];
+
+  app.enableCors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+  });
+
   app.enableShutdownHooks();
 
   app
@@ -27,10 +40,10 @@ async function bootstrap() {
     .getInstance()
     .set("trust proxy", configService.get("TRUST_PROXY", 1));
 
-  app.enableCors({
-    origin: frontendOrigin,
-    credentials: true,
-  });
+  // app.enableCors({
+  //   origin: frontendOrigin,
+  //   credentials: true,
+  // });
 
   app.use(helmet());
 
@@ -115,14 +128,6 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup("api/permit/docs", app, document);
   }
-
-  // temp for mamad's test
-  app.enableCors({
-    origin: ["http://localhost:3000", "http://localhost:2892"],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-  });
 
   await app.listen(configService.get("PORT", 5001));
 }
