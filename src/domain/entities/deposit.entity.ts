@@ -24,6 +24,7 @@ export interface CreateDepositProps {
   providerPaymentId?: string | null;
   paymentUrl?: string | null;
   transactionId?: string | null;
+  providerResponse?: Record<string, unknown> | null;
   completedAt?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
@@ -41,6 +42,7 @@ export interface RestoreDepositProps {
   providerPaymentId: string | null;
   paymentUrl?: string | null;
   transactionId: string | null;
+  providerResponse?: Record<string, unknown> | null;
   createdAt: Date;
   updatedAt: Date;
   completedAt: Date | null;
@@ -59,6 +61,7 @@ export class Deposit {
     public providerPaymentId: string | null,
     public paymentUrl: string | null,
     public transactionId: string | null,
+    public providerResponse: Record<string, unknown> | null,
     public readonly createdAt: Date,
     public updatedAt: Date,
     public completedAt: Date | null,
@@ -89,6 +92,7 @@ export class Deposit {
       props.providerPaymentId ?? null,
       props.paymentUrl ?? null,
       props.transactionId ?? null,
+      props.providerResponse ?? null,
       props.createdAt ?? now,
       props.updatedAt ?? now,
       props.completedAt ?? null,
@@ -108,6 +112,7 @@ export class Deposit {
       props.providerPaymentId,
       props.paymentUrl ?? null,
       props.transactionId,
+      props.providerResponse ?? null,
       props.createdAt,
       props.updatedAt,
       props.completedAt,
@@ -120,13 +125,17 @@ export class Deposit {
     this.updatedAt = new Date();
   }
 
-  markCompleted(transactionId?: string): void {
+  markCompleted(
+    transactionId?: string,
+    providerResponse?: Record<string, unknown>,
+  ): void {
     if (this.status !== DepositStatus.PENDING) {
       throw new DepositChangeStatusNotAllowedException(this.status);
     }
 
     this.status = DepositStatus.COMPLETED;
     this.transactionId = transactionId ?? this.transactionId;
+    this.providerResponse = providerResponse ?? this.providerResponse;
     this.completedAt = new Date();
     this.updatedAt = new Date();
   }

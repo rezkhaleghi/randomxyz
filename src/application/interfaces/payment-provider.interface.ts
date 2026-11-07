@@ -20,6 +20,7 @@ export interface VerifyPaymentInput {
 
 export interface VerifyPaymentResult {
   transactionId?: string;
+  providerResponse?: Record<string, unknown>;
 }
 
 export interface PaymentProviderInterface {

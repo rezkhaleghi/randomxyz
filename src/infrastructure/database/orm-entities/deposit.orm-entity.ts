@@ -69,6 +69,9 @@ export class DepositOrmEntity {
   @Column({ type: "varchar", nullable: true })
   transactionId!: string | null;
 
+  @Column({ type: "jsonb", nullable: true })
+  providerResponse!: Record<string, unknown> | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

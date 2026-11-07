@@ -18,8 +18,8 @@ export interface ListDepositsInput extends PageQuery<"createdAt" | "amount"> {
 export class ListDepositsUseCase {
   constructor(private readonly depositRepository: DepositRepository) {}
 
-  async execute(input: ListDepositsInput): Promise<PageResult<Deposit>> {
-    return this.depositRepository.search(
+  async execute(input: ListDepositsInput) {
+    const result = await this.depositRepository.search(
       {
         userId: input.userId,
         currency: input.currency,
@@ -36,5 +36,13 @@ export class ListDepositsUseCase {
         sortDirection: input.sortDirection,
       },
     );
+
+    return {
+      ...result,
+      data: result.data.map((deposit) => ({
+        ...deposit,
+        bankReferenceId: deposit.transactionId,
+      })),
+    };
   }
 }

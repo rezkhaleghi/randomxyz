@@ -136,7 +136,10 @@ export class VerifyDepositUseCase {
           }),
         );
 
-        currentDeposit.markCompleted(verification.transactionId);
+        currentDeposit.markCompleted(
+          verification.transactionId,
+          verification.providerResponse,
+        );
 
         await depositRepository.save(currentDeposit);
 

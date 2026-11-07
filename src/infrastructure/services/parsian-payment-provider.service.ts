@@ -22,6 +22,7 @@ interface ParsianSalePaymentResult {
 
 interface ParsianConfirmPaymentResult {
   Status?: string | number;
+  [key: string]: unknown;
 }
 
 interface ParsianSoapClient {
@@ -119,7 +120,6 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
       };
     } catch (error) {
       this.logProviderError("SalePaymentRequest", error);
-
       throw new Error("Unable to create Parsian payment.");
     }
   }
@@ -137,11 +137,20 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
         },
       });
 
-      const result = (
-        response?.[0] as {
-          ConfirmPaymentResult?: ParsianConfirmPaymentResult;
-        }
-      )?.ConfirmPaymentResult;
+      const envelope = response?.[0] as {
+        ConfirmPaymentResult?: ParsianConfirmPaymentResult;
+      };
+
+      const result = envelope?.ConfirmPaymentResult;
+
+      // Log the complete confirmation response after removing sensitive fields.
+      const safeResponse = this.sanitizeProviderValue(
+        result ?? envelope ?? response,
+      );
+
+      this.logger.log(
+        `ConfirmPayment response: ${JSON.stringify(safeResponse)}`,
+      );
 
       if (!result || Number(result.Status) !== 0) {
         throw new Error(
@@ -149,12 +158,81 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
         );
       }
 
-      return {};
+      return {
+        transactionId: this.extractTransactionId(result),
+        providerResponse: this.toProviderResponse(safeResponse),
+      };
     } catch (error) {
       this.logProviderError("ConfirmPayment", error);
-
       throw new Error("Unable to confirm Parsian payment.");
     }
+  }
+
+  private extractTransactionId(
+    result: ParsianConfirmPaymentResult,
+  ): string | undefined {
+    const possibleFields = [
+      "RRN",
+      "Rrn",
+      "rrn",
+      "TransactionId",
+      "TransactionID",
+      "transactionId",
+      "ReferenceNumber",
+    ];
+
+    for (const field of possibleFields) {
+      const value = result[field];
+
+      if (
+        (typeof value === "string" || typeof value === "number") &&
+        String(value).trim() !== ""
+      ) {
+        return String(value).trim();
+      }
+    }
+
+    return undefined;
+  }
+
+  private sanitizeProviderValue(value: unknown, key = ""): unknown {
+    if (
+      /pin|password|cvv|cvc|security.?code|token|authorization|secret/i.test(
+        key,
+      )
+    ) {
+      return "[REDACTED]";
+    }
+
+    if (/card.?number|cardnumber|^pan$/i.test(key)) {
+      const digits = String(value ?? "").replace(/\D/g, "");
+      return digits.length >= 4
+        ? `************${digits.slice(-4)}`
+        : "[REDACTED]";
+    }
+
+    if (Array.isArray(value)) {
+      return value.map((item) => this.sanitizeProviderValue(item));
+    }
+
+    if (value !== null && typeof value === "object") {
+      return Object.fromEntries(
+        Object.entries(value).map(([childKey, childValue]) => [
+          childKey,
+          this.sanitizeProviderValue(childValue, childKey),
+        ]),
+      );
+    }
+
+    return value;
+  }
+
+  private toProviderResponse(value: unknown): Record<string, unknown> {
+    if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+      return value as Record<string, unknown>;
+    }
+
+    return { response: value };
   }
 
   private logProviderError(operation: string, error: unknown): void {

@@ -19,21 +19,24 @@ export class ParsianCallbackController {
     @Body() body: Record<string, unknown>,
     @Res() response: Response,
   ): Promise<void> {
-    const frontendUrl = this.configService.getOrThrow("FRONTEND_URL");
-    const redirectUrl = new URL("/", frontendUrl);
+    const frontendUrl = this.configService
+      .getOrThrow("FRONTEND_URL")
+      .replace(/\/+$/, "");
+
+    const redirectUrl = new URL(
+      "/trip-permit/wallet?tab=deposits",
+      `${frontendUrl}/`,
+    );
 
     try {
-      const deposit = await this.handleParsianCallbackUseCase.execute(body);
-
-      redirectUrl.searchParams.set("depositId", deposit.id);
-      redirectUrl.searchParams.set("depositStatus", deposit.status);
+      await this.handleParsianCallbackUseCase.execute(body);
 
       response.redirect(303, redirectUrl.toString());
     } catch {
-      // Do not expose callback validation or SOAP details to the browser.
       this.logger.warn("Parsian callback could not be verified.");
 
-      redirectUrl.searchParams.set("depositStatus", "verification_failed");
+      // Keep the user on the deposits tab even when verification fails.
+      redirectUrl.searchParams.set("paymentStatus", "verification_failed");
 
       response.redirect(303, redirectUrl.toString());
     }

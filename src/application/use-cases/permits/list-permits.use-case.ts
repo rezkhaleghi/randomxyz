@@ -37,6 +37,7 @@ export class ListPermitsUseCase {
           status: permit.status,
           totalAmount: permit.totalAmount,
           currency: permit.currency,
+          qrToken: permit.qrToken,
           createdAt: permit.createdAt,
         })),
       };
