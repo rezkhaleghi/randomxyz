@@ -35,6 +35,7 @@ export class AdminDepositsController {
       status: query.status,
       referenceId: query.referenceId,
       providerPaymentId: query.providerPaymentId,
+      transactionId: query.transactionId,
       from: query.from ? new Date(query.from) : undefined,
       to: query.to ? new Date(query.to) : undefined,
       sortBy: query.sortBy,

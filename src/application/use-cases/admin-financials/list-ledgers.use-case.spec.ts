@@ -1,13 +1,11 @@
 import { describe, expect, it, jest } from "@jest/globals";
 
-import { LedgerType } from "@domain/enums/ledger-type.enum";
-import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
-import { ListLedgersUseCase } from "./list-ledgers.use-case";
+import { AdminListDepositsUseCase } from "./list-deposits.use-case";
 
-describe("ListLedgersUseCase", () => {
-  it("lists admin ledgers with filters and pagination", async () => {
+describe("AdminListDepositsUseCase", () => {
+  it("lists admin deposits", async () => {
     const repository = {
-      searchAdminLedgers: jest.fn<() => Promise<any>>(),
+      search: jest.fn<() => Promise<any>>(),
     };
 
     const page = {
@@ -18,29 +16,33 @@ describe("ListLedgersUseCase", () => {
       totalPages: 0,
     };
 
-    repository.searchAdminLedgers.mockResolvedValue(page);
+    repository.search.mockResolvedValue(page);
 
-    const result = await new ListLedgersUseCase(repository as any).execute({
-      userId: "user-id",
-      currency: PaymentCurrency.USD,
-      type: LedgerType.DEPOSIT,
+    const result = await new AdminListDepositsUseCase(
+      repository as any,
+    ).execute({
       page: 1,
       limit: 20,
-      sortBy: "createdAt",
-      sortDirection: "DESC",
+      transactionId: "123456789012",
     });
 
     expect(result).toBe(page);
-
-    expect(repository.searchAdminLedgers).toHaveBeenCalledWith(
+    expect(repository.search).toHaveBeenCalledWith(
       expect.objectContaining({
-        userId: "user-id",
-        currency: PaymentCurrency.USD,
-        type: LedgerType.DEPOSIT,
+        userId: undefined,
+        currency: undefined,
+        status: undefined,
+        referenceId: undefined,
+        providerPaymentId: undefined,
+        transactionId: "123456789012",
+        from: undefined,
+        to: undefined,
       }),
       expect.objectContaining({
         page: 1,
         limit: 20,
+        sortBy: undefined,
+        sortDirection: undefined,
       }),
     );
   });

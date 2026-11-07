@@ -10,6 +10,7 @@ export interface ListDepositsInput extends PageQuery<"createdAt" | "amount"> {
   status?: string;
   referenceId?: string;
   providerPaymentId?: string;
+  transactionId?: string;
   from?: Date;
   to?: Date;
 }
@@ -26,6 +27,7 @@ export class AdminListDepositsUseCase {
         status: input.status,
         referenceId: input.referenceId,
         providerPaymentId: input.providerPaymentId,
+        transactionId: input.transactionId,
         from: input.from,
         to: input.to,
       },

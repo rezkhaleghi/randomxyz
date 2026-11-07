@@ -9,6 +9,7 @@ export interface DepositSearchFilters {
   status?: string;
   referenceId?: string;
   providerPaymentId?: string;
+  transactionId?: string;
   from?: Date;
   to?: Date;
 }
