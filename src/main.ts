@@ -15,16 +15,17 @@ async function bootstrap() {
   const logger = new Logger("HTTP");
 
   const configService = app.get(ConfigService<EnvironmentConfig>);
+
   const frontendOrigin = new URL(configService.getOrThrow("FRONTEND_URL"))
     .origin;
-
-  app.setGlobalPrefix("api/permit");
 
   const allowedOrigins = [
     frontendOrigin,
     "http://localhost:3000",
     "http://localhost:2892",
   ];
+
+  app.setGlobalPrefix("api/permit");
 
   app.enableCors({
     origin: allowedOrigins,
@@ -40,18 +41,13 @@ async function bootstrap() {
     .getInstance()
     .set("trust proxy", configService.get("TRUST_PROXY", 1));
 
-  // app.enableCors({
-  //   origin: frontendOrigin,
-  //   credentials: true,
-  // });
-
   app.use(helmet());
 
   /**
    * Parsian sends its callback from its own server and does not send the
    * frontend Origin header. Exempt only this exact endpoint.
    *
-   * All other state-changing requests must still originate from the frontend.
+   * All other state-changing requests must originate from an allowed frontend.
    */
   app.use((request: Request, response: Response, next: NextFunction) => {
     const safeMethods = ["GET", "HEAD", "OPTIONS"];
@@ -62,14 +58,14 @@ async function bootstrap() {
 
     if (
       request.method === "POST" &&
-      request.path === "/deposits/parsian/callback"
+      request.path === "/api/permit/deposits/parsian/callback"
     ) {
       return next();
     }
 
     const origin = request.headers.origin;
 
-    if (origin !== frontendOrigin) {
+    if (!origin || !allowedOrigins.includes(origin)) {
       return response.status(403).json({
         statusCode: 403,
         message: "Origin not allowed.",
