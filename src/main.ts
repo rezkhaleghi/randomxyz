@@ -34,14 +34,6 @@ async function bootstrap() {
 
   app.use(helmet());
 
-  // temp for mamad's test
-  app.enableCors({
-    origin: ["http://localhost:3000", "http://localhost:2892"],
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
-  });
-
   /**
    * Parsian sends its callback from its own server and does not send the
    * frontend Origin header. Exempt only this exact endpoint.
@@ -123,6 +115,14 @@ async function bootstrap() {
     const document = SwaggerModule.createDocument(app, config);
     SwaggerModule.setup("api/permit/docs", app, document);
   }
+
+  // temp for mamad's test
+  app.enableCors({
+    origin: ["http://localhost:3000", "http://localhost:2892"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+  });
 
   await app.listen(configService.get("PORT", 5001));
 }
