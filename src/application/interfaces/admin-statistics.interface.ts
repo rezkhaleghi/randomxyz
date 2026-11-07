@@ -3,6 +3,9 @@ export interface AdminStatistics {
   totalAdmins: number;
   verifiedUsers: number;
   unverifiedUsers: number;
+  totalPermits: number;
+  totalDeposits: number;
+  totalOngoingPermits: number;
 }
 
 export abstract class AdminStatisticsService {
