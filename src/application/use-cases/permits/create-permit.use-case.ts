@@ -52,7 +52,7 @@ export class CreatePermitUseCase {
 
     const passengers = input.passengers.map((passenger) => ({
       ...passenger,
-      fullName: passenger.fullName.trim(),
+      fullName: passenger.fullName.trim().toLowerCase(),
       nationalId: passenger.nationalId.trim(),
     }));
 
@@ -88,8 +88,6 @@ export class CreatePermitUseCase {
         auditLogRepository,
       } = repositories;
 
-      // Serializes bookings for the same location so concurrent requests
-      // cannot both consume the same remaining capacity.
       const location = await locationRepository.findByIdForUpdate(
         input.locationId,
       );
@@ -120,7 +118,6 @@ export class CreatePermitUseCase {
 
       while (currentDate <= input.endDate) {
         const override = overridesByDate.get(currentDate);
-
         const capacity = override?.capacity ?? location.capacity;
 
         const reservedCapacity = await permitRepository.countReservedPassengers(
@@ -158,6 +155,45 @@ export class CreatePermitUseCase {
         throw new BadRequestException("Invalid permit amount.");
       }
 
+      const permitPassengers = [];
+
+      for (const passenger of passengers) {
+        const reusablePassenger = await passengerRepository.createIfNotExists(
+          Passenger.create({
+            userId: input.userId,
+            fullName: passenger.fullName,
+            nationalId: passenger.nationalId,
+          }),
+        );
+
+        permitPassengers.push({
+          id: reusablePassenger.id,
+          fullName: passenger.fullName,
+          nationalId: passenger.nationalId,
+          isLeader: passenger.isLeader,
+        });
+      }
+
+      const permitVehicles = [];
+
+      for (const vehicle of vehicles) {
+        const reusableVehicle = await vehicleRepository.createIfNotExists(
+          Vehicle.create({
+            userId: input.userId,
+            kind: vehicle.kind,
+            color: vehicle.color,
+            plateId: vehicle.plateId,
+          }),
+        );
+
+        permitVehicles.push({
+          id: reusableVehicle.id,
+          kind: vehicle.kind,
+          color: vehicle.color,
+          plateId: vehicle.plateId,
+        });
+      }
+
       const permit = Permit.create({
         userId: input.userId,
         locationId: location.id,
@@ -166,9 +202,10 @@ export class CreatePermitUseCase {
         totalAmount,
         currency: PaymentCurrency.IRT,
         qrToken: randomBytes(32).toString("hex"),
+        passengers: permitPassengers,
+        vehicles: permitVehicles,
       });
 
-      // A zero-fee permit does not need a wallet balance or ledger entry.
       if (!isZeroDecimal(totalAmount)) {
         const balance =
           await userBalanceRepository.findByUserIdAndCurrencyForUpdate(
@@ -208,27 +245,6 @@ export class CreatePermitUseCase {
 
       await permitRepository.create(permit);
 
-      const createdPassengers = passengers.map((passenger) =>
-        Passenger.create({
-          permitId: permit.id,
-          fullName: passenger.fullName,
-          nationalId: passenger.nationalId,
-          isLeader: passenger.isLeader,
-        }),
-      );
-
-      const createdVehicles = vehicles.map((vehicle) =>
-        Vehicle.create({
-          permitId: permit.id,
-          kind: vehicle.kind,
-          color: vehicle.color,
-          plateId: vehicle.plateId,
-        }),
-      );
-
-      await passengerRepository.createMany(createdPassengers);
-      await vehicleRepository.createMany(createdVehicles);
-
       await auditLogRepository.create(
         AuditLog.create({
           actorUserId: input.userId,
@@ -256,18 +272,8 @@ export class CreatePermitUseCase {
         totalAmount: permit.totalAmount,
         currency: permit.currency,
         qrToken: permit.qrToken,
-        passengers: createdPassengers.map((passenger) => ({
-          id: passenger.id,
-          fullName: passenger.fullName,
-          nationalId: passenger.nationalId,
-          isLeader: passenger.isLeader,
-        })),
-        vehicles: createdVehicles.map((vehicle) => ({
-          id: vehicle.id,
-          kind: vehicle.kind,
-          color: vehicle.color,
-          plateId: vehicle.plateId,
-        })),
+        passengers: permit.passengers,
+        vehicles: permit.vehicles,
         createdAt: permit.createdAt,
       };
     });

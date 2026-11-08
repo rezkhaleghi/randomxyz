@@ -3,6 +3,20 @@ import { randomUUID } from "crypto";
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
 import { PermitStatus } from "@domain/enums/permit-status.enum";
 
+export interface PermitPassenger {
+  id: string | null;
+  fullName: string;
+  nationalId: string;
+  isLeader: boolean;
+}
+
+export interface PermitVehicle {
+  id: string | null;
+  kind: string;
+  color: string;
+  plateId: string;
+}
+
 export interface CreatePermitProps {
   id?: string;
   userId: string;
@@ -12,6 +26,8 @@ export interface CreatePermitProps {
   totalAmount: string;
   currency: PaymentCurrency;
   qrToken: string;
+  passengers?: PermitPassenger[];
+  vehicles?: PermitVehicle[];
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -26,6 +42,8 @@ export interface RestorePermitProps {
   totalAmount: string;
   currency: PaymentCurrency;
   qrToken: string;
+  passengers?: PermitPassenger[];
+  vehicles?: PermitVehicle[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,6 +59,8 @@ export class Permit {
     public totalAmount: string,
     public readonly currency: PaymentCurrency,
     public readonly qrToken: string,
+    public passengers: PermitPassenger[],
+    public vehicles: PermitVehicle[],
     public readonly createdAt: Date,
     public updatedAt: Date,
   ) {}
@@ -58,6 +78,8 @@ export class Permit {
       props.totalAmount,
       props.currency,
       props.qrToken,
+      props.passengers ?? [],
+      props.vehicles ?? [],
       props.createdAt ?? now,
       props.updatedAt ?? now,
     );
@@ -74,9 +96,20 @@ export class Permit {
       props.totalAmount,
       props.currency,
       props.qrToken,
+      props.passengers ?? [],
+      props.vehicles ?? [],
       props.createdAt,
       props.updatedAt,
     );
+  }
+
+  updateParticipants(
+    passengers: PermitPassenger[],
+    vehicles: PermitVehicle[],
+  ): void {
+    this.passengers = passengers;
+    this.vehicles = vehicles;
+    this.updatedAt = new Date();
   }
 
   updateTotalAmount(totalAmount: string): void {

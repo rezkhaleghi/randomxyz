@@ -13,7 +13,6 @@ import {
 
 import { PageQuery, PageResult } from "@shared/pagination/page-query";
 
-import { PassengerOrmEntity } from "../orm-entities/passenger.orm-entity";
 import { PermitOrmEntity } from "../orm-entities/permit.orm-entity";
 
 @Injectable()
@@ -186,12 +185,10 @@ export class PermitRepositoryImpl extends PermitRepository {
   ): Promise<number> {
     const query = this.repository
       .createQueryBuilder("permit")
-      .innerJoin(
-        PassengerOrmEntity,
-        "passenger",
-        "passenger.permitId = permit.id",
+      .select(
+        "COALESCE(SUM(jsonb_array_length(permit.passengers)), 0)",
+        "count",
       )
-      .select("COUNT(passenger.id)", "count")
       .where("permit.locationId = :locationId", { locationId })
       .andWhere(
         `(
@@ -236,6 +233,8 @@ export class PermitRepositoryImpl extends PermitRepository {
       totalAmount: row.totalAmount,
       currency: row.currency,
       qrToken: row.qrToken,
+      passengers: row.passengers ?? [],
+      vehicles: row.vehicles ?? [],
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     });
@@ -253,6 +252,8 @@ export class PermitRepositoryImpl extends PermitRepository {
     row.totalAmount = permit.totalAmount;
     row.currency = permit.currency;
     row.qrToken = permit.qrToken;
+    row.passengers = permit.passengers;
+    row.vehicles = permit.vehicles;
     row.createdAt = permit.createdAt;
     row.updatedAt = permit.updatedAt;
 

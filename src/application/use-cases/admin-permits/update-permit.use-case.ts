@@ -10,8 +10,6 @@ import { UnitOfWork } from "@application/interfaces/unit-of-work.interface";
 
 import { AuditLog } from "@domain/entities/audit-log.entity";
 import { Ledger } from "@domain/entities/ledger.entity";
-import { Passenger } from "@domain/entities/passenger.entity";
-import { Vehicle } from "@domain/entities/vehicle.entity";
 
 import { AuditAction } from "@domain/enums/audit-action.enum";
 import { LedgerType } from "@domain/enums/ledger-type.enum";
@@ -50,7 +48,7 @@ export class AdminUpdatePermitUseCase {
 
     const passengers = input.passengers.map((item) => ({
       ...item,
-      fullName: item.fullName.trim(),
+      fullName: item.fullName.trim().toLowerCase(),
       nationalId: item.nationalId.trim(),
     }));
 
@@ -100,22 +98,21 @@ export class AdminUpdatePermitUseCase {
         throw new ConflictException("Only confirmed permits can be updated.");
       }
 
-      const [previousPassengers, previousVehicles, overrides] =
-        await Promise.all([
-          repositories.passengerRepository.findByPermitId(permit.id),
-          repositories.vehicleRepository.findByPermitId(permit.id),
-          repositories.locationDateOverrideRepository.findByLocation(
-            permit.locationId,
-            permit.startDate,
-            permit.endDate,
-          ),
-        ]);
+      const previousPassengers = permit.passengers;
+      const previousVehicles = permit.vehicles;
 
       if (previousVehicles.length === 0) {
         throw new InternalServerErrorException(
           "The permit has no existing vehicles, so its original vehicle price cannot be determined.",
         );
       }
+
+      const overrides =
+        await repositories.locationDateOverrideRepository.findByLocation(
+          permit.locationId,
+          permit.startDate,
+          permit.endDate,
+        );
 
       const overridesByDate = new Map(
         overrides.map((override) => [override.date, override]),
@@ -220,34 +217,47 @@ export class AdminUpdatePermitUseCase {
         );
       }
 
+      const passengerSnapshots = [];
+
+      for (const item of passengers) {
+        const reusablePassenger =
+          await repositories.passengerRepository.findByUnique(
+            permit.userId,
+            item.fullName,
+            item.nationalId,
+          );
+
+        passengerSnapshots.push({
+          id: reusablePassenger?.id ?? null,
+          fullName: item.fullName,
+          nationalId: item.nationalId,
+          isLeader: item.isLeader,
+        });
+      }
+
+      const vehicleSnapshots = [];
+
+      for (const item of vehicles) {
+        const reusableVehicle =
+          await repositories.vehicleRepository.findByUnique(
+            permit.userId,
+            item.kind,
+            item.color,
+            item.plateId,
+          );
+
+        vehicleSnapshots.push({
+          id: reusableVehicle?.id ?? null,
+          kind: item.kind,
+          color: item.color,
+          plateId: item.plateId,
+        });
+      }
+
       permit.updateTotalAmount(updatedTotalAmount);
+      permit.updateParticipants(passengerSnapshots, vehicleSnapshots);
 
       await repositories.permitRepository.save(permit);
-
-      await repositories.passengerRepository.deleteByPermitId(permit.id);
-      await repositories.vehicleRepository.deleteByPermitId(permit.id);
-
-      const savedPassengers = await repositories.passengerRepository.createMany(
-        passengers.map((item) =>
-          Passenger.create({
-            permitId: permit.id,
-            fullName: item.fullName,
-            nationalId: item.nationalId,
-            isLeader: item.isLeader,
-          }),
-        ),
-      );
-
-      const savedVehicles = await repositories.vehicleRepository.createMany(
-        vehicles.map((item) =>
-          Vehicle.create({
-            permitId: permit.id,
-            kind: item.kind,
-            color: item.color,
-            plateId: item.plateId,
-          }),
-        ),
-      );
 
       await repositories.auditLogRepository.create(
         AuditLog.create({
@@ -258,9 +268,9 @@ export class AdminUpdatePermitUseCase {
             permitId: permit.id,
             reason: input.reason.trim(),
             previousPassengerCount: previousPassengers.length,
-            passengerCount: savedPassengers.length,
+            passengerCount: passengerSnapshots.length,
             previousVehicleCount: previousVehicles.length,
-            vehicleCount: savedVehicles.length,
+            vehicleCount: vehicleSnapshots.length,
             previousTotalAmount: initialPermit.totalAmount,
             totalAmount: updatedTotalAmount,
             adjustmentAmount,
@@ -274,8 +284,8 @@ export class AdminUpdatePermitUseCase {
         status: permit.status,
         totalAmount: permit.totalAmount,
         currency: permit.currency,
-        passengers: savedPassengers,
-        vehicles: savedVehicles,
+        passengers: permit.passengers,
+        vehicles: permit.vehicles,
       };
     });
   }

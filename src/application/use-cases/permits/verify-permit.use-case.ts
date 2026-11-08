@@ -14,11 +14,9 @@ export class VerifyPermitUseCase {
         throw new NotFoundException("Permit not found.");
       }
 
-      const [location, passengers, vehicles] = await Promise.all([
-        repositories.locationRepository.findById(permit.locationId),
-        repositories.passengerRepository.findByPermitId(permit.id),
-        repositories.vehicleRepository.findByPermitId(permit.id),
-      ]);
+      const location = await repositories.locationRepository.findById(
+        permit.locationId,
+      );
 
       return {
         permitId: permit.id,
@@ -34,18 +32,18 @@ export class VerifyPermitUseCase {
             }
           : null,
 
-        passengerCount: passengers.length,
+        passengerCount: permit.passengers.length,
 
-        leaders: passengers
+        leaders: permit.passengers
           .filter((passenger) => passenger.isLeader)
           .map((passenger) => ({
             fullName: passenger.fullName,
             nationalId: passenger.nationalId,
           })),
 
-        vehicleCount: vehicles.length,
+        vehicleCount: permit.vehicles.length,
 
-        vehicles: vehicles.map((vehicle) => ({
+        vehicles: permit.vehicles.map((vehicle) => ({
           kind: vehicle.kind,
           color: vehicle.color,
           plate: vehicle.plateId,

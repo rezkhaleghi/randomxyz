@@ -2,18 +2,16 @@ import { randomUUID } from "crypto";
 
 export interface CreatePassengerProps {
   id?: string;
-  permitId: string;
+  userId: string;
   fullName: string;
   nationalId: string;
-  isLeader: boolean;
 }
 
 export interface RestorePassengerProps {
   id: string;
-  permitId: string;
+  userId: string;
   fullName: string;
   nationalId: string;
-  isLeader: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,12 +19,11 @@ export interface RestorePassengerProps {
 export class Passenger {
   private constructor(
     public readonly id: string,
-    public readonly permitId: string,
-    public readonly fullName: string,
-    public readonly nationalId: string,
-    public readonly isLeader: boolean,
+    public readonly userId: string,
+    public fullName: string,
+    public nationalId: string,
     public readonly createdAt: Date,
-    public readonly updatedAt: Date,
+    public updatedAt: Date,
   ) {}
 
   static create(props: CreatePassengerProps): Passenger {
@@ -34,10 +31,9 @@ export class Passenger {
 
     return new Passenger(
       props.id ?? randomUUID(),
-      props.permitId,
-      props.fullName,
-      props.nationalId,
-      props.isLeader,
+      props.userId,
+      props.fullName.trim().toLowerCase(),
+      props.nationalId.trim(),
       now,
       now,
     );
@@ -46,12 +42,17 @@ export class Passenger {
   static restore(props: RestorePassengerProps): Passenger {
     return new Passenger(
       props.id,
-      props.permitId,
+      props.userId,
       props.fullName,
       props.nationalId,
-      props.isLeader,
       props.createdAt,
       props.updatedAt,
     );
+  }
+
+  update(props: { fullName: string; nationalId: string }): void {
+    this.fullName = props.fullName.trim().toLowerCase();
+    this.nationalId = props.nationalId.trim();
+    this.updatedAt = new Date();
   }
 }

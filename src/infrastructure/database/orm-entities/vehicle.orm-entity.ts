@@ -9,23 +9,24 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
-import { PermitOrmEntity } from "./permit.orm-entity";
+import { UserOrmEntity } from "./user.orm-entity";
 
 @Entity("vehicles")
-@Index(["permitId", "plateId"], { unique: true })
+@Index(["userId", "kind", "color", "plateId"], { unique: true })
+@Index(["userId", "createdAt"])
 export class VehicleOrmEntity {
   @PrimaryColumn("uuid")
   id!: string;
 
   @Column({ type: "uuid" })
-  permitId!: string;
+  userId!: string;
 
-  @ManyToOne(() => PermitOrmEntity, {
+  @ManyToOne(() => UserOrmEntity, {
     nullable: false,
     onDelete: "CASCADE",
   })
-  @JoinColumn({ name: "permitId" })
-  permit!: PermitOrmEntity;
+  @JoinColumn({ name: "userId" })
+  user!: UserOrmEntity;
 
   @Column({ type: "varchar", length: 100 })
   kind!: string;

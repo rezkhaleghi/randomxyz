@@ -25,6 +25,8 @@ import { PagesModule } from "@api/pages/pages.module";
 
 import { LocationSyncScheduler } from "./infrastructure/services/location-sync.scheduler";
 import { PermitExpirationScheduler } from "./infrastructure/services/permit-expiration.scheduler";
+import { VehiclesModule } from "@api/vehicles/vehicles.module";
+import { PassengersModule } from "@api/passengers/passengers.module";
 
 @Module({
   imports: [
@@ -59,6 +61,9 @@ import { PermitExpirationScheduler } from "./infrastructure/services/permit-expi
 
     HealthModule,
     PagesModule,
+
+    PassengersModule,
+    VehiclesModule,
   ],
 
   providers: [

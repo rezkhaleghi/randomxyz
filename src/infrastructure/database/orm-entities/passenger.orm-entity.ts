@@ -9,32 +9,30 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
-import { PermitOrmEntity } from "./permit.orm-entity";
+import { UserOrmEntity } from "./user.orm-entity";
 
 @Entity("passengers")
-@Index(["permitId", "nationalId"], { unique: true })
+@Index(["userId", "fullName", "nationalId"], { unique: true })
+@Index(["userId", "createdAt"])
 export class PassengerOrmEntity {
   @PrimaryColumn("uuid")
   id!: string;
 
   @Column({ type: "uuid" })
-  permitId!: string;
+  userId!: string;
 
-  @ManyToOne(() => PermitOrmEntity, {
+  @ManyToOne(() => UserOrmEntity, {
     nullable: false,
     onDelete: "CASCADE",
   })
-  @JoinColumn({ name: "permitId" })
-  permit!: PermitOrmEntity;
+  @JoinColumn({ name: "userId" })
+  user!: UserOrmEntity;
 
   @Column({ type: "varchar", length: 255 })
   fullName!: string;
 
   @Column({ type: "varchar", length: 32 })
   nationalId!: string;
-
-  @Column({ type: "boolean", default: false })
-  isLeader!: boolean;
 
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;

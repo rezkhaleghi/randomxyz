@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 
 export interface CreateVehicleProps {
   id?: string;
-  permitId: string;
+  userId: string;
   kind: string;
   color: string;
   plateId: string;
@@ -10,7 +10,7 @@ export interface CreateVehicleProps {
 
 export interface RestoreVehicleProps {
   id: string;
-  permitId: string;
+  userId: string;
   kind: string;
   color: string;
   plateId: string;
@@ -21,12 +21,12 @@ export interface RestoreVehicleProps {
 export class Vehicle {
   private constructor(
     public readonly id: string,
-    public readonly permitId: string,
-    public readonly kind: string,
-    public readonly color: string,
-    public readonly plateId: string,
+    public readonly userId: string,
+    public kind: string,
+    public color: string,
+    public plateId: string,
     public readonly createdAt: Date,
-    public readonly updatedAt: Date,
+    public updatedAt: Date,
   ) {}
 
   static create(props: CreateVehicleProps): Vehicle {
@@ -34,10 +34,10 @@ export class Vehicle {
 
     return new Vehicle(
       props.id ?? randomUUID(),
-      props.permitId,
-      props.kind,
-      props.color,
-      props.plateId,
+      props.userId,
+      props.kind.trim(),
+      props.color.trim(),
+      props.plateId.trim(),
       now,
       now,
     );
@@ -46,12 +46,19 @@ export class Vehicle {
   static restore(props: RestoreVehicleProps): Vehicle {
     return new Vehicle(
       props.id,
-      props.permitId,
+      props.userId,
       props.kind,
       props.color,
       props.plateId,
       props.createdAt,
       props.updatedAt,
     );
+  }
+
+  update(props: { kind: string; color: string; plateId: string }): void {
+    this.kind = props.kind.trim();
+    this.color = props.color.trim();
+    this.plateId = props.plateId.trim();
+    this.updatedAt = new Date();
   }
 }

@@ -72,6 +72,22 @@ export class PermitOrmEntity {
   @Column({ type: "varchar", length: 128 })
   qrToken!: string;
 
+  @Column({ type: "jsonb", default: () => "'[]'::jsonb" })
+  passengers!: {
+    id: string | null;
+    fullName: string;
+    nationalId: string;
+    isLeader: boolean;
+  }[];
+
+  @Column({ type: "jsonb", default: () => "'[]'::jsonb" })
+  vehicles!: {
+    id: string | null;
+    kind: string;
+    color: string;
+    plateId: string;
+  }[];
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 

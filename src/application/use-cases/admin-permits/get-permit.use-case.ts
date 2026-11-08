@@ -7,17 +7,12 @@ export class AdminGetPermitUseCase {
   constructor(private readonly unitOfWork: UnitOfWork) {}
 
   async execute(permitId: string) {
-    return this.unitOfWork.execute(async (repositories) => {
-      const permit = await repositories.permitRepository.findById(permitId);
+    return this.unitOfWork.execute(async ({ permitRepository }) => {
+      const permit = await permitRepository.findById(permitId);
 
       if (!permit) {
         throw new NotFoundException("Permit not found.");
       }
-
-      const [passengers, vehicles] = await Promise.all([
-        repositories.passengerRepository.findByPermitId(permit.id),
-        repositories.vehicleRepository.findByPermitId(permit.id),
-      ]);
 
       return {
         id: permit.id,
@@ -29,8 +24,8 @@ export class AdminGetPermitUseCase {
         totalAmount: permit.totalAmount,
         currency: permit.currency,
         qrToken: permit.qrToken,
-        passengers,
-        vehicles,
+        passengers: permit.passengers,
+        vehicles: permit.vehicles,
         createdAt: permit.createdAt,
         updatedAt: permit.updatedAt,
       };

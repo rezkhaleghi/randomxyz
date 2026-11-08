@@ -13,6 +13,8 @@ import { AdminPagesController } from "./admin-pages.controller";
 import { AdminLocationsController } from "./admin-locations.controller";
 import { AdminPermitSettingsController } from "./admin-permit-settings.controller";
 import { AdminPermitsController } from "./admin-permits.controller";
+import { AdminPassengersController } from "./admin-passengers.controller";
+import { AdminVehiclesController } from "./admin-vehicles.controller";
 
 @Module({
   imports: [ApplicationModule],
@@ -27,6 +29,8 @@ import { AdminPermitsController } from "./admin-permits.controller";
     AdminLocationsController,
     AdminPermitSettingsController,
     AdminPermitsController,
+    AdminPassengersController,
+    AdminVehiclesController,
   ],
   providers: [AdminAuthGuard],
 })

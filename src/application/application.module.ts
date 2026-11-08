@@ -68,6 +68,17 @@ import { AdminRevokePermitUseCase } from "./use-cases/admin-permits/revoke-permi
 import { UpdateUserRoleUseCase } from "./use-cases/admin-users/update-user-role.use-case";
 import { ListUserLedgersUseCase } from "./use-cases/users/list-user-ledgers.use-case";
 
+import { ListPassengersUseCase } from "./use-cases/passengers/list-passengers.use-case";
+import { CreatePassengerUseCase } from "./use-cases/passengers/create-passenger.use-case";
+import { UpdatePassengerUseCase } from "./use-cases/passengers/update-passenger.use-case";
+import { DeletePassengerUseCase } from "./use-cases/passengers/delete-passenger.use-case";
+import { ListVehiclesUseCase } from "./use-cases/vehicles/list-vehicles.use-case";
+import { CreateVehicleUseCase } from "./use-cases/vehicles/create-vehicle.use-case";
+import { UpdateVehicleUseCase } from "./use-cases/vehicles/update-vehicle.use-case";
+import { DeleteVehicleUseCase } from "./use-cases/vehicles/delete-vehicle.use-case";
+import { AdminListPassengersUseCase } from "./use-cases/admin-passengers/list-passengers.use-case";
+import { AdminListVehiclesUseCase } from "./use-cases/admin-vehicles/list-vehicles.use-case";
+
 @Module({
   imports: [],
 
@@ -137,6 +148,19 @@ import { ListUserLedgersUseCase } from "./use-cases/users/list-user-ledgers.use-
     ListPermitsUseCase,
     GetPermitUseCase,
     EndPermitUseCase,
+
+    ListPassengersUseCase,
+    CreatePassengerUseCase,
+    UpdatePassengerUseCase,
+    DeletePassengerUseCase,
+
+    ListVehiclesUseCase,
+    CreateVehicleUseCase,
+    UpdateVehicleUseCase,
+    DeleteVehicleUseCase,
+
+    AdminListPassengersUseCase,
+    AdminListVehiclesUseCase,
 
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,
@@ -212,6 +236,19 @@ import { ListUserLedgersUseCase } from "./use-cases/users/list-user-ledgers.use-
     ListPermitsUseCase,
     GetPermitUseCase,
     EndPermitUseCase,
+
+    ListPassengersUseCase,
+    CreatePassengerUseCase,
+    UpdatePassengerUseCase,
+    DeletePassengerUseCase,
+
+    ListVehiclesUseCase,
+    CreateVehicleUseCase,
+    UpdateVehicleUseCase,
+    DeleteVehicleUseCase,
+
+    AdminListPassengersUseCase,
+    AdminListVehiclesUseCase,
 
     UpdateUserBalanceUseCase,
     ListLedgersUseCase,
