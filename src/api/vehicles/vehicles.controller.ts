@@ -21,11 +21,9 @@ import { UpdateVehicleUseCase } from "@application/use-cases/vehicles/update-veh
 import { TmarAuthGuard } from "../auth/tmar-auth.guard";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 
-import {
-  CreateVehicleDto,
-  ListVehiclesQueryDto,
-  UpdateVehicleDto,
-} from "../permits/dtos/vehicles.dto";
+import { CreateVehicleDto } from "./dtos/create-vehicle.dto";
+import { ListVehiclesQueryDto } from "./dtos/list-vehicles.query.dto";
+import { UpdateVehicleDto } from "./dtos/update-vehicle.dto";
 
 @ApiTags("vehicles")
 @Controller("vehicles")

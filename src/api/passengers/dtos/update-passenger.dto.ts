@@ -1,19 +1,16 @@
-import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
-import { CreatePassengerDto } from "./create-passenger.dto";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString, MaxLength } from "class-validator";
 
-export class UpdatePassengerDto extends CreatePassengerDto {
-  @ApiPropertyOptional({ example: "Reza Khaleghi" })
-  @IsOptional()
+export class UpdatePassengerDto {
+  @ApiProperty({ example: "Reza Khaleghi" })
   @IsString()
   @IsNotEmpty()
   @MaxLength(255)
-  fullName?: string;
+  fullName!: string;
 
-  @ApiPropertyOptional({ example: "1234567890" })
-  @IsOptional()
+  @ApiProperty({ example: "1234567890" })
   @IsString()
   @IsNotEmpty()
   @MaxLength(32)
-  nationalId?: string;
+  nationalId!: string;
 }

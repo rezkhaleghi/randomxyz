@@ -1,25 +1,22 @@
-import { ApiPropertyOptional } from "@nestjs/swagger";
-import { IsNotEmpty, IsOptional, IsString, MaxLength } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsNotEmpty, IsString, MaxLength } from "class-validator";
 
 export class UpdateVehicleDto {
-  @ApiPropertyOptional({ example: "Land Rover Defender" })
-  @IsOptional()
+  @ApiProperty({ example: "Land Rover Defender" })
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
-  kind?: string;
+  kind!: string;
 
-  @ApiPropertyOptional({ example: "Green" })
-  @IsOptional()
+  @ApiProperty({ example: "Green" })
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
-  color?: string;
+  color!: string;
 
-  @ApiPropertyOptional({ example: "12A345-IR" })
-  @IsOptional()
+  @ApiProperty({ example: "12A345-IR" })
   @IsString()
   @IsNotEmpty()
   @MaxLength(32)
-  plateId?: string;
+  plateId!: string;
 }
