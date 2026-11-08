@@ -25,6 +25,7 @@ describe("ListDepositsUseCase", () => {
         {
           id: "deposit-1",
           userId: "user-1",
+          transactionId: "bank-reference-1",
         } as Deposit,
       ],
       total: 1,
@@ -54,7 +55,15 @@ describe("ListDepositsUseCase", () => {
 
     const response = await useCase.execute(input);
 
-    expect(response).toBe(result);
+    expect(response).toEqual({
+      ...result,
+      data: [
+        {
+          ...result.data[0],
+          bankReferenceId: "bank-reference-1",
+        },
+      ],
+    });
 
     expect(depositRepositoryMock.search).toHaveBeenCalledWith(
       {
@@ -96,7 +105,7 @@ describe("ListDepositsUseCase", () => {
 
     const response = await useCase.execute(input);
 
-    expect(response).toBe(result);
+    expect(response).toEqual(result);
 
     expect(depositRepositoryMock.search).toHaveBeenCalledWith(
       {
