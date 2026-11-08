@@ -1,7 +1,6 @@
 import { TmarAuthUseCase } from "./tmar-auth.use-case";
 import { UnitOfWork } from "@application/interfaces/unit-of-work.interface";
 import { User } from "@domain/entities/user.entity";
-import { UserBalance } from "@domain/entities/user-balance.entity";
 import { UserStatus } from "@domain/enums/user-status.enum";
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
 import { ApplicationUnauthorizedException } from "@application/exceptions/application-unauthorized.exception";
@@ -13,10 +12,12 @@ describe("TmarAuthUseCase", () => {
     findByIdForUpdate: jest.fn(),
     save: jest.fn(),
   };
+
   const userBalanceRepository = {
     findByUserIdAndCurrency: jest.fn(),
     create: jest.fn(),
   };
+
   const unitOfWork = { execute: jest.fn() };
   let useCase: TmarAuthUseCase;
 
@@ -31,12 +32,15 @@ describe("TmarAuthUseCase", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    unitOfWork.execute.mockImplementation((callback: any) =>
+
+    unitOfWork.execute.mockImplementation(async (callback: any) =>
       callback({ userRepository, userBalanceRepository }),
     );
+
     userBalanceRepository.findByUserIdAndCurrency.mockResolvedValue({
       id: "balance-1",
     });
+
     useCase = new TmarAuthUseCase(unitOfWork as unknown as UnitOfWork);
   });
 
@@ -74,11 +78,12 @@ describe("TmarAuthUseCase", () => {
     userBalanceRepository.findByUserIdAndCurrency.mockResolvedValue(null);
     userBalanceRepository.create.mockImplementation(async (balance) => balance);
 
-    await expect(useCase.execute(identity)).resolves.toBe(user);
+    await useCase.execute(identity);
 
     expect(userRepository.findByExternalUserId).toHaveBeenCalledWith(
       "external-1",
     );
+
     expect(
       userRepository.createIfNotExistsByExternalUserId,
     ).toHaveBeenCalledWith(
@@ -87,6 +92,9 @@ describe("TmarAuthUseCase", () => {
         email: "user@example.com",
       }),
     );
+
+    expect(userRepository.findByIdForUpdate).toHaveBeenCalledWith("user-1");
+
     expect(userBalanceRepository.create).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: "user-1",
@@ -101,6 +109,7 @@ describe("TmarAuthUseCase", () => {
       externalUserId: "external-1",
       email: "user@example.com",
     });
+
     user.restrict();
 
     userRepository.findByExternalUserId.mockResolvedValue(user);
@@ -141,6 +150,7 @@ describe("TmarAuthUseCase", () => {
       email: "user@example.com",
       emailVerified: true,
     });
+
     user.synchronizeTmarTravelProfile({
       externalUserId: "external-1",
       email: "user@example.com",

@@ -54,6 +54,7 @@ describe("AdminUpdatePermitUseCase", () => {
     vehicleRepository: { findByUnique: jest.fn() },
     auditLogRepository: { create: jest.fn() },
   };
+
   const unitOfWork = { execute: jest.fn() };
   let useCase: AdminUpdatePermitUseCase;
 
@@ -79,6 +80,7 @@ describe("AdminUpdatePermitUseCase", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
     permit.status = PermitStatus.CONFIRMED;
     permit.totalAmount = "100";
     permit.vehicles = [
@@ -89,15 +91,19 @@ describe("AdminUpdatePermitUseCase", () => {
     unitOfWork.execute.mockImplementation((callback: any) =>
       callback(repositories),
     );
+
     repositories.permitRepository.findById.mockResolvedValue(permit);
     repositories.permitRepository.findByIdForUpdate.mockResolvedValue(permit);
+
     repositories.locationRepository.findByIdForUpdate.mockResolvedValue({
       id: "location-1",
       capacity: 10,
     });
+
     repositories.locationDateOverrideRepository.findByLocation.mockResolvedValue(
       [],
     );
+
     repositories.permitRepository.countReservedPassengers.mockResolvedValue(0);
     repositories.passengerRepository.findByUnique.mockResolvedValue(null);
     repositories.vehicleRepository.findByUnique.mockResolvedValue(null);
@@ -155,6 +161,7 @@ describe("AdminUpdatePermitUseCase", () => {
     repositories.passengerRepository.findByUnique.mockResolvedValue({
       id: "passenger-1",
     });
+
     repositories.vehicleRepository.findByUnique.mockResolvedValue({
       id: "vehicle-2",
     });
@@ -166,10 +173,11 @@ describe("AdminUpdatePermitUseCase", () => {
       "reza khaleghi",
       "1234567890",
     );
+
     expect(repositories.vehicleRepository.findByUnique).toHaveBeenCalledWith(
       "user-1",
       "Land Rover Defender",
-      "12A345-IR",
+      "Green",
       "12A345-IR",
     );
 
@@ -191,6 +199,7 @@ describe("AdminUpdatePermitUseCase", () => {
         },
       ],
     );
+
     expect(repositories.permitRepository.save).toHaveBeenCalledWith(permit);
     expect(repositories.auditLogRepository.create).toHaveBeenCalledTimes(1);
     expect(result.passengers[0].id).toBe("passenger-1");

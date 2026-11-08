@@ -99,10 +99,11 @@ describe("VerifyDepositUseCase", () => {
       markCompleted: jest.fn(function (
         this: Deposit,
         transactionId?: string,
-        providerResponse?: unknown,
+        providerResponse?: Record<string, unknown>,
       ) {
         this.status = DepositStatus.COMPLETED;
         this.transactionId = transactionId ?? null;
+        this.providerResponse = providerResponse ?? null;
       }),
       ...overrides,
     } as unknown as Deposit;
@@ -127,7 +128,6 @@ describe("VerifyDepositUseCase", () => {
     });
 
     expect(result).toBe(deposit);
-
     expect(paymentProviderResolverMock.resolve).not.toHaveBeenCalled();
     expect(paymentProviderMock.verifyPayment).not.toHaveBeenCalled();
   });
@@ -166,7 +166,6 @@ describe("VerifyDepositUseCase", () => {
 
   it("should verify payment and complete the deposit", async () => {
     const deposit = createPendingDeposit();
-
     const providerResponse = { status: "verified" };
 
     const balance = UserBalance.create({
@@ -222,7 +221,6 @@ describe("VerifyDepositUseCase", () => {
     ).toHaveBeenCalledWith("user-1", currency);
 
     expect(userBalanceRepositoryMock.save).toHaveBeenCalledWith(balance);
-
     expect(balance.amount).toBe("150");
 
     expect(ledgerRepositoryMock.create).toHaveBeenCalledTimes(1);
