@@ -22,6 +22,7 @@ interface ParsianSalePaymentResult {
 
 interface ParsianConfirmPaymentResult {
   Status?: string | number;
+  RRN?: string | number;
   [key: string]: unknown;
 }
 
@@ -159,40 +160,16 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
       }
 
       return {
-        transactionId: this.extractTransactionId(result),
+        transactionId:
+          result.RRN !== undefined && result.RRN !== null
+            ? String(result.RRN).trim() || undefined
+            : undefined,
         providerResponse: this.toProviderResponse(safeResponse),
       };
     } catch (error) {
       this.logProviderError("ConfirmPayment", error);
       throw new Error("Unable to confirm Parsian payment.");
     }
-  }
-
-  private extractTransactionId(
-    result: ParsianConfirmPaymentResult,
-  ): string | undefined {
-    const possibleFields = [
-      "RRN",
-      "Rrn",
-      "rrn",
-      "TransactionId",
-      "TransactionID",
-      "transactionId",
-      "ReferenceNumber",
-    ];
-
-    for (const field of possibleFields) {
-      const value = result[field];
-
-      if (
-        (typeof value === "string" || typeof value === "number") &&
-        String(value).trim() !== ""
-      ) {
-        return String(value).trim();
-      }
-    }
-
-    return undefined;
   }
 
   private sanitizeProviderValue(value: unknown, key = ""): unknown {
