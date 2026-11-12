@@ -40,9 +40,6 @@ describe("AdminUpdateWithdrawalStatusUseCase", () => {
     create: jest.fn(),
   };
 
-  // Keep the mock separate from the use-case type.
-  // This preserves Jest's mock methods while satisfying the constructor's
-  // dependency type.
   const sendNotificationUseCaseMock = {
     execute: jest.fn(),
   };
@@ -123,7 +120,6 @@ describe("AdminUpdateWithdrawalStatusUseCase", () => {
     });
 
     expect(result.getStatus()).toBe(WithdrawalStatus.APPROVED);
-
     expect(withdrawalRepository.save).toHaveBeenCalledWith(withdrawal);
 
     expect(auditLogRepository.create).toHaveBeenCalledWith(
@@ -186,7 +182,6 @@ describe("AdminUpdateWithdrawalStatusUseCase", () => {
 
     expect(result.getStatus()).toBe(WithdrawalStatus.REJECTED);
     expect(result.rejectionReason).toBe("Invalid destination");
-
     expect(balance.amount).toBe("150");
 
     expect(userBalanceRepository.save).toHaveBeenCalledWith(balance);
@@ -199,7 +194,7 @@ describe("AdminUpdateWithdrawalStatusUseCase", () => {
         balanceBefore: "50",
         balanceAfter: "150",
         type: LedgerType.REFUND,
-        referenceId: withdrawal.referenceId,
+        referenceId: withdrawal.id,
       }),
     );
 
@@ -384,7 +379,7 @@ describe("AdminUpdateWithdrawalStatusUseCase", () => {
         balanceBefore: "49.75",
         balanceAfter: "150",
         type: LedgerType.REFUND,
-        referenceId: withdrawal.referenceId,
+        referenceId: withdrawal.id,
       }),
     );
   });

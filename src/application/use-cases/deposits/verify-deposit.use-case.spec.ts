@@ -7,6 +7,7 @@ import { AuditLog } from "@domain/entities/audit-log.entity";
 
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
 import { DepositStatus } from "@domain/enums/deposit-status.enum";
+import { PaymentProvider } from "@domain/enums/payment-provider.enum";
 import { LedgerType } from "@domain/enums/ledger-type.enum";
 import { AuditAction } from "@domain/enums/audit-action.enum";
 
@@ -87,38 +88,25 @@ describe("VerifyDepositUseCase", () => {
   }
 
   function createPendingDeposit(overrides: Partial<Deposit> = {}): Deposit {
-    return {
+    const deposit = Deposit.create({
       id: "deposit-1",
       userId: "user-1",
-      status: DepositStatus.PENDING,
-      providerPaymentId: "payment-1",
-      referenceId: "reference-1",
-      amount: "100",
       currency,
-      provider: undefined,
-      markCompleted: jest.fn(function (
-        this: Deposit,
-        transactionId?: string,
-        providerResponse?: Record<string, unknown>,
-      ) {
-        this.status = DepositStatus.COMPLETED;
-        this.transactionId = transactionId ?? null;
-        this.providerResponse = providerResponse ?? null;
-      }),
-      ...overrides,
-    } as unknown as Deposit;
+      amount: "100",
+      provider: PaymentProvider.FAKE_PROVIDER,
+      merchantOrderId: "merchant-order-1",
+      providerPaymentId: "payment-1",
+    });
+
+    Object.assign(deposit, overrides);
+
+    return deposit;
   }
 
-  it("should return already completed deposit without verifying it again", async () => {
-    const deposit = {
-      id: "deposit-1",
-      userId: "user-1",
-      status: DepositStatus.COMPLETED,
-      providerPaymentId: "payment-1",
-      referenceId: "reference-1",
-      amount: "100",
-      currency,
-    } as Deposit;
+  it("should return an already completed deposit without verifying it again", async () => {
+    const deposit = createPendingDeposit();
+
+    deposit.markCompleted("transaction-1");
 
     setupFirstTransaction(deposit);
 
@@ -166,6 +154,7 @@ describe("VerifyDepositUseCase", () => {
 
   it("should verify payment and complete the deposit", async () => {
     const deposit = createPendingDeposit();
+    const markCompletedSpy = jest.spyOn(deposit, "markCompleted");
     const providerResponse = { status: "verified" };
 
     const balance = UserBalance.create({
@@ -210,9 +199,12 @@ describe("VerifyDepositUseCase", () => {
 
     expect(result).toBe(deposit);
 
-    expect(paymentProviderResolverMock.resolve).toHaveBeenCalledTimes(1);
+    expect(paymentProviderResolverMock.resolve).toHaveBeenCalledWith(
+      PaymentProvider.FAKE_PROVIDER,
+    );
 
     expect(paymentProviderMock.verifyPayment).toHaveBeenCalledWith({
+      merchantOrderId: deposit.merchantOrderId,
       providerPaymentId: "payment-1",
     });
 
@@ -233,12 +225,15 @@ describe("VerifyDepositUseCase", () => {
     expect(ledger.balanceBefore).toBe("50");
     expect(ledger.balanceAfter).toBe("150");
     expect(ledger.type).toBe(LedgerType.DEPOSIT);
-    expect(ledger.referenceId).toBe("reference-1");
+    expect(ledger.referenceId).toBe(deposit.id);
 
-    expect(deposit.markCompleted).toHaveBeenCalledWith(
+    expect(markCompletedSpy).toHaveBeenCalledWith(
       "transaction-1",
       providerResponse,
     );
+
+    expect(deposit.status).toBe(DepositStatus.COMPLETED);
+    expect(deposit.transactionId).toBe("transaction-1");
 
     expect(depositRepositoryMock.save).toHaveBeenCalledWith(deposit);
 

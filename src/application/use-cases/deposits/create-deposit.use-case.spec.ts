@@ -88,11 +88,11 @@ describe("CreateDepositUseCase", () => {
       amount: createdDeposit.amount,
       provider: createdDeposit.provider,
       status: createdDeposit.status,
-      referenceId: createdDeposit.referenceId,
-      providerOrderId: createdDeposit.providerOrderId,
+      merchantOrderId: createdDeposit.merchantOrderId,
       providerPaymentId: "payment-123",
       paymentUrl: "https://payment.test",
       transactionId: null,
+      providerResponse: null,
       createdAt: createdDeposit.createdAt,
       updatedAt: new Date(),
       completedAt: null,
@@ -130,7 +130,6 @@ describe("CreateDepositUseCase", () => {
     );
 
     expect(userRepositoryMock.findById).toHaveBeenCalledWith("user-1");
-
     expect(depositRepositoryMock.create).toHaveBeenCalledTimes(1);
 
     const depositArgument = depositRepositoryMock.create.mock.calls[0][0];
@@ -140,13 +139,12 @@ describe("CreateDepositUseCase", () => {
     expect(depositArgument.amount).toBe("100");
     expect(depositArgument.provider).toBe(PaymentProvider.FAKE_PROVIDER);
     expect(depositArgument.status).toBe(DepositStatus.PENDING);
-    expect(depositArgument.referenceId).toBeDefined();
+    expect(depositArgument.merchantOrderId).toBeDefined();
 
     expect(paymentProviderMock.createPayment).toHaveBeenCalledWith({
       amount: "100",
       currency,
-      referenceId: createdDeposit.referenceId,
-      providerOrderId: createdDeposit.providerOrderId,
+      merchantOrderId: createdDeposit.merchantOrderId,
       callbackUrl: "https://backend.test/deposits/parsian/callback",
     });
 
@@ -157,7 +155,7 @@ describe("CreateDepositUseCase", () => {
     expect(depositRepositoryMock.save).toHaveBeenCalledWith(createdDeposit);
   });
 
-  it("creates a separate deposit for every new request", async () => {
+  it("creates a separate deposit and merchant order ID for every new request", async () => {
     const firstDeposit = Deposit.create({
       userId: "user-1",
       currency,
@@ -173,7 +171,9 @@ describe("CreateDepositUseCase", () => {
     });
 
     expect(firstDeposit.id).not.toBe(secondDeposit.id);
-    expect(firstDeposit.referenceId).not.toBe(secondDeposit.referenceId);
+    expect(firstDeposit.merchantOrderId).not.toBe(
+      secondDeposit.merchantOrderId,
+    );
   });
 
   it("throws when the currency is not supported", async () => {

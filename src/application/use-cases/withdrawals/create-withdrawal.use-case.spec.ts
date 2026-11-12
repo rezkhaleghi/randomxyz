@@ -129,6 +129,7 @@ describe("CreateWithdrawalUseCase", () => {
       expect.objectContaining({
         amount: "-50",
         type: LedgerType.WITHDRAWAL,
+        referenceId: result.id,
       }),
     );
   });
@@ -161,7 +162,6 @@ describe("CreateWithdrawalUseCase", () => {
 
     expect(audit.metadata).toEqual({
       withdrawalId: result.id,
-      referenceId: result.referenceId,
       amount: "50",
       currency: PaymentCurrency.USD,
     });

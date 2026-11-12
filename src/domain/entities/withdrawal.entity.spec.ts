@@ -15,11 +15,10 @@ describe("Withdrawal", () => {
       destination: "destination-1",
     });
 
-  it("creates a pending withdrawal with generated identifiers", () => {
+  it("creates a pending withdrawal with a generated ID", () => {
     const withdrawal = createWithdrawal();
 
     expect(withdrawal.id).toBeDefined();
-    expect(withdrawal.referenceId).toBeDefined();
     expect(withdrawal.userId).toBe("user-1");
     expect(withdrawal.currency).toBe(PaymentCurrency.USD);
     expect(withdrawal.amount).toBe("100");
@@ -98,7 +97,7 @@ describe("Withdrawal", () => {
     );
   });
 
-  it("completes an approved withdrawal with a transaction id", () => {
+  it("completes an approved withdrawal with a transaction ID", () => {
     const withdrawal = createWithdrawal();
 
     withdrawal.approve();
@@ -109,7 +108,7 @@ describe("Withdrawal", () => {
     expect(withdrawal.completedAt).toBeInstanceOf(Date);
   });
 
-  it("retains an existing transaction id when completing without a new one", () => {
+  it("retains an existing transaction ID when completing without a new one", () => {
     const withdrawal = Withdrawal.restore({
       id: "withdrawal-1",
       userId: "user-1",
@@ -117,7 +116,6 @@ describe("Withdrawal", () => {
       amount: "100",
       status: WithdrawalStatus.APPROVED,
       destination: "destination-1",
-      referenceId: "reference-1",
       transactionId: "tx-existing",
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -173,7 +171,6 @@ describe("Withdrawal", () => {
       amount: "100",
       status: WithdrawalStatus.COMPLETED,
       destination: "destination-1",
-      referenceId: "reference-1",
       transactionId: "tx-123",
       createdAt,
       updatedAt,

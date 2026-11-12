@@ -54,9 +54,9 @@ describe("ListWithdrawalsUseCase", () => {
     expect(withdrawalRepository.search).toHaveBeenCalledWith(
       {
         userId: "user-1",
+        id: undefined,
         currency: undefined,
         status: undefined,
-        referenceId: undefined,
         from: undefined,
         to: undefined,
       },
@@ -87,7 +87,7 @@ describe("ListWithdrawalsUseCase", () => {
       userId: "user-1",
       currency: PaymentCurrency.USD,
       status: "PENDING",
-      referenceId: "reference-1",
+      id: "withdrawal-1",
       from,
       to,
       page: 2,
@@ -101,7 +101,7 @@ describe("ListWithdrawalsUseCase", () => {
         userId: "user-1",
         currency: PaymentCurrency.USD,
         status: "PENDING",
-        referenceId: "reference-1",
+        id: "withdrawal-1",
         from,
         to,
       },

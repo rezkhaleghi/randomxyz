@@ -21,7 +21,7 @@ describe("Deposit", () => {
     const deposit = createDeposit();
 
     expect(deposit.id).toBeDefined();
-    expect(deposit.referenceId).toBeDefined();
+    expect(deposit.merchantOrderId).toBeDefined();
     expect(deposit.userId).toBe("user-1");
     expect(deposit.currency).toBe(PaymentCurrency.USD);
     expect(deposit.amount).toBe("100");
