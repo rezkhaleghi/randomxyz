@@ -167,6 +167,7 @@ export class DepositRepositoryImpl extends DepositRepository {
       providerPaymentId: row.providerPaymentId,
       paymentUrl: row.paymentUrl,
       transactionId: row.transactionId,
+      providerResponse: row.providerResponse,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       completedAt: row.completedAt,
@@ -187,6 +188,7 @@ export class DepositRepositoryImpl extends DepositRepository {
     row.providerPaymentId = deposit.providerPaymentId;
     row.paymentUrl = deposit.paymentUrl;
     row.transactionId = deposit.transactionId;
+    row.providerResponse = deposit.providerResponse;
     row.createdAt = deposit.createdAt;
     row.updatedAt = deposit.updatedAt;
     row.completedAt = deposit.completedAt;
