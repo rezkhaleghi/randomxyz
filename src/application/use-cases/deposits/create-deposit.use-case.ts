@@ -36,7 +36,7 @@ export class CreateDepositUseCase {
   ) {}
 
   async execute(input: CreateDepositInput): Promise<Deposit> {
-    // Restrict FAKE PROVIDER on the prodcution
+    // Restrict FAKE PROVIDER in production.
     if (
       process.env.NODE_ENV === "production" &&
       input.provider === PaymentProvider.FAKE_PROVIDER
@@ -81,8 +81,7 @@ export class CreateDepositUseCase {
     const payment = await paymentProvider.createPayment({
       amount: deposit.amount,
       currency: deposit.currency,
-      referenceId: deposit.referenceId,
-      providerOrderId: deposit.providerOrderId,
+      merchantOrderId: deposit.merchantOrderId,
       callbackUrl: input.callbackUrl,
     });
 

@@ -5,9 +5,9 @@ export type WithdrawalSortBy = "createdAt" | "amount";
 
 export interface WithdrawalSearchFilters {
   userId?: string;
+  id?: string;
   currency?: string;
   status?: string;
-  referenceId?: string;
   from?: Date;
   to?: Date;
 }

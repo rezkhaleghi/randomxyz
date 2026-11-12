@@ -37,7 +37,7 @@ export class FakePaymentProvider implements PaymentProviderInterface {
       "/checkout",
     );
     checkoutUrl.search = "";
-    checkoutUrl.searchParams.set("referenceId", input.referenceId);
+    checkoutUrl.searchParams.set("merchantOrderId", input.merchantOrderId);
     checkoutUrl.searchParams.set("providerPaymentId", providerPaymentId);
 
     return {

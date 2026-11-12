@@ -12,8 +12,6 @@ import {
 
 import { ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
-import type { Request } from "express";
-
 import { AdminAuthGuard } from "./admin-auth.guard";
 
 import { AdminGetWithdrawalUseCase } from "@application/use-cases/admin-financials/get-withdrawal.use-case";
@@ -22,6 +20,7 @@ import { AdminUpdateWithdrawalStatusUseCase } from "@application/use-cases/admin
 import { ListWithdrawalsQueryDto } from "./dtos/withdrawals/list-withdrawals.query.dto";
 import { UpdateWithdrawalStausDto } from "./dtos/withdrawals/update-withdrawal-status.dto";
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
+
 @ApiTags("admin-withdrawals")
 @Controller("admin/withdrawals")
 @UseGuards(AdminAuthGuard)
@@ -42,7 +41,7 @@ export class AdminWithdrawalsController {
       userId: query.userId,
       currency: query.currency,
       status: query.status,
-      referenceId: query.referenceId,
+      id: query.id,
       from: query.from ? new Date(query.from) : undefined,
       to: query.to ? new Date(query.to) : undefined,
       sortBy: query.sortBy,

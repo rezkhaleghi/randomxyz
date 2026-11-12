@@ -6,9 +6,9 @@ import { PageQuery, PageResult } from "@shared/pagination/page-query";
 
 export interface ListDepositsInput extends PageQuery<"createdAt" | "amount"> {
   userId?: string;
+  id?: string;
   currency?: string;
   status?: string;
-  referenceId?: string;
   providerPaymentId?: string;
   transactionId?: string;
   from?: Date;
@@ -23,9 +23,9 @@ export class AdminListDepositsUseCase {
     return this.depositRepository.search(
       {
         userId: input.userId,
+        id: input.id,
         currency: input.currency,
         status: input.status,
-        referenceId: input.referenceId,
         providerPaymentId: input.providerPaymentId,
         transactionId: input.transactionId,
         from: input.from,

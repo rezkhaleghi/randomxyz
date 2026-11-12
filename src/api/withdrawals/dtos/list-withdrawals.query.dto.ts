@@ -23,12 +23,12 @@ export class ListWithdrawalsQueryDto extends SortablePaginationQueryDto {
   currency?: PaymentCurrency;
 
   @ApiPropertyOptional({
-    description: "Filter by reference ID.",
+    description: "Filter by withdrawal ID.",
     format: "uuid",
   })
   @IsOptional()
   @IsUUID()
-  referenceId?: string;
+  id?: string;
 
   @ApiPropertyOptional({
     description: "Return withdrawals created from this date.",

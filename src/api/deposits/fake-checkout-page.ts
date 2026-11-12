@@ -1,7 +1,7 @@
 export class FakeCheckoutPage {
   static render(
     callbackUrl: string,
-    referenceId: string,
+    merchantOrderId: string,
     providerPaymentId: string,
   ): string {
     const escapeHtml = (value: string): string =>
@@ -18,7 +18,7 @@ export class FakeCheckoutPage {
       });
 
     const safeCallbackUrl = escapeHtml(callbackUrl);
-    const safeReferenceId = escapeHtml(referenceId);
+    const safeMerchantOrderId = escapeHtml(merchantOrderId);
     const safePaymentId = escapeHtml(providerPaymentId);
 
     return `
@@ -580,8 +580,8 @@ export class FakeCheckoutPage {
               <form method="POST" action="${safeCallbackUrl}">
                 <input
                   type="hidden"
-                  name="referenceId"
-                  value="${safeReferenceId}"
+                  name="merchantOrderId"
+                  value="${safeMerchantOrderId}"
                 />
                 <input
                   type="hidden"

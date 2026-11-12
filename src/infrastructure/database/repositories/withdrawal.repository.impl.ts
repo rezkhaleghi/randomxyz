@@ -75,6 +75,12 @@ export class WithdrawalRepositoryImpl extends WithdrawalRepository {
       });
     }
 
+    if (filters.id) {
+      qb.andWhere("withdrawal.id = :id", {
+        id: filters.id,
+      });
+    }
+
     if (filters.currency) {
       qb.andWhere("withdrawal.currency = :currency", {
         currency: filters.currency,
@@ -84,12 +90,6 @@ export class WithdrawalRepositoryImpl extends WithdrawalRepository {
     if (filters.status) {
       qb.andWhere("withdrawal.status = :status", {
         status: filters.status,
-      });
-    }
-
-    if (filters.referenceId) {
-      qb.andWhere("withdrawal.referenceId = :referenceId", {
-        referenceId: filters.referenceId,
       });
     }
 
@@ -139,7 +139,6 @@ export class WithdrawalRepositoryImpl extends WithdrawalRepository {
       amount: row.amount,
       status: row.status,
       destination: row.destination,
-      referenceId: row.referenceId,
       transactionId: row.transactionId,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -157,7 +156,6 @@ export class WithdrawalRepositoryImpl extends WithdrawalRepository {
     row.amount = withdrawal.amount;
     row.status = withdrawal.getStatus();
     row.destination = withdrawal.destination;
-    row.referenceId = withdrawal.referenceId;
     row.transactionId = withdrawal.transactionId;
     row.rejectionReason = withdrawal.rejectionReason;
     row.createdAt = withdrawal.createdAt;

@@ -71,6 +71,7 @@ export class VerifyDepositUseCase {
     );
 
     const verification = await paymentProvider.verifyPayment({
+      merchantOrderId: deposit.merchantOrderId,
       providerPaymentId: deposit.providerPaymentId,
     });
 
@@ -127,9 +128,8 @@ export class VerifyDepositUseCase {
             balanceBefore,
             balanceAfter: savedBalance.amount,
             type: LedgerType.DEPOSIT,
-            referenceId: currentDeposit.referenceId,
+            referenceId: currentDeposit.id,
             metadata: {
-              depositId: currentDeposit.id,
               providerPaymentId: currentDeposit.providerPaymentId,
               transactionId: verification.transactionId,
             },
@@ -150,7 +150,6 @@ export class VerifyDepositUseCase {
             action: AuditAction.DEPOSIT_COMPLETED,
             metadata: {
               depositId: currentDeposit.id,
-              referenceId: currentDeposit.referenceId,
               amount: currentDeposit.amount,
               currency: currentDeposit.currency,
             },

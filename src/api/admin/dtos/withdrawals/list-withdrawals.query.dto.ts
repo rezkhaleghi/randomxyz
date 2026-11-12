@@ -1,11 +1,5 @@
-import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
-import {
-  IsDateString,
-  IsEnum,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from "class-validator";
+import { ApiPropertyOptional } from "@nestjs/swagger";
+import { IsDateString, IsEnum, IsOptional, IsUUID } from "class-validator";
 
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
 import { WithdrawalStatus } from "@domain/enums/withdrawal-status.enum";
@@ -27,15 +21,14 @@ export class ListWithdrawalsQueryDto extends SortablePaginationQueryDto {
   @IsEnum(WithdrawalStatus)
   status?: WithdrawalStatus;
 
-  @ApiPropertyOptional({ format: "uuid" })
+  @ApiPropertyOptional({
+    description: "Filter by withdrawal ID.",
+    format: "uuid",
+  })
   @IsOptional()
   @IsUUID()
-  referenceId?: string;
+  id?: string;
 
-  @ApiPropertyOptional({
-    description: "Provider withdrawal identifier.",
-    example: "withdrawal_123456789",
-  })
   @ApiPropertyOptional({ example: "2026-09-01T00:00:00.000Z" })
   @IsOptional()
   @IsDateString()

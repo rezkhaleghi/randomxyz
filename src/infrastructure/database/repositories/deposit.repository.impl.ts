@@ -64,19 +64,11 @@ export class DepositRepositoryImpl extends DepositRepository {
     return row ? this.toDomain(row) : null;
   }
 
-  async findByReferenceId(referenceId: string): Promise<Deposit | null> {
-    const row = await this.repository.findOne({
-      where: { referenceId },
-    });
-
-    return row ? this.toDomain(row) : null;
-  }
-
-  async findByProviderOrderId(
-    providerOrderId: string,
+  async findByMerchantOrderId(
+    merchantOrderId: string,
   ): Promise<Deposit | null> {
     const row = await this.repository.findOne({
-      where: { providerOrderId },
+      where: { merchantOrderId },
     });
 
     return row ? this.toDomain(row) : null;
@@ -94,6 +86,12 @@ export class DepositRepositoryImpl extends DepositRepository {
       });
     }
 
+    if (filters.id) {
+      qb.andWhere("deposit.id = :id", {
+        id: filters.id,
+      });
+    }
+
     if (filters.currency) {
       qb.andWhere("deposit.currency = :currency", {
         currency: filters.currency,
@@ -103,12 +101,6 @@ export class DepositRepositoryImpl extends DepositRepository {
     if (filters.status) {
       qb.andWhere("deposit.status = :status", {
         status: filters.status,
-      });
-    }
-
-    if (filters.referenceId) {
-      qb.andWhere("deposit.referenceId = :referenceId", {
-        referenceId: filters.referenceId,
       });
     }
 
@@ -162,8 +154,7 @@ export class DepositRepositoryImpl extends DepositRepository {
       amount: row.amount,
       provider: row.provider,
       status: row.status,
-      referenceId: row.referenceId,
-      providerOrderId: row.providerOrderId,
+      merchantOrderId: row.merchantOrderId,
       providerPaymentId: row.providerPaymentId,
       paymentUrl: row.paymentUrl,
       transactionId: row.transactionId,
@@ -183,8 +174,7 @@ export class DepositRepositoryImpl extends DepositRepository {
     row.amount = deposit.amount;
     row.provider = deposit.provider;
     row.status = deposit.status;
-    row.referenceId = deposit.referenceId;
-    row.providerOrderId = deposit.providerOrderId;
+    row.merchantOrderId = deposit.merchantOrderId;
     row.providerPaymentId = deposit.providerPaymentId;
     row.paymentUrl = deposit.paymentUrl;
     row.transactionId = deposit.transactionId;

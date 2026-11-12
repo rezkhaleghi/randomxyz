@@ -50,14 +50,14 @@ export class CallbackController {
 
   @Get(`${PaymentProvider.FAKE_PROVIDER}/checkout`)
   fakeCheckout(
-    @Query("referenceId") referenceId: string,
+    @Query("merchantOrderId") merchantOrderId: string,
     @Query("providerPaymentId") providerPaymentId: string,
     @Res() response: Response,
   ): void {
     this.ensureFakeProviderEnabled();
 
     if (
-      !referenceId ||
+      !merchantOrderId ||
       !providerPaymentId ||
       !/^fake-payment-[0-9a-f-]+$/i.test(providerPaymentId)
     ) {
@@ -77,7 +77,11 @@ export class CallbackController {
     response
       .type("html")
       .send(
-        FakeCheckoutPage.render(callbackUrl, referenceId, providerPaymentId),
+        FakeCheckoutPage.render(
+          callbackUrl,
+          merchantOrderId,
+          providerPaymentId,
+        ),
       );
   }
 

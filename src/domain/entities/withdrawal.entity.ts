@@ -14,7 +14,6 @@ export interface CreateWithdrawalProps {
   currency: PaymentCurrency;
   amount: string;
   destination: string;
-  referenceId?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -26,7 +25,6 @@ export interface RestoreWithdrawalProps {
   amount: string;
   status: WithdrawalStatus;
   destination: string;
-  referenceId: string;
   transactionId: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -42,7 +40,6 @@ export class Withdrawal {
     public readonly amount: string,
     private status: WithdrawalStatus,
     public readonly destination: string,
-    public readonly referenceId: string,
     public transactionId: string | null,
     public readonly createdAt: Date,
     public updatedAt: Date,
@@ -74,7 +71,6 @@ export class Withdrawal {
       props.amount,
       WithdrawalStatus.PENDING,
       props.destination,
-      props.referenceId ?? randomUUID(),
       null,
       props.createdAt ?? now,
       props.updatedAt ?? now,
@@ -97,7 +93,6 @@ export class Withdrawal {
       props.amount,
       props.status,
       props.destination,
-      props.referenceId,
       props.transactionId,
       props.createdAt,
       props.updatedAt,

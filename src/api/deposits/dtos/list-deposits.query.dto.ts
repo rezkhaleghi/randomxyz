@@ -29,12 +29,12 @@ export class ListDepositsQueryDto extends SortablePaginationQueryDto {
   currency?: PaymentCurrency;
 
   @ApiPropertyOptional({
-    description: "Filter by reference ID.",
+    description: "Filter by deposit ID.",
     format: "uuid",
   })
   @IsOptional()
   @IsUUID()
-  referenceId?: string;
+  id?: string;
 
   @ApiPropertyOptional({
     description: "Filter by provider payment ID.",

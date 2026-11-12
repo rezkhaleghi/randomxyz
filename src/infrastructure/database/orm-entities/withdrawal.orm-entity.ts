@@ -16,7 +16,6 @@ import { UserOrmEntity } from "./user.orm-entity";
 
 @Entity("withdrawals")
 @Index(["userId", "createdAt"])
-@Index(["referenceId"], { unique: true })
 export class WithdrawalOrmEntity {
   @PrimaryColumn("uuid")
   id!: string;
@@ -49,9 +48,6 @@ export class WithdrawalOrmEntity {
 
   @Column({ type: "text" })
   destination!: string;
-
-  @Column({ type: "uuid" })
-  referenceId!: string;
 
   @Column({ type: "varchar", nullable: true })
   transactionId!: string | null;

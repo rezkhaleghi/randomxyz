@@ -43,7 +43,7 @@ export class WithdrawalsController {
       limit: query.limit,
       currency: query.currency,
       status: query.status,
-      referenceId: query.referenceId,
+      id: query.id,
       from: query.from ? new Date(query.from) : undefined,
       to: query.to ? new Date(query.to) : undefined,
       sortBy: query.sortBy,

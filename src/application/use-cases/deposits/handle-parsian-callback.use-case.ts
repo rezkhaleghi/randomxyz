@@ -38,7 +38,7 @@ export class HandleParsianCallbackUseCase {
       throw new NotMatchException("Parsian callback fields", "Deposit");
     }
 
-    const deposit = await this.depositRepository.findByProviderOrderId(orderId);
+    const deposit = await this.depositRepository.findByMerchantOrderId(orderId);
 
     if (!deposit) {
       throw new DepositNotFoundException();

@@ -60,11 +60,11 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
       throw new Error("Parsian supports IRT deposits only.");
     }
 
-    if (!input.providerOrderId || !/^\d+$/.test(input.providerOrderId)) {
-      throw new Error("A numeric Parsian order ID is required.");
+    if (!/^\d+$/.test(input.merchantOrderId)) {
+      throw new Error("A numeric Parsian merchant order ID is required.");
     }
 
-    const orderId = Number(input.providerOrderId);
+    const orderId = Number(input.merchantOrderId);
     const amountInRial = Number(tomanToRialAmount(input.amount));
 
     if (
@@ -72,7 +72,7 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
       orderId <= 0 ||
       orderId > 2_147_483_647
     ) {
-      throw new Error("Invalid Parsian order ID.");
+      throw new Error("Invalid Parsian merchant order ID.");
     }
 
     if (!Number.isSafeInteger(amountInRial) || amountInRial <= 0) {
@@ -164,7 +164,7 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
           result.RRN !== undefined && result.RRN !== null
             ? String(result.RRN).trim() || undefined
             : undefined,
-        providerResponse: this.toProviderResponse(result),
+        providerResponse: this.toProviderResponse(safeResponse),
       };
     } catch (error) {
       this.logProviderError("ConfirmPayment", error);

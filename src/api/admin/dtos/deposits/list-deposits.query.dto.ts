@@ -21,10 +21,13 @@ export class ListDepositsQueryDto extends SortablePaginationQueryDto {
   @IsEnum(DepositStatus)
   status?: DepositStatus;
 
-  @ApiPropertyOptional({ format: "uuid" })
+  @ApiPropertyOptional({
+    description: "Filter by deposit ID.",
+    format: "uuid",
+  })
   @IsOptional()
   @IsUUID()
-  referenceId?: string;
+  id?: string;
 
   @ApiPropertyOptional({
     description: "Provider payment identifier.",

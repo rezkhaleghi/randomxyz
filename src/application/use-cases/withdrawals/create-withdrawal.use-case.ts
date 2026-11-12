@@ -81,9 +81,8 @@ export class CreateWithdrawalUseCase {
             balanceBefore,
             balanceAfter: savedBalance.amount,
             type: LedgerType.WITHDRAWAL,
-            referenceId: savedWithdrawal.referenceId,
+            referenceId: savedWithdrawal.id,
             metadata: {
-              withdrawalId: savedWithdrawal.id,
               destination: input.destination,
             },
           }),
@@ -96,7 +95,6 @@ export class CreateWithdrawalUseCase {
             action: AuditAction.WITHDRAWAL_REQUESTED,
             metadata: {
               withdrawalId: savedWithdrawal.id,
-              referenceId: savedWithdrawal.referenceId,
               amount: input.amount,
               currency: input.currency,
             },

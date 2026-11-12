@@ -6,9 +6,9 @@ import { PageQuery, PageResult } from "@shared/pagination/page-query";
 
 export interface ListDepositsInput extends PageQuery<"createdAt" | "amount"> {
   userId: string;
+  id?: string;
   currency?: string;
   status?: string;
-  referenceId?: string;
   providerPaymentId?: string;
   from?: Date;
   to?: Date;
@@ -22,9 +22,9 @@ export class ListDepositsUseCase {
     const result = await this.depositRepository.search(
       {
         userId: input.userId,
+        id: input.id,
         currency: input.currency,
         status: input.status,
-        referenceId: input.referenceId,
         providerPaymentId: input.providerPaymentId,
         from: input.from,
         to: input.to,

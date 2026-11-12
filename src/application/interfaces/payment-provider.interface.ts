@@ -4,8 +4,7 @@ import { PaymentProvider } from "@domain/enums/payment-provider.enum";
 export interface CreatePaymentInput {
   amount: string;
   currency: PaymentCurrency;
-  referenceId: string;
-  providerOrderId?: string | null;
+  merchantOrderId: string;
   callbackUrl: string;
 }
 
@@ -15,6 +14,7 @@ export interface CreatePaymentResult {
 }
 
 export interface VerifyPaymentInput {
+  merchantOrderId: string;
   providerPaymentId: string;
 }
 

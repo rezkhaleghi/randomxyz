@@ -12,7 +12,7 @@ import { UnitOfWork } from "@application/interfaces/unit-of-work.interface";
 import { VerifyDepositUseCase } from "./verify-deposit.use-case";
 
 export interface FakeCallbackInput {
-  referenceId?: unknown;
+  merchantOrderId?: unknown;
   providerPaymentId?: unknown;
   status?: unknown;
 }
@@ -26,15 +26,16 @@ export class HandleFakeCallbackUseCase {
   ) {}
 
   async execute(input: FakeCallbackInput) {
-    const referenceId = this.toStringValue(input.referenceId);
+    const merchantOrderId = this.toStringValue(input.merchantOrderId);
     const providerPaymentId = this.toStringValue(input.providerPaymentId);
     const status = this.toStringValue(input.status);
 
-    if (!referenceId || !providerPaymentId || !status) {
+    if (!merchantOrderId || !providerPaymentId || !status) {
       throw new NotMatchException("Fake callback fields", "Deposit");
     }
 
-    const deposit = await this.depositRepository.findByReferenceId(referenceId);
+    const deposit =
+      await this.depositRepository.findByMerchantOrderId(merchantOrderId);
 
     if (!deposit) {
       throw new DepositNotFoundException();

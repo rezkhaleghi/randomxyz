@@ -8,9 +8,9 @@ export interface ListWithdrawalsInput extends PageQuery<
   "createdAt" | "amount"
 > {
   userId: string;
+  id?: string;
   currency?: string;
   status?: string;
-  referenceId?: string;
   from?: Date;
   to?: Date;
 }
@@ -23,9 +23,9 @@ export class ListWithdrawalsUseCase {
     return this.withdrawalRepository.search(
       {
         userId: input.userId,
+        id: input.id,
         currency: input.currency,
         status: input.status,
-        referenceId: input.referenceId,
         from: input.from,
         to: input.to,
       },

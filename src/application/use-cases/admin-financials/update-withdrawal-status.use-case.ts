@@ -94,9 +94,8 @@ export class AdminUpdateWithdrawalStatusUseCase {
                 balanceBefore,
                 balanceAfter: savedBalance.amount,
                 type: LedgerType.REFUND,
-                referenceId: withdrawal.referenceId,
+                referenceId: withdrawal.id,
                 metadata: {
-                  withdrawalId: withdrawal.id,
                   rejectedBy: input.adminUserId,
                   reason: input.reason ?? null,
                 },
@@ -123,7 +122,6 @@ export class AdminUpdateWithdrawalStatusUseCase {
             action: this.getAuditAction(input.status),
             metadata: {
               withdrawalId: saved.id,
-              referenceId: saved.referenceId,
               amount: saved.amount,
               currency: saved.currency,
               reason: input.reason ?? null,

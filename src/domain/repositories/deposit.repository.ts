@@ -5,9 +5,9 @@ export type DepositSortBy = "createdAt" | "amount";
 
 export interface DepositSearchFilters {
   userId?: string;
+  id?: string;
   currency?: string;
   status?: string;
-  referenceId?: string;
   providerPaymentId?: string;
   transactionId?: string;
   from?: Date;
@@ -33,10 +33,8 @@ export abstract class DepositRepository {
     id: string,
   ): Promise<Deposit | null>;
 
-  abstract findByReferenceId(referenceId: string): Promise<Deposit | null>;
-
-  abstract findByProviderOrderId(
-    providerOrderId: string,
+  abstract findByMerchantOrderId(
+    merchantOrderId: string,
   ): Promise<Deposit | null>;
 
   abstract search(

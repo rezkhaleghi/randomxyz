@@ -18,9 +18,8 @@ export interface CreateDepositProps {
   currency: PaymentCurrency;
   amount: string;
   provider: PaymentProvider;
-  providerOrderId?: string | null;
+  merchantOrderId?: string;
   status?: DepositStatus;
-  referenceId?: string;
   providerPaymentId?: string | null;
   paymentUrl?: string | null;
   transactionId?: string | null;
@@ -37,8 +36,7 @@ export interface RestoreDepositProps {
   amount: string;
   provider: PaymentProvider;
   status: DepositStatus;
-  referenceId: string;
-  providerOrderId?: string | null;
+  merchantOrderId: string;
   providerPaymentId: string | null;
   paymentUrl?: string | null;
   transactionId: string | null;
@@ -56,8 +54,7 @@ export class Deposit {
     public readonly amount: string,
     public readonly provider: PaymentProvider,
     public status: DepositStatus,
-    public readonly referenceId: string,
-    public readonly providerOrderId: string | null,
+    public readonly merchantOrderId: string,
     public providerPaymentId: string | null,
     public paymentUrl: string | null,
     public transactionId: string | null,
@@ -72,11 +69,11 @@ export class Deposit {
       throw new InvalidDepositAmountException();
     }
 
-    const providerOrderId =
-      props.providerOrderId ??
+    const merchantOrderId =
+      props.merchantOrderId ??
       (props.provider === PaymentProvider.PARSIAN
         ? randomInt(1_000_000, 2_147_483_647).toString()
-        : null);
+        : randomUUID());
 
     const now = new Date();
 
@@ -87,8 +84,7 @@ export class Deposit {
       props.amount,
       props.provider,
       props.status ?? DepositStatus.PENDING,
-      props.referenceId ?? randomUUID(),
-      providerOrderId,
+      merchantOrderId,
       props.providerPaymentId ?? null,
       props.paymentUrl ?? null,
       props.transactionId ?? null,
@@ -107,8 +103,7 @@ export class Deposit {
       props.amount,
       props.provider,
       props.status,
-      props.referenceId,
-      props.providerOrderId ?? null,
+      props.merchantOrderId,
       props.providerPaymentId,
       props.paymentUrl ?? null,
       props.transactionId,
