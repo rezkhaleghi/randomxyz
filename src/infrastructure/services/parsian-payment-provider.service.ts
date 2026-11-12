@@ -164,7 +164,7 @@ export class ParsianPaymentProvider implements PaymentProviderInterface {
           result.RRN !== undefined && result.RRN !== null
             ? String(result.RRN).trim() || undefined
             : undefined,
-        providerResponse: this.toProviderResponse(safeResponse),
+        providerResponse: this.toProviderResponse(result),
       };
     } catch (error) {
       this.logProviderError("ConfirmPayment", error);
