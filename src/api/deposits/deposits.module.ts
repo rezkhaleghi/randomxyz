@@ -3,10 +3,13 @@ import { Module } from "@nestjs/common";
 import { ApplicationModule } from "@application/application.module";
 
 import { DepositsController } from "./deposits.controller";
-import { ParsianCallbackController } from "./parsian-callback.controller";
+import { CallbackController } from "./callback.controller";
+
+import { HandleFakeCallbackUseCase } from "@application/use-cases/deposits/handle-fake-callback.use-case";
 
 @Module({
   imports: [ApplicationModule],
-  controllers: [DepositsController, ParsianCallbackController],
+  controllers: [DepositsController, CallbackController],
+  providers: [HandleFakeCallbackUseCase],
 })
 export class DepositsModule {}

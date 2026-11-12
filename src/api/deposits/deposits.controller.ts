@@ -17,6 +17,8 @@ import { GetDepositUseCase } from "@application/use-cases/deposits/get-deposit.u
 import { ListDepositsUseCase } from "@application/use-cases/deposits/list-deposits.use-case";
 import { VerifyDepositUseCase } from "@application/use-cases/deposits/verify-deposit.use-case";
 
+import { PaymentProvider } from "@domain/enums/payment-provider.enum";
+
 import { TmarAuthGuard } from "../auth/tmar-auth.guard";
 import { ListDepositsQueryDto } from "./dtos/list-deposits.query.dto";
 import { CreateDepositDto } from "./dtos/create-deposit.dto";
@@ -80,12 +82,15 @@ export class DepositsController {
       .getOrThrow<string>("BACKEND_URL")
       .replace(/\/+$/, "");
 
+    const callbackUrl = `${backendUrl}/deposits/${dto.provider}/callback`;
+    console.log(callbackUrl);
+
     return this.createDepositUseCase.execute({
       userId: req.user.id,
       currency: dto.currency,
       amount: dto.amount,
       provider: dto.provider,
-      callbackUrl: `${backendUrl}/deposits/parsian/callback`,
+      callbackUrl,
     });
   }
 

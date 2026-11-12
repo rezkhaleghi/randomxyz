@@ -26,10 +26,23 @@ export class FakePaymentProvider implements PaymentProviderInterface {
     this.assertEnabledOutsideProduction();
 
     const providerPaymentId = `fake-payment-${randomUUID()}`;
+    const checkoutUrl = new URL(input.callbackUrl);
+
+    if (!checkoutUrl.pathname.endsWith("/callback")) {
+      throw new Error("Fake payment callback URL must end with /callback.");
+    }
+
+    checkoutUrl.pathname = checkoutUrl.pathname.replace(
+      /\/callback$/,
+      "/checkout",
+    );
+    checkoutUrl.search = "";
+    checkoutUrl.searchParams.set("referenceId", input.referenceId);
+    checkoutUrl.searchParams.set("providerPaymentId", providerPaymentId);
 
     return {
       providerPaymentId,
-      paymentUrl: `https://fake-payment.example/pay/${providerPaymentId}?reference=${input.referenceId}`,
+      paymentUrl: checkoutUrl.toString(),
     };
   }
 
@@ -40,14 +53,13 @@ export class FakePaymentProvider implements PaymentProviderInterface {
 
     return {
       transactionId: `fake-tx-${randomUUID()}`,
+      providerResponse: {
+        provider: PaymentProvider.FAKE_PROVIDER,
+        simulated: true,
+      },
     };
   }
 
-  /**
-   * This provider simulates successful payments; it does not contact a real
-   * payment gateway. Allow it only in explicitly identified development/test
-   * environments so it cannot credit real balances in production.
-   */
   private assertEnabledOutsideProduction(): void {
     const nodeEnv =
       this.configService?.get<string>("NODE_ENV") ?? process.env.NODE_ENV;

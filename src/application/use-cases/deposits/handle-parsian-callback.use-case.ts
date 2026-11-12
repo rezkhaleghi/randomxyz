@@ -9,6 +9,7 @@ import {
 } from "@domain/exceptions/domain.exception";
 import { DepositRepository } from "@domain/repositories/deposit.repository";
 
+import { UnitOfWork } from "@application/interfaces/unit-of-work.interface";
 import { VerifyDepositUseCase } from "./verify-deposit.use-case";
 import { tomanToRialAmount } from "@domain/utils/decimal.util";
 
@@ -24,6 +25,7 @@ export class HandleParsianCallbackUseCase {
   constructor(
     private readonly depositRepository: DepositRepository,
     private readonly verifyDepositUseCase: VerifyDepositUseCase,
+    private readonly unitOfWork: UnitOfWork,
   ) {}
 
   async execute(input: ParsianCallbackInput) {
@@ -32,7 +34,7 @@ export class HandleParsianCallbackUseCase {
     const amount = this.toStringValue(input.Amount);
     const status = this.toStringValue(input.status);
 
-    if (!orderId || !/^\d+$/.test(orderId) || !token || !amount) {
+    if (!orderId || !/^\d+$/.test(orderId) || !token || !status) {
       throw new NotMatchException("Parsian callback fields", "Deposit");
     }
 
@@ -57,17 +59,35 @@ export class HandleParsianCallbackUseCase {
       throw new NotMatchException("Parsian token", "Deposit");
     }
 
-    // Callback success is not proof of settlement. Server-side confirmation is required.
+    // A non-zero Parsian status means the payment was not successful.
     if (status !== "0") {
-      throw new NotMatchException("Successful Parsian callback", "Deposit");
+      return this.unitOfWork.execute(async ({ depositRepository }) => {
+        const currentDeposit = await depositRepository.findByIdForUpdate(
+          deposit.id,
+        );
+
+        if (!currentDeposit) {
+          throw new DepositNotFoundException();
+        }
+
+        // Do not change an already completed or failed deposit.
+        if (currentDeposit.status !== DepositStatus.PENDING) {
+          return currentDeposit;
+        }
+
+        currentDeposit.markFailed();
+
+        return depositRepository.save(currentDeposit);
+      });
+    }
+
+    if (!amount || !/^\d+$/.test(amount)) {
+      throw new NotMatchException("Parsian payment amount", "Deposit");
     }
 
     const expectedRialAmount = tomanToRialAmount(deposit.amount);
 
-    if (
-      !/^\d+$/.test(amount) ||
-      BigInt(amount) !== BigInt(expectedRialAmount)
-    ) {
+    if (BigInt(amount) !== BigInt(expectedRialAmount)) {
       throw new NotMatchException("Parsian payment amount", "Deposit");
     }
 

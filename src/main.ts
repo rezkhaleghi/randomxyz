@@ -16,6 +16,8 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService<EnvironmentConfig>);
 
+  const isProduction = process.env.NODE_ENV === "production";
+
   const frontendOrigin = new URL(configService.getOrThrow("FRONTEND_URL"))
     .origin;
 
@@ -28,7 +30,7 @@ async function bootstrap() {
   app.setGlobalPrefix("api/permit");
 
   app.enableCors({
-    origin: allowedOrigins,
+    origin: isProduction ? allowedOrigins : true,
     credentials: true,
     methods: ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
@@ -43,37 +45,27 @@ async function bootstrap() {
 
   app.use(helmet());
 
-  /**
-   * Parsian sends its callback from its own server and does not send the
-   * frontend Origin header. Exempt only this exact endpoint.
-   *
-   * All other state-changing requests must originate from an allowed frontend.
-   */
-  app.use((request: Request, response: Response, next: NextFunction) => {
-    const safeMethods = ["GET", "HEAD", "OPTIONS"];
+  // Enforce frontend-origin validation only in production.
+  if (isProduction) {
+    app.use((request: Request, response: Response, next: NextFunction) => {
+      const safeMethods = ["GET", "HEAD", "OPTIONS"];
 
-    if (safeMethods.includes(request.method)) {
-      return next();
-    }
+      if (safeMethods.includes(request.method)) {
+        return next();
+      }
 
-    if (
-      request.method === "POST" &&
-      request.path === "/api/permit/deposits/parsian/callback"
-    ) {
-      return next();
-    }
+      const origin = request.headers.origin;
 
-    const origin = request.headers.origin;
+      if (!origin || !allowedOrigins.includes(origin)) {
+        return response.status(403).json({
+          statusCode: 403,
+          message: "Origin not allowed.",
+        });
+      }
 
-    if (!origin || !allowedOrigins.includes(origin)) {
-      return response.status(403).json({
-        statusCode: 403,
-        message: "Origin not allowed.",
-      });
-    }
-
-    next();
-  });
+      next();
+    });
+  }
 
   app.use((request: Request, response: Response, next: NextFunction) => {
     const requestId = randomUUID();

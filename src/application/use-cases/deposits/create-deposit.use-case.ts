@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { ForbiddenException, Inject, Injectable } from "@nestjs/common";
 
 import { Deposit } from "@domain/entities/deposit.entity";
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
@@ -36,6 +36,16 @@ export class CreateDepositUseCase {
   ) {}
 
   async execute(input: CreateDepositInput): Promise<Deposit> {
+    // Restrict FAKE PROVIDER on the prodcution
+    if (
+      process.env.NODE_ENV === "production" &&
+      input.provider === PaymentProvider.FAKE_PROVIDER
+    ) {
+      throw new ForbiddenException(
+        "Fake payment provider is not available in production.",
+      );
+    }
+
     const paymentProvider = this.paymentProviderResolver.resolve(
       input.provider,
     );
