@@ -55,9 +55,6 @@ export class AdminUpdateWithdrawalStatusUseCase {
         const user = await userRepository.findById(withdrawal.userId);
 
         if (!user) {
-          // The withdrawal has a mandatory user FK, so this should normally
-          // be impossible. Keep the check because notification delivery
-          // requires a valid user snapshot.
           throw new Error(`User not found for withdrawal ${withdrawal.id}`);
         }
 
@@ -133,7 +130,6 @@ export class AdminUpdateWithdrawalStatusUseCase {
         return {
           withdrawal: saved,
           userEmail: user.email,
-          userName: user.firstName ?? user.userName ?? undefined,
         };
       },
     );
@@ -143,23 +139,15 @@ export class AdminUpdateWithdrawalStatusUseCase {
      *
      * Notification failure must never turn a successful withdrawal
      * operation into a failed financial operation.
-     *
-     * Each channel gets its own Notification record, so the database
-     * records exactly which channel succeeded or failed.
      */
-    await this.sendWithdrawalNotification(
-      result.withdrawal,
-      result.userEmail,
-      result.userName,
-    );
+    await this.sendWithdrawalNotification(result.withdrawal, result.userEmail);
 
     return result.withdrawal;
   }
 
   private async sendWithdrawalNotification(
     withdrawal: Withdrawal,
-    email: string,
-    userName?: string,
+    email: string | null,
   ): Promise<void> {
     const status = withdrawal.getStatus();
 
@@ -204,22 +192,20 @@ export class AdminUpdateWithdrawalStatusUseCase {
     };
 
     try {
-      /*
-       * In-app notification is persisted independently from email.
-       */
+      // Always create the in-app notification.
       await this.sendNotificationUseCase.execute({
         ...baseInput,
         channel: NotificationChannel.IN_APP,
       });
 
-      /*
-       * Email is a separate Notification record.
-       */
-      await this.sendNotificationUseCase.execute({
-        ...baseInput,
-        email,
-        channel: NotificationChannel.EMAIL,
-      });
+      // Create an email notification only when the user has an email.
+      if (email) {
+        await this.sendNotificationUseCase.execute({
+          ...baseInput,
+          email,
+          channel: NotificationChannel.EMAIL,
+        });
+      }
     } catch (error) {
       /*
        * SendNotificationUseCase normally records provider failures as

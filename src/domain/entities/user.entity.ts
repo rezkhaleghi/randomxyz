@@ -14,7 +14,7 @@ export type UpdateUserParams = Partial<{
 export interface CreateUserProps {
   id?: string;
   externalUserId?: string | null;
-  email: string;
+  email?: string | null;
   referrer?: string;
   role?: UserRole;
   tmarTravelRole?: string;
@@ -24,7 +24,7 @@ export interface CreateUserProps {
 export interface RestoreUserProps {
   id: string;
   externalUserId?: string | null;
-  email: string;
+  email?: string | null;
   referrer?: string;
   role: UserRole;
   tmarTravelRole?: string;
@@ -46,7 +46,7 @@ export class User {
   private constructor(
     public readonly id: string,
     public externalUserId: string | null,
-    public email: string,
+    public email: string | null,
     public referrer: string,
     public role: UserRole,
     public tmarTravelRole: string,
@@ -82,7 +82,7 @@ export class User {
     return new User(
       params.id ?? randomUUID(),
       params.externalUserId ?? null,
-      params.email,
+      params.email ?? null,
       params.referrer ?? "tmar-travel",
       params.role ?? UserRole.USER,
       params.tmarTravelRole ?? UserRole.USER,
@@ -102,7 +102,7 @@ export class User {
     return new User(
       params.id,
       params.externalUserId ?? null,
-      params.email,
+      params.email ?? null,
       params.referrer ?? "tmar-travel",
       params.role,
       params.tmarTravelRole ?? UserRole.USER,
@@ -144,7 +144,7 @@ export class User {
 
   synchronizeTmarTravelProfile(params: {
     externalUserId: string;
-    email: string;
+    email: string | null;
     firstName: string | null;
     lastName: string | null;
     role: string;
@@ -159,12 +159,11 @@ export class User {
     this.lastName = params.lastName;
     this.tmarTravelRole = params.role;
 
-    // TmarTravel administrators are superAdmins in Tmar-Cert.
     if (params.role.trim().toLowerCase() === "admin") {
       this.role = UserRole.SUPER_ADMIN;
     }
 
-    this._emailVerified = true;
+    this._emailVerified = Boolean(params.email);
 
     this.touch();
   }

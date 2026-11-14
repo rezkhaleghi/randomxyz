@@ -3,10 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 import { User } from "@domain/entities/user.entity";
-import {
-  UserAlreadyExistsException,
-  UsernameAlreadyExistsException,
-} from "@domain/exceptions/domain.exception";
+import { UsernameAlreadyExistsException } from "@domain/exceptions/domain.exception";
 import { UserRole } from "@domain/enums/user-role.enum";
 import { UserRepository } from "@domain/repositories/user.repository";
 import { AdminUserSearchFilters } from "@domain/repositories/admin-user-search-filters";
@@ -301,10 +298,6 @@ export class UserRepositoryImpl implements UserRepository {
 
     const columns = getPostgresUniqueViolationColumns(error);
 
-    if (columns.length === 1 && columns[0] === "email") {
-      throw new UserAlreadyExistsException("the requested email");
-    }
-
     if (columns.length === 1 && columns[0] === "userName") {
       throw new UsernameAlreadyExistsException("the requested username");
     }
@@ -334,7 +327,7 @@ export class UserRepositoryImpl implements UserRepository {
     const row = new UserOrmEntity();
 
     row.id = user.id;
-    row.externalUserId = user.externalUserId;
+    row.externalUserId = user.externalUserId!;
     row.email = user.email;
     row.referrer = user.referrer;
     row.role = user.role;

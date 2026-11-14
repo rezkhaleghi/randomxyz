@@ -20,7 +20,7 @@ export interface PassengerAdminRecord {
     id: string;
     firstName: string | null;
     lastName: string | null;
-    email: string;
+    email: string | null;
   };
 }
 

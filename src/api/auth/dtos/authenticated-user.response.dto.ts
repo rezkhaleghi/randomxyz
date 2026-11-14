@@ -4,8 +4,8 @@ export class AuthenticatedUserResponseDto {
   @ApiProperty()
   id!: string;
 
-  @ApiProperty()
-  email!: string;
+  @ApiProperty({ nullable: true, type: String })
+  email!: string | null;
 
   @ApiProperty({
     example: "tmar-travel",

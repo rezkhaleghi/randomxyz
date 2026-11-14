@@ -29,23 +29,28 @@ export class TmarJwtService extends TmarTokenVerifier {
         !Number.isInteger(payload.exp) ||
         typeof payload._id !== "string" ||
         !payload._id.trim() ||
-        typeof payload.email !== "string" ||
-        !payload.email.trim() ||
         typeof payload.role !== "string" ||
         !payload.role.trim()
       ) {
         throw new Error("Invalid authentication token payload.");
       }
 
+      const email =
+        typeof payload.email === "string" && payload.email.trim()
+          ? payload.email.trim().toLowerCase()
+          : null;
+
       return {
         _id: payload._id.trim(),
-        email: payload.email.trim().toLowerCase(),
+        email,
         firstName:
           typeof payload.firstName === "string"
-            ? payload.firstName.trim()
+            ? payload.firstName.trim() || null
             : null,
         lastName:
-          typeof payload.lastName === "string" ? payload.lastName.trim() : null,
+          typeof payload.lastName === "string"
+            ? payload.lastName.trim() || null
+            : null,
         status: typeof payload.status === "string" ? payload.status : null,
         role: payload.role.trim(),
       };

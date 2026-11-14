@@ -22,13 +22,15 @@ export class UserOrmEntity {
 
   @Column({
     type: "varchar",
-    nullable: true,
     unique: true,
   })
-  externalUserId!: string | null;
+  externalUserId!: string;
 
-  @Column({ unique: true })
-  email!: string;
+  @Column({
+    type: "varchar",
+    nullable: true,
+  })
+  email!: string | null;
 
   @Column({
     type: "varchar",

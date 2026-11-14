@@ -17,9 +17,8 @@ export class TmarAuthUseCase {
 
   async execute(identity: TmarIdentity): Promise<User> {
     const externalUserId = identity._id.trim();
-    const email = identity.email.trim().toLowerCase();
 
-    if (!externalUserId || !email) {
+    if (!externalUserId || !identity.role.trim()) {
       throw new ApplicationUnauthorizedException(
         "Invalid authentication identity.",
       );
@@ -31,6 +30,8 @@ export class TmarAuthUseCase {
       );
     }
 
+    const email = identity.email?.trim().toLowerCase() || null;
+
     return this.unitOfWork.execute(
       async ({ userRepository, userBalanceRepository }) => {
         let user = await userRepository.findByExternalUserId(externalUserId);
@@ -40,7 +41,7 @@ export class TmarAuthUseCase {
             externalUserId,
             email,
             referrer: "tmar-travel",
-            emailVerified: true,
+            emailVerified: Boolean(email),
           });
 
           newUser.synchronizeTmarTravelProfile({
@@ -88,7 +89,7 @@ export class TmarAuthUseCase {
           user.firstName !== identity.firstName ||
           user.lastName !== identity.lastName ||
           user.tmarTravelRole !== identity.role ||
-          !user.emailVerified ||
+          user.emailVerified !== Boolean(email) ||
           (shouldBeSuperAdmin && user.role !== UserRole.SUPER_ADMIN);
 
         if (profileChanged) {
