@@ -168,6 +168,7 @@ export class PassengerRepositoryImpl extends PassengerRepository {
         userId: row.userId,
         fullName: row.fullName,
         nationalId: row.nationalId,
+        isForeignNational: row.isForeignNational ?? false,
         createdAt: row.createdAt,
         updatedAt: row.updatedAt,
         user: {
@@ -190,6 +191,7 @@ export class PassengerRepositoryImpl extends PassengerRepository {
       userId: row.userId,
       fullName: row.fullName,
       nationalId: row.nationalId,
+      isForeignNational: row.isForeignNational ?? false,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     });
@@ -202,6 +204,7 @@ export class PassengerRepositoryImpl extends PassengerRepository {
     row.userId = passenger.userId;
     row.fullName = passenger.fullName;
     row.nationalId = passenger.nationalId;
+    row.isForeignNational = passenger.isForeignNational;
     row.createdAt = passenger.createdAt;
     row.updatedAt = passenger.updatedAt;
 

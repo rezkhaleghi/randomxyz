@@ -12,6 +12,7 @@ export interface UpdatePassengerInput {
   userId: string;
   fullName: string;
   nationalId: string;
+  isForeignNational?: boolean;
 }
 
 @Injectable()
@@ -22,7 +23,12 @@ export class UpdatePassengerUseCase {
     const fullName = input.fullName?.trim().toLowerCase();
     const nationalId = input.nationalId?.trim();
 
-    if (!fullName || !nationalId) {
+    if (
+      !fullName ||
+      !nationalId ||
+      (input.isForeignNational !== undefined &&
+        typeof input.isForeignNational !== "boolean")
+    ) {
       throw new BadRequestException("Invalid passenger information.");
     }
 
@@ -48,7 +54,11 @@ export class UpdatePassengerUseCase {
         );
       }
 
-      passenger.update({ fullName, nationalId });
+      passenger.update({
+        fullName,
+        nationalId,
+        isForeignNational: input.isForeignNational,
+      });
 
       const saved = await passengerRepository.save(passenger);
 
@@ -56,6 +66,7 @@ export class UpdatePassengerUseCase {
         id: saved.id,
         fullName: saved.fullName,
         nationalId: saved.nationalId,
+        isForeignNational: saved.isForeignNational,
         createdAt: saved.createdAt,
         updatedAt: saved.updatedAt,
       };

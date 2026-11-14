@@ -102,12 +102,14 @@ export class UsersController {
     return {
       id: user.id,
       email: user.email,
+      referrer: user.referrer,
       emailVerified: user.emailVerified,
       firstName: user.firstName,
       lastName: user.lastName,
       userName: user.userName,
       dateOfBirth: user.dateOfBirth,
       bio: user.bio,
+      role: user.role,
     };
   }
 }

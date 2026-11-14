@@ -8,6 +8,7 @@ export interface PermitPassenger {
   fullName: string;
   nationalId: string;
   isLeader: boolean;
+  isForeignNational?: boolean;
 }
 
 export interface PermitVehicle {

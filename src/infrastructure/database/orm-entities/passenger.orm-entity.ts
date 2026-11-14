@@ -34,6 +34,9 @@ export class PassengerOrmEntity {
   @Column({ type: "varchar", length: 32 })
   nationalId!: string;
 
+  @Column({ type: "boolean", default: false })
+  isForeignNational!: boolean;
+
   @CreateDateColumn({ type: "timestamp" })
   createdAt!: Date;
 

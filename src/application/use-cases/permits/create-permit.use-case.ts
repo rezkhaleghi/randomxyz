@@ -35,6 +35,7 @@ export interface CreatePermitInput {
     fullName: string;
     nationalId: string;
     isLeader: boolean;
+    isForeignNational?: boolean;
   }[];
   vehicles: {
     kind: string;
@@ -163,14 +164,32 @@ export class CreatePermitUseCase {
             userId: input.userId,
             fullName: passenger.fullName,
             nationalId: passenger.nationalId,
+            isForeignNational: passenger.isForeignNational ?? false,
           }),
         );
+
+        // When the client explicitly sends the value, keep the reusable
+        // passenger record in sync with the latest submitted value.
+        if (
+          passenger.isForeignNational !== undefined &&
+          reusablePassenger.isForeignNational !== passenger.isForeignNational
+        ) {
+          reusablePassenger.update({
+            fullName: reusablePassenger.fullName,
+            nationalId: reusablePassenger.nationalId,
+            isForeignNational: passenger.isForeignNational,
+          });
+
+          await passengerRepository.save(reusablePassenger);
+        }
 
         permitPassengers.push({
           id: reusablePassenger.id,
           fullName: passenger.fullName,
           nationalId: passenger.nationalId,
           isLeader: passenger.isLeader,
+          isForeignNational:
+            passenger.isForeignNational ?? reusablePassenger.isForeignNational,
         });
       }
 
@@ -296,7 +315,9 @@ export class CreatePermitUseCase {
       if (
         !passenger.fullName?.trim() ||
         !passenger.nationalId?.trim() ||
-        typeof passenger.isLeader !== "boolean"
+        typeof passenger.isLeader !== "boolean" ||
+        (passenger.isForeignNational !== undefined &&
+          typeof passenger.isForeignNational !== "boolean")
       ) {
         throw new BadRequestException("Invalid passenger information.");
       }

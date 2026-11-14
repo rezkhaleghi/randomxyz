@@ -32,6 +32,7 @@ export class ListPassengersUseCase {
           id: passenger.id,
           fullName: passenger.fullName,
           nationalId: passenger.nationalId,
+          isForeignNational: passenger.isForeignNational,
           createdAt: passenger.createdAt,
           updatedAt: passenger.updatedAt,
         })),

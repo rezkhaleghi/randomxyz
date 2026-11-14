@@ -167,7 +167,7 @@ export class PermitRepositoryImpl extends PermitRepository {
     const result = await this.repository
       .createQueryBuilder()
       .update(PermitOrmEntity)
-      .set({ status: PermitStatus.EXPIRED })
+      .set({ status: PermitStatus.ENDED })
       .where('"status" = :status', {
         status: PermitStatus.CONFIRMED,
       })
@@ -233,7 +233,10 @@ export class PermitRepositoryImpl extends PermitRepository {
       totalAmount: row.totalAmount,
       currency: row.currency,
       qrToken: row.qrToken,
-      passengers: row.passengers ?? [],
+      passengers: (row.passengers ?? []).map((passenger) => ({
+        ...passenger,
+        isForeignNational: passenger.isForeignNational ?? false,
+      })),
       vehicles: row.vehicles ?? [],
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
@@ -252,7 +255,10 @@ export class PermitRepositoryImpl extends PermitRepository {
     row.totalAmount = permit.totalAmount;
     row.currency = permit.currency;
     row.qrToken = permit.qrToken;
-    row.passengers = permit.passengers;
+    row.passengers = permit.passengers.map((passenger) => ({
+      ...passenger,
+      isForeignNational: passenger.isForeignNational ?? false,
+    }));
     row.vehicles = permit.vehicles;
     row.createdAt = permit.createdAt;
     row.updatedAt = permit.updatedAt;

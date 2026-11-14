@@ -21,6 +21,7 @@ import { UpdateUserRoleUseCase } from "@application/use-cases/admin-users/update
 import type { AuthenticatedRequest } from "../auth/authenticated-request.type";
 
 import { AdminAuthGuard } from "./admin-auth.guard";
+import { SuperAdminAuthGuard } from "./super-admin-auth.guard";
 import { AdminUserResponseDto } from "./dtos/users/admin-user.response.dto";
 import { AdminUserListResponseDto } from "./dtos/users/admin-user-list.response.dto";
 import { ListAuditLogsQueryDto } from "./dtos/audit-logs/list-audit-logs.query.dto";
@@ -88,7 +89,7 @@ export class AdminUsersController {
   @ApiOperation({
     summary: "List and search users",
     description:
-      "List users with pagination, sorting, filtering, and prefix search by email, username, first name, last name, or full name.",
+      "List users with pagination, sorting, filtering, and prefix search by ID, email, username, first name, last name, or full name.",
   })
   @ApiResponse({
     status: 200,
@@ -135,10 +136,11 @@ export class AdminUsersController {
   }
 
   @Patch(":id/role")
+  @UseGuards(SuperAdminAuthGuard)
   @ApiOperation({
     summary: "Update a user's Tmar-Cert role",
     description:
-      "Changes only the locally managed Tmar-Cert role. The TmarTravel role is synchronized separately from the user's JWT.",
+      "Only superAdmins can change local Tmar-Cert roles. TmarTravel administrators are synchronized as superAdmins.",
   })
   @ApiParam({
     name: "id",
@@ -152,7 +154,7 @@ export class AdminUsersController {
   })
   @ApiResponse({
     status: 403,
-    description: "Administrator access required",
+    description: "Super administrator access required",
   })
   @ApiResponse({
     status: 404,
@@ -176,9 +178,9 @@ export class AdminUsersController {
     return {
       id: user.id,
       email: user.email,
-      role: user.role as AdminUserResponseDto["role"],
-      tmarTravelRole:
-        user.tmarTravelRole as AdminUserResponseDto["tmarTravelRole"],
+      referrer: user.referrer,
+      role: user.role,
+      tmarTravelRole: user.tmarTravelRole,
       emailVerified: user.emailVerified,
       firstName: user.firstName,
       lastName: user.lastName,

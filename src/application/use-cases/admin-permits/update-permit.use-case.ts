@@ -31,6 +31,7 @@ export interface UpdatePermitInput {
     fullName: string;
     nationalId: string;
     isLeader: boolean;
+    isForeignNational?: boolean;
   }[];
   vehicles: {
     kind: string;
@@ -232,6 +233,10 @@ export class AdminUpdatePermitUseCase {
           fullName: item.fullName,
           nationalId: item.nationalId,
           isLeader: item.isLeader,
+          isForeignNational:
+            item.isForeignNational ??
+            reusablePassenger?.isForeignNational ??
+            false,
         });
       }
 
@@ -311,7 +316,9 @@ export class AdminUpdatePermitUseCase {
       if (
         !item.fullName?.trim() ||
         !item.nationalId?.trim() ||
-        typeof item.isLeader !== "boolean"
+        typeof item.isLeader !== "boolean" ||
+        (item.isForeignNational !== undefined &&
+          typeof item.isForeignNational !== "boolean")
       ) {
         throw new BadRequestException("Invalid passenger information.");
       }

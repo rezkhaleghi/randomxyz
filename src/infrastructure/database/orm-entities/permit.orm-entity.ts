@@ -78,6 +78,7 @@ export class PermitOrmEntity {
     fullName: string;
     nationalId: string;
     isLeader: boolean;
+    isForeignNational: boolean;
   }[];
 
   @Column({ type: "jsonb", default: () => "'[]'::jsonb" })

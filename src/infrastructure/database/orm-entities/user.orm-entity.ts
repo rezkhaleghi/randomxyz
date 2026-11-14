@@ -30,6 +30,12 @@ export class UserOrmEntity {
   @Column({ unique: true })
   email!: string;
 
+  @Column({
+    type: "varchar",
+    default: "tmar-travel",
+  })
+  referrer!: string;
+
   @Column({ nullable: true, type: "varchar" })
   firstName!: string | null;
 

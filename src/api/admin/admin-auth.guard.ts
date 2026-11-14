@@ -30,11 +30,10 @@ export class AdminAuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
 
-    const isAdmin =
-      user.role === UserRole.ADMIN ||
-      user.tmarTravelRole.toLowerCase() === "admin";
+    const hasAdminAccess =
+      user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN;
 
-    if (!isAdmin) {
+    if (!hasAdminAccess) {
       throw new ForbiddenException("Administrator access required.");
     }
 

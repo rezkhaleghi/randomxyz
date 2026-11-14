@@ -46,15 +46,39 @@ describe("CreatePassengerUseCase", () => {
         userId: "user-1",
         fullName: "reza khaleghi",
         nationalId: "1234567890",
+        isForeignNational: false,
       }),
     );
+
     expect(result).toEqual({
       id: passenger.id,
       fullName: passenger.fullName,
       nationalId: passenger.nationalId,
+      isForeignNational: false,
       createdAt: passenger.createdAt,
       updatedAt: passenger.updatedAt,
     });
+  });
+
+  it("creates a foreign-national passenger when requested", async () => {
+    const passenger = Passenger.create({
+      id: "passenger-1",
+      userId: "user-1",
+      fullName: "john smith",
+      nationalId: "1234567890",
+      isForeignNational: true,
+    });
+
+    passengerRepositoryMock.createIfNotExists.mockResolvedValue(passenger);
+
+    const result = await useCase.execute({
+      userId: "user-1",
+      fullName: "John Smith",
+      nationalId: "1234567890",
+      isForeignNational: true,
+    });
+
+    expect(result.isForeignNational).toBe(true);
   });
 
   it.each([

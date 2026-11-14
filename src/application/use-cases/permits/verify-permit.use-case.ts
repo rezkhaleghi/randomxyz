@@ -39,6 +39,7 @@ export class VerifyPermitUseCase {
           .map((passenger) => ({
             fullName: passenger.fullName,
             nationalId: passenger.nationalId,
+            isForeignNational: passenger.isForeignNational ?? false,
           })),
 
         vehicleCount: permit.vehicles.length,

@@ -39,10 +39,15 @@ export class UpdateUserRoleUseCase {
         const remainsExternalAdmin =
           user.tmarTravelRole.toLowerCase() === "admin";
 
+        const wasAdmin =
+          previousRole === UserRole.ADMIN ||
+          previousRole === UserRole.SUPER_ADMIN;
+
+        const remainsAdmin =
+          role === UserRole.ADMIN || role === UserRole.SUPER_ADMIN;
+
         const isLosingLastEffectiveAdmin =
-          previousRole === UserRole.ADMIN &&
-          role !== UserRole.ADMIN &&
-          !remainsExternalAdmin;
+          wasAdmin && !remainsAdmin && !remainsExternalAdmin;
 
         if (
           isLosingLastEffectiveAdmin &&

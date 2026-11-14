@@ -130,13 +130,15 @@ export class UserRepositoryImpl implements UserRepository {
   }
 
   async saveAdminMutation(user: User, wasAdmin: boolean): Promise<User | null> {
-    if (!wasAdmin || user.role === UserRole.ADMIN) {
+    const adminRoles = [UserRole.ADMIN, UserRole.SUPER_ADMIN];
+
+    if (!wasAdmin || adminRoles.includes(user.role)) {
       return this.save(user);
     }
 
     return this.repo.manager.transaction(async (manager) => {
       const admins = await manager.find(UserOrmEntity, {
-        where: { role: UserRole.ADMIN },
+        where: [{ role: UserRole.ADMIN }, { role: UserRole.SUPER_ADMIN }],
         lock: { mode: "pessimistic_write" },
       });
 
@@ -158,7 +160,7 @@ export class UserRepositoryImpl implements UserRepository {
   async deleteAdminUser(id: string): Promise<boolean> {
     return this.repo.manager.transaction(async (manager) => {
       const admins = await manager.find(UserOrmEntity, {
-        where: { role: UserRole.ADMIN },
+        where: [{ role: UserRole.ADMIN }, { role: UserRole.SUPER_ADMIN }],
         lock: { mode: "pessimistic_write" },
       });
 
@@ -170,7 +172,10 @@ export class UserRepositoryImpl implements UserRepository {
         return false;
       }
 
-      if (user.role === UserRole.ADMIN && admins.length <= 1) {
+      const isAdmin =
+        user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN;
+
+      if (isAdmin && admins.length <= 1) {
         return false;
       }
 
@@ -280,8 +285,8 @@ export class UserRepositoryImpl implements UserRepository {
   async countEffectiveAdmins(): Promise<number> {
     return this.repo
       .createQueryBuilder("user")
-      .where("user.role = :localAdminRole", {
-        localAdminRole: UserRole.ADMIN,
+      .where("user.role IN (:...localAdminRoles)", {
+        localAdminRoles: [UserRole.ADMIN, UserRole.SUPER_ADMIN],
       })
       .orWhere("LOWER(user.tmarTravelRole) = :externalAdminRole", {
         externalAdminRole: "admin",
@@ -310,6 +315,7 @@ export class UserRepositoryImpl implements UserRepository {
       id: row.id,
       externalUserId: row.externalUserId,
       email: row.email,
+      referrer: row.referrer ?? "tmar-travel",
       role: row.role,
       tmarTravelRole: row.tmarTravelRole ?? UserRole.USER,
       emailVerified: row.emailVerified,
@@ -330,6 +336,7 @@ export class UserRepositoryImpl implements UserRepository {
     row.id = user.id;
     row.externalUserId = user.externalUserId;
     row.email = user.email;
+    row.referrer = user.referrer;
     row.role = user.role;
     row.tmarTravelRole = user.tmarTravelRole;
     row.emailVerified = user.emailVerified;

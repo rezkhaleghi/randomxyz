@@ -1,5 +1,11 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString, MaxLength } from "class-validator";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import {
+  IsBoolean,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from "class-validator";
 
 export class UpdatePassengerDto {
   @ApiProperty({ example: "Reza Khaleghi" })
@@ -13,4 +19,9 @@ export class UpdatePassengerDto {
   @IsNotEmpty()
   @MaxLength(32)
   nationalId!: string;
+
+  @ApiPropertyOptional({ example: false })
+  @IsOptional()
+  @IsBoolean()
+  isForeignNational?: boolean;
 }

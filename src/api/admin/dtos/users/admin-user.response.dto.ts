@@ -11,7 +11,13 @@ export class AdminUserResponseDto {
   email!: string;
 
   @ApiProperty({
-    description: "Role assigned locally by Tmar-Cert administrators.",
+    example: "tmar-travel",
+  })
+  referrer!: string;
+
+  @ApiProperty({
+    description:
+      "Tmar-Cert role. TmarTravel administrators are mapped to superAdmin.",
     enum: UserRole,
   })
   role!: UserRole;

@@ -1,10 +1,11 @@
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import {
   ArrayMinSize,
   IsArray,
   IsBoolean,
   IsNotEmpty,
+  IsOptional,
   IsString,
   ValidateNested,
 } from "class-validator";
@@ -23,6 +24,11 @@ export class UpdatePermitPassengerDto {
   @ApiProperty()
   @IsBoolean()
   isLeader!: boolean;
+
+  @ApiPropertyOptional({ example: false, default: false })
+  @IsOptional()
+  @IsBoolean()
+  isForeignNational?: boolean;
 }
 
 export class UpdatePermitVehicleDto {

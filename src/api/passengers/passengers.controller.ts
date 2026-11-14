@@ -59,6 +59,7 @@ export class PassengersController {
       userId: req.user.id,
       fullName: dto.fullName,
       nationalId: dto.nationalId,
+      isForeignNational: dto.isForeignNational,
     });
   }
 
@@ -74,6 +75,7 @@ export class PassengersController {
       userId: req.user.id,
       fullName: dto.fullName,
       nationalId: dto.nationalId,
+      isForeignNational: dto.isForeignNational,
     });
   }
 

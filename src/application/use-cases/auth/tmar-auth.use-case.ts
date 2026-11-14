@@ -8,6 +8,7 @@ import { User } from "@domain/entities/user.entity";
 import { UserBalance } from "@domain/entities/user-balance.entity";
 
 import { UserStatus } from "@domain/enums/user-status.enum";
+import { UserRole } from "@domain/enums/user-role.enum";
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
 
 @Injectable()
@@ -38,6 +39,7 @@ export class TmarAuthUseCase {
           const newUser = User.create({
             externalUserId,
             email,
+            referrer: "tmar-travel",
             emailVerified: true,
           });
 
@@ -77,13 +79,17 @@ export class TmarAuthUseCase {
           );
         }
 
+        const shouldBeSuperAdmin =
+          identity.role.trim().toLowerCase() === "admin";
+
         const profileChanged =
           user.externalUserId !== externalUserId ||
           user.email !== email ||
           user.firstName !== identity.firstName ||
           user.lastName !== identity.lastName ||
           user.tmarTravelRole !== identity.role ||
-          !user.emailVerified;
+          !user.emailVerified ||
+          (shouldBeSuperAdmin && user.role !== UserRole.SUPER_ADMIN);
 
         if (profileChanged) {
           user.synchronizeTmarTravelProfile({

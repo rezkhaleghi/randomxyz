@@ -3,6 +3,7 @@ import { Module } from "@nestjs/common";
 import { ApplicationModule } from "@application/application.module";
 
 import { AdminAuthGuard } from "./admin-auth.guard";
+import { SuperAdminAuthGuard } from "./super-admin-auth.guard";
 import { AdminUsersController } from "./admin-users.controller";
 import { AdminUserBalancesController } from "./admin-user-balances.controller";
 import { AdminLedgersController } from "./admin-ledgers.controller";
@@ -32,6 +33,6 @@ import { AdminVehiclesController } from "./admin-vehicles.controller";
     AdminPassengersController,
     AdminVehiclesController,
   ],
-  providers: [AdminAuthGuard],
+  providers: [AdminAuthGuard, SuperAdminAuthGuard],
 })
 export class AdminModule {}

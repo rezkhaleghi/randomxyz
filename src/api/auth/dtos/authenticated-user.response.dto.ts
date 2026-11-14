@@ -7,6 +7,11 @@ export class AuthenticatedUserResponseDto {
   @ApiProperty()
   email!: string;
 
+  @ApiProperty({
+    example: "tmar-travel",
+  })
+  referrer!: string;
+
   @ApiProperty()
   emailVerified!: boolean;
 

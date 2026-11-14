@@ -7,6 +7,7 @@ export interface CreatePassengerInput {
   userId: string;
   fullName: string;
   nationalId: string;
+  isForeignNational?: boolean;
 }
 
 @Injectable()
@@ -17,7 +18,12 @@ export class CreatePassengerUseCase {
     const fullName = input.fullName?.trim().toLowerCase();
     const nationalId = input.nationalId?.trim();
 
-    if (!fullName || !nationalId) {
+    if (
+      !fullName ||
+      !nationalId ||
+      (input.isForeignNational !== undefined &&
+        typeof input.isForeignNational !== "boolean")
+    ) {
       throw new BadRequestException("Invalid passenger information.");
     }
 
@@ -27,6 +33,7 @@ export class CreatePassengerUseCase {
           userId: input.userId,
           fullName,
           nationalId,
+          isForeignNational: input.isForeignNational ?? false,
         }),
       );
 
@@ -34,6 +41,7 @@ export class CreatePassengerUseCase {
         id: passenger.id,
         fullName: passenger.fullName,
         nationalId: passenger.nationalId,
+        isForeignNational: passenger.isForeignNational,
         createdAt: passenger.createdAt,
         updatedAt: passenger.updatedAt,
       };

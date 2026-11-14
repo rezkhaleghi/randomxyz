@@ -13,6 +13,7 @@ export interface PassengerAdminRecord {
   userId: string;
   fullName: string;
   nationalId: string;
+  isForeignNational: boolean;
   createdAt: Date;
   updatedAt: Date;
   user: {

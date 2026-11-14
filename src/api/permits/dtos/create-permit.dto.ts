@@ -5,13 +5,14 @@ import {
   IsBoolean,
   IsDateString,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsUUID,
   Matches,
   MaxLength,
   ValidateNested,
 } from "class-validator";
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
 
 export class CreatePermitPassengerDto {
   @ApiProperty({ example: "Reza Khaleghi" })
@@ -29,6 +30,11 @@ export class CreatePermitPassengerDto {
   @ApiProperty({ example: true })
   @IsBoolean()
   isLeader!: boolean;
+
+  @ApiPropertyOptional({ example: false, default: false })
+  @IsOptional()
+  @IsBoolean()
+  isForeignNational?: boolean;
 }
 
 export class CreatePermitVehicleDto {

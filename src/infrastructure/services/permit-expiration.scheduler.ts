@@ -45,7 +45,7 @@ export class PermitExpirationScheduler
       const count = await this.expirePermitsUseCase.execute();
 
       if (count > 0) {
-        this.logger.log(`Expired ${count} permits.`);
+        this.logger.log(`Ended ${count} permits whose end dates have passed.`);
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error";

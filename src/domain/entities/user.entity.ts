@@ -15,6 +15,7 @@ export interface CreateUserProps {
   id?: string;
   externalUserId?: string | null;
   email: string;
+  referrer?: string;
   role?: UserRole;
   tmarTravelRole?: string;
   emailVerified?: boolean;
@@ -24,6 +25,7 @@ export interface RestoreUserProps {
   id: string;
   externalUserId?: string | null;
   email: string;
+  referrer?: string;
   role: UserRole;
   tmarTravelRole?: string;
   emailVerified: boolean;
@@ -45,6 +47,7 @@ export class User {
     public readonly id: string,
     public externalUserId: string | null,
     public email: string,
+    public referrer: string,
     public role: UserRole,
     public tmarTravelRole: string,
     emailVerified: boolean,
@@ -80,6 +83,7 @@ export class User {
       params.id ?? randomUUID(),
       params.externalUserId ?? null,
       params.email,
+      params.referrer ?? "tmar-travel",
       params.role ?? UserRole.USER,
       params.tmarTravelRole ?? UserRole.USER,
       params.emailVerified ?? false,
@@ -99,6 +103,7 @@ export class User {
       params.id,
       params.externalUserId ?? null,
       params.email,
+      params.referrer ?? "tmar-travel",
       params.role,
       params.tmarTravelRole ?? UserRole.USER,
       params.emailVerified,
@@ -153,6 +158,12 @@ export class User {
     this.firstName = params.firstName;
     this.lastName = params.lastName;
     this.tmarTravelRole = params.role;
+
+    // TmarTravel administrators are superAdmins in Tmar-Cert.
+    if (params.role.trim().toLowerCase() === "admin") {
+      this.role = UserRole.SUPER_ADMIN;
+    }
+
     this._emailVerified = true;
 
     this.touch();
