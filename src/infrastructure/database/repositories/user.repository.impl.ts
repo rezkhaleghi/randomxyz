@@ -200,17 +200,18 @@ export class UserRepositoryImpl implements UserRepository {
 
         qb.andWhere(
           `
-          (
-            user.email ILIKE :exactEmail
-            OR user.userName ILIKE :prefix
-            OR user.firstName ILIKE :prefix
-            OR user.lastName ILIKE :prefix
-            OR (
-              user.firstName ILIKE :firstName
-              AND user.lastName ILIKE :lastName
-            )
+        (
+          CAST(user.id AS TEXT) ILIKE :prefix
+          OR user.email ILIKE :exactEmail
+          OR user.userName ILIKE :prefix
+          OR user.firstName ILIKE :prefix
+          OR user.lastName ILIKE :prefix
+          OR (
+            user.firstName ILIKE :firstName
+            AND user.lastName ILIKE :lastName
           )
-          `,
+        )
+        `,
           {
             exactEmail: normalizedSearch,
             prefix: `${normalizedSearch}%`,
@@ -221,13 +222,14 @@ export class UserRepositoryImpl implements UserRepository {
       } else {
         qb.andWhere(
           `
-          (
-            user.email ILIKE :exactEmail
-            OR user.userName ILIKE :prefix
-            OR user.firstName ILIKE :prefix
-            OR user.lastName ILIKE :prefix
-          )
-          `,
+        (
+          CAST(user.id AS TEXT) ILIKE :prefix
+          OR user.email ILIKE :exactEmail
+          OR user.userName ILIKE :prefix
+          OR user.firstName ILIKE :prefix
+          OR user.lastName ILIKE :prefix
+        )
+        `,
           {
             exactEmail: normalizedSearch,
             prefix: `${normalizedSearch}%`,
