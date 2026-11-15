@@ -1,11 +1,12 @@
 import { describe, expect, it, jest } from "@jest/globals";
 
-import { AdminListDepositsUseCase } from "./list-deposits.use-case";
+import { ListLedgersUseCase } from "./list-ledgers.use-case";
+import { LedgerRepository } from "@domain/repositories/ledger.repository";
 
-describe("AdminListDepositsUseCase", () => {
-  it("lists admin deposits", async () => {
+describe("ListLedgersUseCase", () => {
+  it("lists admin ledgers", async () => {
     const repository = {
-      search: jest.fn<() => Promise<any>>(),
+      searchAdminLedgers: jest.fn<() => Promise<any>>(),
     };
 
     const page = {
@@ -16,34 +17,32 @@ describe("AdminListDepositsUseCase", () => {
       totalPages: 0,
     };
 
-    repository.search.mockResolvedValue(page);
+    repository.searchAdminLedgers.mockResolvedValue(page);
 
-    const result = await new AdminListDepositsUseCase(
-      repository as any,
+    const result = await new ListLedgersUseCase(
+      repository as unknown as LedgerRepository,
     ).execute({
       page: 1,
       limit: 20,
-      transactionId: "123456789012",
     });
 
     expect(result).toBe(page);
-    expect(repository.search).toHaveBeenCalledWith(
-      expect.objectContaining({
+    expect(repository.searchAdminLedgers).toHaveBeenCalledWith(
+      {
         userId: undefined,
         currency: undefined,
-        status: undefined,
+        type: undefined,
+        actorUserId: undefined,
         referenceId: undefined,
-        providerPaymentId: undefined,
-        transactionId: "123456789012",
         from: undefined,
         to: undefined,
-      }),
-      expect.objectContaining({
+      },
+      {
         page: 1,
         limit: 20,
         sortBy: undefined,
         sortDirection: undefined,
-      }),
+      },
     );
   });
 });

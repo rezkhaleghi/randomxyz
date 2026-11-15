@@ -188,6 +188,7 @@ describe("AdminUpdatePermitUseCase", () => {
           fullName: "reza khaleghi",
           nationalId: "1234567890",
           isLeader: true,
+          isForeignNational: false,
         },
       ],
       [

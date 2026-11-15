@@ -43,7 +43,7 @@ describe("ListDepositsUseCase", () => {
       userId: "user-1",
       currency: "USD",
       status: "PENDING",
-      referenceId: "reference-1",
+      id: "deposit-1",
       providerPaymentId: "payment-1",
       from,
       to,
@@ -70,7 +70,7 @@ describe("ListDepositsUseCase", () => {
         userId: "user-1",
         currency: "USD",
         status: "PENDING",
-        referenceId: "reference-1",
+        id: "deposit-1",
         providerPaymentId: "payment-1",
         from,
         to,
@@ -110,9 +110,9 @@ describe("ListDepositsUseCase", () => {
     expect(depositRepositoryMock.search).toHaveBeenCalledWith(
       {
         userId: "user-1",
+        id: undefined,
         currency: undefined,
         status: undefined,
-        referenceId: undefined,
         providerPaymentId: undefined,
         from: undefined,
         to: undefined,

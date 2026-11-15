@@ -29,9 +29,9 @@ describe("AdminListWithdrawalsUseCase", () => {
     expect(repository.search).toHaveBeenCalledWith(
       expect.objectContaining({
         userId: undefined,
+        id: undefined,
         currency: undefined,
         status: undefined,
-        referenceId: undefined,
         from: undefined,
         to: undefined,
       }),

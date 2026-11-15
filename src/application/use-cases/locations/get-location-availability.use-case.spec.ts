@@ -21,7 +21,11 @@ describe("GetLocationAvailabilityUseCase", () => {
   };
 
   beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-11-01T00:00:00.000Z"));
+
     jest.clearAllMocks();
+
     unitOfWork.execute.mockImplementation((callback: any) =>
       callback(repositories),
     );
@@ -41,6 +45,10 @@ describe("GetLocationAvailabilityUseCase", () => {
     useCase = new GetLocationAvailabilityUseCase(
       unitOfWork as unknown as UnitOfWork,
     );
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
   });
 
   it("calculates daily fees and remaining capacity", async () => {

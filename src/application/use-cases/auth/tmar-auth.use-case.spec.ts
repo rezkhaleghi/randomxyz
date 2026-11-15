@@ -1,7 +1,6 @@
 import { TmarAuthUseCase } from "./tmar-auth.use-case";
 import { UnitOfWork } from "@application/interfaces/unit-of-work.interface";
 import { User } from "@domain/entities/user.entity";
-import { UserStatus } from "@domain/enums/user-status.enum";
 import { PaymentCurrency } from "@domain/enums/payment-currency.enum";
 import { ApplicationUnauthorizedException } from "@application/exceptions/application-unauthorized.exception";
 
@@ -44,16 +43,45 @@ describe("TmarAuthUseCase", () => {
     useCase = new TmarAuthUseCase(unitOfWork as unknown as UnitOfWork);
   });
 
-  it("rejects an empty external ID or email", async () => {
+  it("rejects an empty external ID or role", async () => {
     await expect(
       useCase.execute({ ...identity, _id: " " }),
     ).rejects.toBeInstanceOf(ApplicationUnauthorizedException);
 
     await expect(
-      useCase.execute({ ...identity, email: " " }),
+      useCase.execute({ ...identity, role: " " }),
     ).rejects.toBeInstanceOf(ApplicationUnauthorizedException);
 
     expect(unitOfWork.execute).not.toHaveBeenCalled();
+  });
+
+  it("allows authentication without an email", async () => {
+    const user = User.create({
+      id: "user-1",
+      externalUserId: "external-1",
+      email: null,
+      emailVerified: false,
+    });
+
+    userRepository.findByExternalUserId.mockResolvedValue(null);
+    userRepository.createIfNotExistsByExternalUserId.mockResolvedValue(user);
+    userRepository.findByIdForUpdate.mockResolvedValue(user);
+
+    await useCase.execute({
+      ...identity,
+      email: null,
+    });
+
+    expect(
+      userRepository.createIfNotExistsByExternalUserId,
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({
+        externalUserId: "external-1",
+        email: null,
+      }),
+    );
+
+    expect(userRepository.findByIdForUpdate).toHaveBeenCalledWith("user-1");
   });
 
   it("rejects a blocked Tmar-Travel account", async () => {

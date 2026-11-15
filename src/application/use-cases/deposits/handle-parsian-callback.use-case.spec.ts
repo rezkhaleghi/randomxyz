@@ -12,7 +12,7 @@ import {
 
 describe("HandleParsianCallbackUseCase", () => {
   const depositRepository = {
-    findByProviderOrderId: jest.fn(),
+    findByMerchantOrderId: jest.fn(),
   };
 
   const verifyDepositUseCase = {
@@ -47,7 +47,7 @@ describe("HandleParsianCallbackUseCase", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    depositRepository.findByProviderOrderId.mockResolvedValue(deposit);
+    depositRepository.findByMerchantOrderId.mockResolvedValue(deposit);
     verifyDepositUseCase.execute.mockResolvedValue({ id: "deposit-1" });
 
     useCase = new HandleParsianCallbackUseCase(
@@ -65,7 +65,7 @@ describe("HandleParsianCallbackUseCase", () => {
       status: "0",
     });
 
-    expect(depositRepository.findByProviderOrderId).toHaveBeenCalledWith(
+    expect(depositRepository.findByMerchantOrderId).toHaveBeenCalledWith(
       "12345",
     );
 
@@ -143,11 +143,11 @@ describe("HandleParsianCallbackUseCase", () => {
       }),
     ).rejects.toBeInstanceOf(NotMatchException);
 
-    expect(depositRepository.findByProviderOrderId).not.toHaveBeenCalled();
+    expect(depositRepository.findByMerchantOrderId).not.toHaveBeenCalled();
   });
 
   it("throws when the deposit cannot be found", async () => {
-    depositRepository.findByProviderOrderId.mockResolvedValue(null);
+    depositRepository.findByMerchantOrderId.mockResolvedValue(null);
 
     await expect(
       useCase.execute({
@@ -160,7 +160,7 @@ describe("HandleParsianCallbackUseCase", () => {
   });
 
   it("rejects a deposit from another provider or currency", async () => {
-    depositRepository.findByProviderOrderId.mockResolvedValue({
+    depositRepository.findByMerchantOrderId.mockResolvedValue({
       ...deposit,
       provider: PaymentProvider.FAKE_PROVIDER,
     });
@@ -181,7 +181,7 @@ describe("HandleParsianCallbackUseCase", () => {
       status: DepositStatus.COMPLETED,
     };
 
-    depositRepository.findByProviderOrderId.mockResolvedValue(completed);
+    depositRepository.findByMerchantOrderId.mockResolvedValue(completed);
 
     await expect(
       useCase.execute({
